@@ -1,1241 +1,1225 @@
-/* =====================================================
-   ORGANIGO - PREMIUM GROCERY STORE
-   Modern E-commerce Home Page
-   Responsive | Professional | Animated
-===================================================== */
+/* =========================================
+   ORGANIGO - PREMIUM FRESH GROCERY STORE
+   Eat Healthy. Live Fresh.
+========================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
 
-/* ROOT VARIABLES */
-
 :root {
-  --primary: #159447;
-  --primary-dark: #08743a;
-  --primary-light: #e9f8ef;
-
-  --accent: #ffb703;
-
-  --text-dark: #172b20;
-  --text-main: #405348;
-  --text-muted: #84938a;
-
-  --background: #ffffff;
-  --surface: #f7faf7;
+  --green: #168b45;
+  --dark-green: #086b32;
+  --light-green: #eaf8ee;
+  --orange: #ff9f35;
+  --text: #202b23;
+  --muted: #78847c;
+  --white: #ffffff;
+  --background: #f8fbf8;
   --border: #e8eee9;
-
-  --radius-sm: 10px;
-  --radius-md: 17px;
-  --radius-lg: 26px;
-
-  --shadow-sm: 0 5px 20px rgba(20, 60, 35, 0.05);
-  --shadow-md: 0 15px 40px rgba(20, 60, 35, 0.09);
-  --shadow-lg: 0 20px 55px rgba(20, 60, 35, 0.13);
-
-  --transition: all 0.3s ease;
+  --shadow: 0 8px 30px rgba(20, 80, 40, 0.07);
 }
 
-/* MAIN PAGE */
-
-.home-page {
-  width: 100%;
-  max-width: 1500px;
-  margin: auto;
-  padding: 35px 5%;
-  font-family: 'DM Sans', sans-serif;
-  color: var(--text-dark);
-  overflow: hidden;
-}
-
-.home-page * {
+* {
   box-sizing: border-box;
 }
 
-.home-page button {
+html {
+  scroll-behavior: smooth;
+}
+
+.organigo-home {
+  width: 100%;
+  background: var(--background);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+}
+
+.organigo-home button,
+.organigo-home input {
   font-family: inherit;
 }
 
-/* =====================================================
+/* =========================================
    HERO SECTION
-===================================================== */
+========================================= */
 
-.hero-banner {
-  position: relative;
-  min-height: 410px;
-  padding: 60px 7%;
-
+.organigo-hero {
+  max-width: 1400px;
+  min-height: 420px;
+  margin: 25px auto;
+  padding: 55px 7%;
+  border-radius: 28px;
+  background: linear-gradient(115deg, #e6f8e9, #f4fff3);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 30px;
-
-  background:
-    radial-gradient(
-      circle at 85% 20%,
-      rgba(87, 207, 117, 0.22),
-      transparent 35%
-    ),
-    linear-gradient(
-      120deg,
-      #e6f8e9,
-      #f5fbef,
-      #e4f7e9
-    );
-
-  border: 1px solid #dff0e2;
-  border-radius: 30px;
-
+  position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
 }
-
-/* Decorative Background */
-
-.hero-banner::before {
-  content: "";
-  position: absolute;
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.35);
-  right: 15%;
-  top: -130px;
-}
-
-.hero-banner::after {
-  content: "";
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.25);
-  right: 2%;
-  bottom: -100px;
-}
-
-/* HERO CONTENT */
 
 .hero-content {
-  position: relative;
+  max-width: 590px;
   z-index: 2;
-  max-width: 600px;
 }
 
 .hero-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 10px 19px;
-
-  background: #d4f5df;
-  color: var(--primary-dark);
-
-  border: 1px solid #c1ebd0;
-  border-radius: 50px;
-
-  font-size: 11px;
+  display: inline-block;
+  background: #d5f2dc;
+  color: var(--dark-green);
+  padding: 9px 17px;
+  border-radius: 30px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 1.7px;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
 }
 
 .hero-content h1 {
-  margin: 25px 0 18px;
-
-  color: #143b26;
-
   font-family: 'Manrope', sans-serif;
-  font-size: clamp(35px, 4.5vw, 59px);
-
+  font-size: clamp(42px, 5vw, 68px);
+  line-height: 1.12;
   font-weight: 800;
-  line-height: 1.13;
-  letter-spacing: -2px;
+  margin: 0;
+  color: #183b25;
+}
+
+.hero-content h1 span {
+  color: var(--green);
 }
 
 .hero-content p {
-  max-width: 480px;
-
-  color: #61766a;
-
-  font-size: 15px;
-  line-height: 1.9;
+  color: #617267;
+  font-size: 16px;
+  line-height: 1.8;
+  max-width: 460px;
+  margin: 20px 0 25px;
 }
 
-/* HERO BUTTON */
-
-.hero-content button {
-  margin-top: 27px;
-  padding: 16px 35px;
-
-  background: linear-gradient(
-    135deg,
-    #159447,
-    #08743a
-  );
-
-  color: white;
-
-  border: none;
+.hero-button {
+  display: inline-block;
+  padding: 15px 26px;
   border-radius: 12px;
-
+  background: var(--green);
+  color: white;
   font-size: 14px;
   font-weight: 800;
-
-  cursor: pointer;
-  transition: var(--transition);
-
-  box-shadow: 0 8px 20px rgba(21, 148, 71, 0.2);
+  text-decoration: none;
+  transition: 0.3s;
+  box-shadow: 0 7px 18px rgba(22, 139, 69, 0.2);
 }
 
-.hero-content button:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 25px rgba(21, 148, 71, 0.3);
+.hero-button:hover {
+  background: var(--dark-green);
+  transform: translateY(-3px);
 }
 
-/* HERO IMAGE */
-
-.hero-image {
-  position: relative;
-  z-index: 2;
-
+.hero-features {
   display: flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 280px;
-
-  font-size: clamp(90px, 11vw, 155px);
-  letter-spacing: -22px;
-
-  filter: drop-shadow(0 15px 15px rgba(0,0,0,0.12));
-
-  animation: floating 4s ease-in-out infinite;
-}
-
-@keyframes floating {
-  0%, 100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-15px);
-  }
-}
-
-/* =====================================================
-   CATEGORY SECTION
-===================================================== */
-
-.category-section {
-  margin-top: 75px;
-}
-
-.category-section h2,
-.products-section h2 {
-  margin: 0;
-
-  font-family: 'Manrope', sans-serif;
-  font-size: 29px;
-  font-weight: 800;
-
-  letter-spacing: -0.8px;
-  color: var(--text-dark);
-}
-
-.category-section > p,
-.section-heading p {
-  margin-top: 8px;
-
-  color: var(--text-muted);
-  font-size: 14px;
-}
-
-/* CATEGORY GRID */
-
-.category-grid {
-  display: grid;
-
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-
-  gap: 17px;
+  flex-wrap: wrap;
+  gap: 18px;
   margin-top: 30px;
 }
 
-/* CATEGORY CARD */
+.hero-features span {
+  font-size: 12px;
+  color: #43664d;
+  font-weight: 700;
+}
 
-.category-card {
+.hero-visual {
+  width: 390px;
+  height: 330px;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  min-width: 0;
-  min-height: 135px;
+.hero-food-circle {
+  width: 285px;
+  height: 285px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 35px;
+  gap: 5px;
+  box-shadow: 0 15px 50px rgba(20, 90, 40, 0.08);
+  animation: floatFood 4s ease-in-out infinite;
+}
 
-  padding: 22px 10px;
+.hero-food-circle span {
+  font-size: 67px;
+}
 
+.hero-fresh-badge {
+  position: absolute;
+  right: -5px;
+  bottom: 20px;
+  width: 105px;
+  height: 105px;
+  border-radius: 50%;
+  background: var(--green);
+  color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  box-shadow: 0 8px 25px rgba(0, 100, 40, 0.2);
+  transform: rotate(10deg);
+}
 
-  background: #f8fbf8;
+.hero-fresh-badge strong {
+  font-size: 25px;
+}
 
+.hero-fresh-badge span {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+@keyframes floatFood {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* =========================================
+   BENEFITS
+========================================= */
+
+.organigo-benefits {
+  max-width: 1300px;
+  margin: 35px auto;
+  padding: 0 25px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.organigo-benefits > div {
+  background: white;
+  padding: 20px;
   border: 1px solid var(--border);
-  border-radius: 18px;
-
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.category-card:hover {
-  background: #edfaef;
-  border-color: #91d5a4;
-
-  transform: translateY(-7px);
-
-  box-shadow: var(--shadow-md);
-}
-
-.category-card span {
-  font-size: 45px;
-
-  transition: var(--transition);
-}
-
-.category-card:hover span {
-  transform: scale(1.17) rotate(-5deg);
-}
-
-.category-card h3 {
-  margin: 13px 0 0;
-
-  color: var(--text-main);
-
-  font-size: 13px;
-  font-weight: 800;
-}
-
-/* ACTIVE CATEGORY */
-
-.category-card.active-category {
-  background: #e6f8eb;
-
-  border: 1.5px solid var(--primary);
-
-  box-shadow: 0 6px 18px rgba(21, 148, 71, 0.10);
-}
-
-/* =====================================================
-   OFFER BANNER
-===================================================== */
-
-.offer-banner {
-  position: relative;
-
-  margin-top: 65px;
-  padding: 42px 48px;
-
+  border-radius: 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-
-  background:
-    radial-gradient(
-      circle at 90% 10%,
-      rgba(255,255,255,0.15),
-      transparent 30%
-    ),
-    linear-gradient(
-      115deg,
-      #075d32,
-      #159447,
-      #20a95a
-    );
-
-  border-radius: 25px;
-
-  color: white;
-  overflow: hidden;
+  gap: 14px;
+  transition: 0.3s;
 }
 
-.offer-banner::before {
-  content: "";
-
-  position: absolute;
-  width: 220px;
-  height: 220px;
-
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 50%;
-
-  right: 13%;
-  top: -120px;
+.organigo-benefits > div:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
 }
 
-.offer-banner h2 {
-  margin: 0 0 12px;
+.organigo-benefits > div > span {
+  font-size: 32px;
+}
 
-  color: white;
-
-  font-family: 'Manrope', sans-serif;
-  font-size: 29px;
+.organigo-benefits h4 {
+  margin: 0 0 5px;
+  font-size: 14px;
   font-weight: 800;
 }
 
-.offer-banner p {
+.organigo-benefits p {
   margin: 0;
-
-  color: rgba(255,255,255,0.85);
-  font-size: 14px;
+  font-size: 11px;
+  color: var(--muted);
 }
 
-.offer-banner span {
-  position: relative;
-  z-index: 2;
+/* =========================================
+   COMMON SECTION HEADING
+========================================= */
 
-  font-size: 75px;
-
-  transition: var(--transition);
+.organigo-categories,
+.organigo-products-section {
+  max-width: 1300px;
+  margin: 65px auto;
+  padding: 0 25px;
 }
-
-.offer-banner:hover span {
-  transform: rotate(-12deg) scale(1.12);
-}
-
-/* =====================================================
-   PRODUCTS SECTION
-===================================================== */
-
-.products-section {
-  margin-top: 75px;
-  padding-bottom: 55px;
-}
-
-/* SECTION HEADING */
 
 .section-heading {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 20px;
+  align-items: end;
+  gap: 15px;
+  margin-bottom: 25px;
 }
 
-.section-heading > span {
-  padding: 10px 18px;
-
-  color: var(--primary);
-  background: var(--primary-light);
-
-  border-radius: 50px;
-
-  font-size: 13px;
+.section-label {
+  display: block;
+  color: var(--green);
+  font-size: 11px;
   font-weight: 800;
-
-  cursor: pointer;
-  transition: var(--transition);
+  letter-spacing: 1.5px;
+  margin-bottom: 9px;
 }
 
-.section-heading > span:hover {
-  color: white;
-  background: var(--primary);
+.section-heading h2 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 30px;
+  margin: 0;
+  font-weight: 800;
+  color: #203629;
 }
 
-/* PRODUCT GRID */
+.section-heading > p {
+  color: var(--muted);
+  font-size: 13px;
+}
 
-.product-grid {
+/* =========================================
+   CATEGORY SECTION
+========================================= */
+
+.category-list {
   display: grid;
-
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-
-  gap: 23px;
-  margin-top: 32px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 15px;
 }
 
-/* PRODUCT CARD */
-
-.product-card {
-  position: relative;
-
-  min-width: 0;
-
-  padding: 15px;
-
+.category-item {
+  min-height: 130px;
   background: white;
-
-  border: 1px solid #e9eee9;
-  border-radius: 20px;
-
-  overflow: hidden;
-
-  transition: var(--transition);
-}
-
-.product-card:hover {
-  transform: translateY(-8px);
-
-  border-color: #a8dcb5;
-
-  box-shadow: var(--shadow-lg);
-}
-
-/* PRODUCT IMAGE */
-
-.product-image {
-  position: relative;
-
-  width: 100%;
-  height: 205px;
-
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  background: linear-gradient(
-    145deg,
-    #f4faf4,
-    #eaf6ec
-  );
-
-  border-radius: 15px;
-
-  overflow: hidden;
-
-  font-size: 85px;
+  gap: 12px;
+  transition: 0.3s;
 }
 
-.product-image img {
-  width: 100%;
-  height: 100%;
-
-  padding: 12px;
-
-  display: block;
-
-  object-fit: contain;
-
-  transition: transform 0.45s ease;
+.category-item span {
+  font-size: 39px;
+  transition: 0.3s;
 }
 
-.product-card:hover .product-image img {
+.category-item strong {
+  font-size: 13px;
+  color: #435148;
+}
+
+.category-item:hover,
+.category-item.active {
+  background: var(--light-green);
+  border-color: #9ed7ae;
+  transform: translateY(-5px);
+  box-shadow: var(--shadow);
+}
+
+.category-item.active strong {
+  color: var(--dark-green);
+}
+
+.category-item:hover span {
   transform: scale(1.12);
 }
 
-/* PRODUCT DETAILS */
+/* =========================================
+   PRODUCT SECTION
+========================================= */
 
-.product-card h3 {
-  margin: 17px 0 0;
-
-  color: var(--text-dark);
-
-  font-family: 'Manrope', sans-serif;
-  font-size: 16px;
+.product-count {
+  color: var(--green);
+  background: var(--light-green);
+  border-radius: 30px;
+  padding: 9px 16px;
+  font-size: 12px;
   font-weight: 800;
 }
 
-.product-card > p {
-  margin: 8px 0 0;
-
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-/* PRICE */
-
-.product-price {
+.product-search {
+  max-width: 480px;
+  height: 49px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-
-  gap: 10px;
-  margin-top: 17px;
+  gap: 12px;
+  padding: 0 16px;
+  margin-bottom: 28px;
 }
 
-.product-price strong {
-  color: var(--primary-dark);
-
-  font-size: 21px;
-  font-weight: 800;
+.product-search span {
+  font-size: 18px;
 }
 
-.product-price del {
-  color: #a4aea6;
-  font-size: 13px;
-}
-
-/* ADD TO CART */
-
-.add-cart-btn {
+.product-search input {
   width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--text);
+}
 
-  margin-top: 17px;
-  padding: 13px;
+.product-search:focus-within {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(22, 139, 69, 0.08);
+}
 
-  background: #eaf8ee;
-  color: var(--primary-dark);
+.organigo-product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
 
-  border: 1px solid #c5e9ce;
-  border-radius: 11px;
+.organigo-product-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  overflow: hidden;
+  transition: 0.3s;
+}
 
-  font-size: 14px;
+.organigo-product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(20, 80, 40, 0.1);
+  border-color: #c6e7cf;
+}
+
+.product-image-box {
+  height: 190px;
+  background: #f3faf3;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.product-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.4s;
+}
+
+.organigo-product-card:hover .product-image-box img {
+  transform: scale(1.07);
+}
+
+.product-placeholder {
+  font-size: 75px;
+}
+
+.fresh-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #e0f6e5;
+  color: var(--dark-green);
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 9px;
   font-weight: 800;
-
-  cursor: pointer;
-  transition: var(--transition);
+  letter-spacing: 1px;
 }
 
-.add-cart-btn:hover {
-  background: linear-gradient(
-    135deg,
-    #159447,
-    #08743a
-  );
-
-  color: white;
-  border-color: var(--primary);
-
-  box-shadow: 0 7px 17px rgba(21,148,71,0.18);
+.product-details {
+  padding: 16px;
 }
 
-.add-cart-btn:active {
-  transform: scale(0.96);
+.product-category {
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
-/* =====================================================
-   SEARCH RESULTS
-===================================================== */
+.product-details h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #26382b;
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
 
-.search-result-info {
-  margin-top: 22px;
-  padding: 16px 20px;
+.product-unit {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0 0 17px;
+}
 
+.product-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-
-  gap: 12px;
-
-  background: #edf9f0;
-
-  border: 1px solid #ccebd4;
-  border-radius: 14px;
-
-  color: var(--primary-dark);
-  font-size: 14px;
+  gap: 8px;
 }
 
-.search-result-info strong {
-  font-weight: 800;
+.product-price strong {
+  color: #1b3021;
+  font-size: 19px;
 }
 
-.search-result-info button {
-  padding: 8px 14px;
-
+.product-add-button {
+  border: 1px solid var(--green);
+  color: var(--green);
   background: white;
-  color: var(--primary);
-
-  border: 1px solid #ccebd4;
-  border-radius: 8px;
-
+  padding: 9px 19px;
+  border-radius: 9px;
+  font-size: 12px;
   font-weight: 800;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.product-add-button:hover {
+  color: white;
+  background: var(--green);
+}
+
+/* =========================================
+   EMPTY PRODUCT STATE
+========================================= */
+
+.organigo-empty-state {
+  background: white;
+  border: 1px dashed #c9ddce;
+  border-radius: 20px;
+  min-height: 260px;
+  padding: 35px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.organigo-empty-state > span {
+  font-size: 55px;
+  margin-bottom: 10px;
+}
+
+.organigo-empty-state h3 {
+  font-size: 21px;
+  margin: 5px 0;
+}
+
+.organigo-empty-state p {
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 400px;
+  line-height: 1.7;
+}
+
+.organigo-empty-state button {
+  margin-top: 10px;
+  padding: 11px 20px;
+  border: none;
+  border-radius: 9px;
+  color: white;
+  background: var(--green);
+  font-weight: 700;
   cursor: pointer;
 }
 
-.search-result-info button:hover {
-  background: var(--primary);
-  color: white;
-}
+/* =========================================
+   BOTTOM BRAND BANNER
+========================================= */
 
-/* =====================================================
-   NO PRODUCTS
-===================================================== */
-
-.no-products {
-  margin-top: 30px;
-  padding: 65px 20px;
-
-  text-align: center;
-
-  background: #f8fbf8;
-
-  border: 1px solid var(--border);
+.organigo-bottom-banner {
+  max-width: 1300px;
+  margin: 65px auto 45px;
+  padding: 38px 6%;
   border-radius: 22px;
-}
-
-.no-products h2 {
-  margin-bottom: 12px;
-  font-size: 25px;
-}
-
-.no-products p {
-  margin-bottom: 25px;
-
-  color: var(--text-muted);
-  font-size: 14px;
-}
-
-.no-products .add-cart-btn {
-  width: auto;
-  min-width: 180px;
-
-  padding: 13px 22px;
-
-  background: var(--primary);
+  background: linear-gradient(110deg, #126e38, #229d50);
   color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
 }
 
-/* =====================================================
-   FOCUS & ACCESSIBILITY
-===================================================== */
-
-.home-page button:focus-visible,
-.category-card:focus-visible,
-.section-heading > span:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 4px;
+.organigo-bottom-banner span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #c8f4d2;
 }
 
-/* =====================================================
+.organigo-bottom-banner h2 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 32px;
+  margin: 12px 0;
+}
+
+.organigo-bottom-banner p {
+  font-size: 14px;
+  color: #e1f5e6;
+}
+
+.banner-emoji {
+  font-size: 55px;
+  letter-spacing: 5px;
+}
+
+/* =========================================
    TABLET RESPONSIVE
-===================================================== */
+========================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1000px) {
 
-  .category-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .organigo-hero {
+    margin: 20px;
+    padding: 40px;
   }
 
-  .product-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .hero-visual {
+    width: 300px;
   }
 
-  .hero-banner {
-    min-height: 350px;
+  .hero-food-circle {
+    width: 235px;
+    height: 235px;
   }
 
-  .product-image {
-    height: 180px;
-  }
-}
-
-/* =====================================================
-   TABLET
-===================================================== */
-
-@media (max-width: 768px) {
-
-  .home-page {
-    padding: 25px 4%;
+  .hero-food-circle span {
+    font-size: 50px;
   }
 
-  .hero-banner {
-    padding: 40px 30px;
-    gap: 15px;
+  .organigo-benefits {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .hero-image {
-    min-width: 160px;
-    font-size: 90px;
+  .category-list {
+    grid-template-columns: repeat(4, 1fr);
   }
 
-  .category-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 13px;
-  }
-
-  .product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 17px;
-  }
-
-  .offer-banner {
-    padding: 32px;
-  }
-
-  .category-section,
-  .products-section {
-    margin-top: 55px;
+  .organigo-product-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* =====================================================
-   MOBILE
-===================================================== */
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
 
-@media (max-width: 600px) {
+@media (max-width: 650px) {
 
-  .home-page {
-    padding: 16px 4%;
-  }
-
-  /* HERO */
-
-  .hero-banner {
+  .organigo-hero {
     min-height: auto;
-
+    margin: 12px;
     padding: 32px 22px;
-
+    border-radius: 20px;
     flex-direction: column;
     align-items: flex-start;
+  }
 
-    border-radius: 20px;
+  .hero-content {
+    width: 100%;
   }
 
   .hero-content h1 {
-    font-size: 32px;
-    letter-spacing: -1px;
+    font-size: 43px;
   }
 
   .hero-content p {
     font-size: 13px;
-    line-height: 1.8;
   }
 
-  .hero-content button {
-    padding: 13px 25px;
-    font-size: 13px;
+  .hero-tag {
+    font-size: 9px;
   }
 
-  .hero-image {
-    align-self: center;
-
-    min-width: auto;
-
-    margin-top: 15px;
-
-    font-size: 80px;
-    letter-spacing: -12px;
+  .hero-button {
+    padding: 13px 19px;
+    font-size: 12px;
   }
 
-  /* CATEGORY */
-
-  .category-section,
-  .products-section {
-    margin-top: 43px;
-  }
-
-  .category-section h2,
-  .products-section h2 {
-    font-size: 23px;
-  }
-
-  .category-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .hero-features {
     gap: 10px;
-    margin-top: 22px;
   }
 
-  .category-card {
-    min-height: 110px;
-    padding: 15px 5px;
-
-    border-radius: 14px;
+  .hero-features span {
+    font-size: 10px;
   }
 
-  .category-card span {
-    font-size: 35px;
+  .hero-visual {
+    width: 100%;
+    height: 230px;
+    margin-top: 20px;
   }
 
-  .category-card h3 {
-    margin-top: 9px;
-    font-size: 12px;
+  .hero-food-circle {
+    width: 205px;
+    height: 205px;
   }
 
-  /* OFFER */
-
-  .offer-banner {
-    margin-top: 42px;
-    padding: 25px 20px;
-    border-radius: 18px;
-  }
-
-  .offer-banner h2 {
-    font-size: 19px;
-  }
-
-  .offer-banner p {
-    font-size: 12px;
-  }
-
-  .offer-banner span {
+  .hero-food-circle span {
     font-size: 45px;
   }
 
-  /* PRODUCTS */
-
-  .product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin-top: 23px;
+  .hero-fresh-badge {
+    width: 80px;
+    height: 80px;
+    right: 10px;
+    bottom: 0;
   }
 
-  .product-card {
-    padding: 10px;
-    border-radius: 15px;
+  .hero-fresh-badge strong {
+    font-size: 19px;
   }
 
-  .product-image {
-    height: 135px;
-    font-size: 55px;
-    border-radius: 11px;
+  .hero-fresh-badge span {
+    font-size: 9px;
   }
 
-  .product-image img {
-    padding: 5px;
-  }
-
-  .product-card h3 {
-    margin-top: 12px;
-    font-size: 13px;
-  }
-
-  .product-card > p {
-    font-size: 11px;
-  }
-
-  .product-price {
-    gap: 7px;
-    margin-top: 12px;
-  }
-
-  .product-price strong {
-    font-size: 17px;
-  }
-
-  .product-price del {
-    font-size: 11px;
-  }
-
-  .add-cart-btn {
-    margin-top: 12px;
-    padding: 11px 5px;
-    font-size: 12px;
-  }
-
-  /* SECTION HEADING */
-
-  .section-heading {
+  .organigo-benefits {
+    padding: 0 12px;
     gap: 10px;
+    margin: 25px auto;
   }
 
-  .section-heading > span {
-    padding: 8px 12px;
-    font-size: 11px;
-    white-space: nowrap;
-  }
-
-  /* SEARCH */
-
-  .search-result-info {
-    padding: 12px;
-    font-size: 12px;
-  }
-
-  /* NO PRODUCTS */
-
-  .no-products {
-    padding: 45px 15px;
-  }
-
-  .no-products h2 {
-    font-size: 21px;
-  }
-
-}
-
-/* =====================================================
-   SMALL MOBILE
-===================================================== */
-
-@media (max-width: 360px) {
-
-  .hero-content h1 {
-    font-size: 27px;
-  }
-
-  .category-grid {
-    gap: 7px;
-  }
-
-  .category-card {
-    min-height: 100px;
-  }
-
-  .category-card span {
-    font-size: 29px;
-  }
-
-  .category-card h3 {
-    font-size: 10px;
-  }
-
-  .product-grid {
-    gap: 8px;
-  }
-
-  .product-image {
-    height: 110px;
-  }
-
-  .product-card {
-    padding: 8px;
-  }
-
-}
-
-/* =====================================================
-   REDUCED MOTION
-===================================================== */
-
-@media (prefers-reduced-motion: reduce) {
-
-  .home-page *,
-  .home-page *::before,
-  .home-page *::after {
-
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-
-  }
-
-}
-/* =====================================================
-   ORGANIGO - MOBILE RESPONSIVE FINAL FIX
-===================================================== */
-
-/* Prevent horizontal scrolling */
-html,
-body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-#root {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-/* Tablet */
-@media (max-width: 768px) {
-
-  .home-page {
-    width: 100%;
-    padding: 20px 3%;
-  }
-
-  .hero-banner {
-    width: 100%;
-    gap: 15px;
-  }
-
-  .hero-content {
-    width: 100%;
-  }
-
-  .hero-image {
-    min-width: 0;
-  }
-
-  .category-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .product-card {
-    min-width: 0;
-  }
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-
-  .home-page {
-    padding: 14px 12px;
-  }
-
-  .hero-banner {
-    width: 100%;
-    padding: 28px 18px;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .hero-content {
-    width: 100%;
-  }
-
-  .hero-content h1 {
-    font-size: clamp(26px, 7vw, 34px);
-    line-height: 1.2;
-  }
-
-  .hero-content p {
-    font-size: 13px;
-  }
-
-  .hero-image {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .category-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .organigo-benefits > div {
+    padding: 13px 10px;
     gap: 9px;
   }
 
-  .category-card {
-    min-width: 0;
-    min-height: 105px;
-    padding: 12px 4px;
+  .organigo-benefits > div > span {
+    font-size: 25px;
   }
 
-  .category-card h3 {
-    text-align: center;
-    overflow-wrap: anywhere;
+  .organigo-benefits h4 {
+    font-size: 11px;
   }
 
-  .offer-banner {
-    width: 100%;
-    gap: 12px;
+  .organigo-benefits p {
+    font-size: 9px;
   }
 
-  .offer-banner h2 {
-    font-size: 18px;
-  }
-
-  .offer-banner span {
-    font-size: 40px;
+  .organigo-categories,
+  .organigo-products-section {
+    padding: 0 13px;
+    margin: 45px auto;
   }
 
   .section-heading {
     align-items: flex-start;
-    flex-wrap: wrap;
   }
 
-  .product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .section-heading h2 {
+    font-size: 23px;
+  }
+
+  .section-heading > p {
+    display: none;
+  }
+
+  .section-label {
+    font-size: 9px;
+  }
+
+  .category-list {
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
   }
 
-  .product-card {
-    width: 100%;
-    padding: 9px;
-  }
-
-  .product-image {
-    width: 100%;
-    height: 125px;
-  }
-
-  .product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
-  .product-card h3 {
-    overflow-wrap: anywhere;
-  }
-
-  .add-cart-btn {
-    width: 100%;
-    padding: 10px 4px;
-  }
-}
-
-/* Very Small Mobile */
-@media (max-width: 360px) {
-
-  .home-page {
-    padding: 12px 9px;
-  }
-
-  .category-grid {
-    gap: 6px;
-  }
-
-  .category-card {
-    min-height: 95px;
-  }
-
-  .category-card span {
-    font-size: 27px;
-  }
-
-  .category-card h3 {
-    font-size: 10px;
-  }
-
-  .product-grid {
+  .category-item {
+    min-height: 105px;
+    border-radius: 13px;
     gap: 8px;
   }
 
-  .product-image {
-    height: 105px;
+  .category-item span {
+    font-size: 32px;
   }
 
-  .product-card h3 {
-    font-size: 12px;
+  .category-item strong {
+    font-size: 11px;
+  }
+
+  .product-search {
+    height: 44px;
+    margin-bottom: 18px;
+  }
+
+  .product-search input {
+    font-size: 11px;
+  }
+
+  .organigo-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+  }
+
+  .product-image-box {
+    height: 135px;
+  }
+
+  .product-placeholder {
+    font-size: 55px;
+  }
+
+  .product-details {
+    padding: 11px;
+  }
+
+  .product-details h3 {
+    font-size: 13px;
+  }
+
+  .product-category {
+    font-size: 8px;
+  }
+
+  .product-unit {
+    font-size: 10px;
+    margin-bottom: 12px;
   }
 
   .product-price strong {
-    font-size: 15px;
+    font-size: 16px;
   }
 
-  .add-cart-btn {
+  .product-add-button {
+    padding: 8px 11px;
+    font-size: 10px;
+  }
+
+  .fresh-tag {
+    top: 8px;
+    left: 8px;
+    font-size: 8px;
+    padding: 5px 7px;
+  }
+
+  .product-count {
+    font-size: 10px;
+    padding: 7px 10px;
+  }
+
+  .organigo-empty-state {
+    min-height: 220px;
+    padding: 25px 15px;
+  }
+
+  .organigo-bottom-banner {
+    margin: 40px 12px 25px;
+    padding: 28px 20px;
+    border-radius: 17px;
+  }
+
+  .organigo-bottom-banner h2 {
+    font-size: 23px;
+  }
+
+  .organigo-bottom-banner p {
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .organigo-bottom-banner span {
+    font-size: 9px;
+  }
+
+  .banner-emoji {
+    font-size: 30px;
+    letter-spacing: 0;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 360px) {
+
+  .hero-content h1 {
+    font-size: 36px;
+  }
+
+  .category-list {
+    gap: 7px;
+  }
+
+  .category-item {
+    min-height: 90px;
+  }
+
+  .category-item span {
+    font-size: 27px;
+  }
+
+  .product-image-box {
+    height: 115px;
+  }
+
+  .product-add-button {
+    padding: 7px 8px;
+  }
+
+  .organigo-bottom-banner h2 {
+    font-size: 20px;
+  }
+}
+/* ==============================
+   PRODUCT QUANTITY CONTROLS
+============================== */
+
+.product-quantity-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 13px;
+  min-width: 105px;
+  height: 37px;
+  padding: 4px 7px;
+  background: #159447;
+  border: 1px solid #159447;
+  border-radius: 9px;
+  box-shadow: 0 3px 9px rgba(21, 148, 71, 0.15);
+}
+
+.product-quantity-control button {
+  width: 27px;
+  height: 27px;
+  border: none;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #159447;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
+}
+
+.product-quantity-control button:hover {
+  background: #e9f8ed;
+  transform: scale(1.08);
+}
+
+.product-quantity-control span {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+  min-width: 12px;
+  text-align: center;
+}
+/* =====================================
+   REAL PHOTO CATEGORY DESIGN
+===================================== */
+
+.category-list {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.category-item {
+  min-height: 165px;
+  padding: 13px 10px;
+  background: #ffffff;
+  border: 1px solid #e8eee9;
+  border-radius: 17px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  transition: 0.3s ease;
+}
+
+.category-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f0f7f0;
+  border: 3px solid #edf7ef;
+}
+
+.category-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.category-item strong {
+  color: #34473a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.category-item:hover .category-image img {
+  transform: scale(1.12);
+}
+
+.category-item.active {
+  background: #effaf1;
+  border-color: #159447;
+  box-shadow: 0 7px 20px rgba(21, 148, 71, 0.10);
+}
+
+.category-item.active strong {
+  color: #086b32;
+}
+
+/* REAL HERO IMAGE */
+
+.hero-visual {
+  width: 390px;
+  height: 330px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-real-image {
+  width: 290px;
+  height: 290px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 9px solid #ffffff;
+  box-shadow: 0 15px 45px rgba(20, 90, 40, 0.15);
+  animation: floatFood 4s ease-in-out infinite;
+}
+
+.hero-fresh-badge {
+  z-index: 2;
+}
+
+/* TABLET */
+
+@media (max-width: 1000px) {
+  .category-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .category-image {
+    width: 90px;
+    height: 90px;
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+  .category-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .category-item {
+    min-height: 135px;
+    padding: 10px 6px;
+  }
+
+  .category-image {
+    width: 82px;
+    height: 82px;
+  }
+
+  .category-item strong {
     font-size: 11px;
   }
-}
-/* HOME PAGE MOBILE WIDTH FIX */
 
-.home-page {
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
-  padding-left: 16px;
-  padding-right: 16px;
-  overflow-x: clip;
+  .hero-real-image {
+    width: 205px;
+    height: 205px;
+  }
 }
 
-.home-page * {
-  max-width: 100%;
-}
-
-@media (max-width: 600px) {
-
-  .home-page {
-    width: 100%;
-    padding: 12px;
-    margin: 0;
+@media (max-width: 360px) {
+  .category-image {
+    width: 70px;
+    height: 70px;
   }
 
-  .hero-banner,
-  .offer-banner {
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
+  .category-item {
+    min-height: 115px;
+  }
+}
+/* ===== ORGANIGO SMALL HERO SECTION ===== */
+
+.organigo-home .organigo-hero {
+  min-height: 280px !important;
+  height: auto !important;
+  padding: 25px 5% !important;
+  gap: 20px !important;
+}
+
+.organigo-home .hero-content {
+  padding: 0 !important;
+}
+
+.organigo-home .hero-tag {
+  font-size: 11px !important;
+}
+
+.organigo-home .hero-content h1 {
+  font-size: 36px !important;
+  line-height: 1.15 !important;
+  margin: 10px 0 !important;
+}
+
+.organigo-home .hero-content p {
+  font-size: 14px !important;
+  margin-bottom: 14px !important;
+}
+
+.organigo-home .hero-button {
+  padding: 11px 20px !important;
+}
+
+.organigo-home .hero-features {
+  margin-top: 15px !important;
+  gap: 12px !important;
+}
+
+.organigo-home .hero-visual {
+  height: 240px !important;
+  min-height: 0 !important;
+}
+
+.organigo-home .hero-real-image {
+  width: 210px !important;
+  height: 210px !important;
+}
+
+/* MOBILE */
+@media (max-width: 650px) {
+  .organigo-home .organigo-hero {
+    min-height: 0 !important;
+    padding: 22px 16px !important;
+    gap: 10px !important;
   }
 
-  .category-grid,
-  .product-grid {
-    width: 100%;
+  .organigo-home .hero-content h1 {
+    font-size: 28px !important;
+  }
+
+  .organigo-home .hero-visual {
+    height: 170px !important;
+  }
+
+  .organigo-home .hero-real-image {
+    width: 145px !important;
+    height: 145px !important;
+  }
+}
+/* =================================
+   ORGANIGO BLINKIT STYLE MOBILE
+================================= */
+
+@media (max-width: 650px) {
+
+  /* HERO HIDE ON MOBILE */
+  .organigo-home .organigo-hero {
+    display: none !important;
+  }
+
+  /* BENEFITS HIDE ON MOBILE */
+  .organigo-home .organigo-benefits {
+    display: none !important;
+  }
+
+  /* CATEGORY SECTION */
+  .organigo-home .organigo-categories {
+    margin: 16px auto 22px !important;
+    padding: 0 12px !important;
+  }
+
+  .organigo-home .organigo-categories .section-heading {
+    margin-bottom: 12px;
+  }
+
+  .organigo-home .organigo-categories .section-heading h2 {
+    font-size: 19px;
+  }
+
+  .organigo-home .category-list {
+    display: flex !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 12px;
+    padding: 3px 2px 10px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .organigo-home .category-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .organigo-home .category-item {
+    flex: 0 0 82px;
+    min-height: 110px;
+    padding: 8px 4px;
+    border-radius: 13px;
+    gap: 7px;
+    scroll-snap-align: start;
+  }
+
+  .organigo-home .category-image {
+    width: 65px;
+    height: 65px;
+  }
+
+  .organigo-home .category-item strong {
+    font-size: 10px;
+  }
+
+  /* PRODUCTS START QUICKLY */
+
+  .organigo-home .organigo-products-section {
+    margin: 20px auto 35px !important;
+    padding: 0 12px !important;
+  }
+
+  .organigo-home .organigo-products-section .section-heading {
+    margin-bottom: 15px;
+  }
+
+  .organigo-home .organigo-products-section .section-heading h2 {
+    font-size: 20px;
+  }
+
+  /* TWO PRODUCTS PER ROW */
+
+  .organigo-home .organigo-product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
-  .category-card,
-  .product-card {
-    min-width: 0;
+  .organigo-home .product-image-box {
+    height: 145px;
   }
 
-  .section-heading {
-    width: 100%;
-    flex-wrap: wrap;
+  .organigo-home .product-details {
+    padding: 10px;
   }
 
-  .product-image {
-    width: 100%;
+  .organigo-home .product-details h3 {
+    font-size: 13px;
+  }
+
+  .organigo-home .product-price strong {
+    font-size: 16px;
+  }
+
+  .organigo-home .organigo-bottom-banner {
+    margin-top: 25px;
   }
 }

@@ -1,44 +1,70 @@
+import React, { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
-import { useState, useEffect } from "react";
 import "../styles/Home.css";
 
+const categories = [
+  {
+    name: "All",
+    image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=85",
+  },
+  {
+    name: "Fruits",
+    image: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&q=85",
+  },
+  {
+    name: "Vegetables",
+    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=85",
+  },
+  {
+    name: "Juice",
+    image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=400&q=85",
+  },
+  {
+    name: "Dairy",
+    image: "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&q=85",
+  },
+  {
+    name: "Bakery",
+    image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=85",
+  },
+  {
+    name: "Snacks",
+    image: "https://images.unsplash.com/photo-1621939514649-280e2aa2f7c1?w=400&q=85",
+  },
+];
+
 function Home() {
-  const { cartCount } = useCart();
-  const [adminProducts, setAdminProducts] = useState([]);
+  const {
+    cartItems,
+    addToCart,
+    increaseQuantity,
+    decreaseQuantity,
+  } = useCart();
+
+  const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const { addToCart } = useCart();
 
-  // Load Admin Products
   const loadProducts = () => {
     try {
       const savedProducts = JSON.parse(
         localStorage.getItem("organigoProducts") || "[]"
       );
 
-      setAdminProducts(savedProducts);
-    } catch (error) {
-      console.error("Product loading error:", error);
-      setAdminProducts([]);
+      setProducts(savedProducts);
+    } catch {
+      setProducts([]);
     }
   };
 
   useEffect(() => {
     loadProducts();
 
-    // Listen for Admin Product Updates
     window.addEventListener("storage", loadProducts);
-
     window.addEventListener("organigoProductsUpdated", loadProducts);
 
-    // Header Search Event
     const handleSearch = (event) => {
       setSearchQuery(event.detail || "");
-      setSelectedCategory("All");
-
-      document
-        .getElementById("all-products")
-        ?.scrollIntoView({ behavior: "smooth" });
     };
 
     window.addEventListener("organigoSearch", handleSearch);
@@ -53,319 +79,279 @@ function Home() {
     };
   }, []);
 
-  // Categories
-  const categories = [
-    { name: "All", icon: "🛒" },
-    { name: "Fruits", icon: "🍎" },
-    { name: "Vegetables", icon: "🥦" },
-    { name: "Dairy", icon: "🥛" },
-    { name: "Bakery", icon: "🍞" },
-    { name: "Snacks", icon: "🍿" },
-    { name: "Beverages", icon: "🥤" },
-  ];
+  const getProductQuantity = (product) => {
+    const productId = String(
+      product._id || product.id || product.name
+    );
 
-  // Demo Products
-  const demoProducts = [
-    {
-      id: "demo-1",
-      name: "Fresh Apple",
-      category: "Fruits",
-      weight: "1 kg",
-      price: 120,
-      oldPrice: 150,
-      icon: "🍎",
-    },
-    {
-      id: "demo-2",
-      name: "Fresh Banana",
-      category: "Fruits",
-      weight: "1 dozen",
-      price: 50,
-      oldPrice: 65,
-      icon: "🍌",
-    },
-    {
-      id: "demo-3",
-      name: "Fresh Tomato",
-      category: "Vegetables",
-      weight: "1 kg",
-      price: 30,
-      oldPrice: 40,
-      icon: "🍅",
-    },
-    {
-      id: "demo-4",
-      name: "Fresh Broccoli",
-      category: "Vegetables",
-      weight: "500 g",
-      price: 45,
-      oldPrice: 60,
-      icon: "🥦",
-    },
-    {
-      id: "demo-5",
-      name: "Fresh Orange",
-      category: "Fruits",
-      weight: "1 kg",
-      price: 80,
-      oldPrice: 100,
-      icon: "🍊",
-    },
-    {
-      id: "demo-6",
-      name: "Fresh Carrot",
-      category: "Vegetables",
-      weight: "1 kg",
-      price: 40,
-      oldPrice: 50,
-      icon: "🥕",
-    },
-  ];
+    const cartProduct = cartItems.find(
+      (item) => String(item.id) === productId
+    );
 
-  // All Products
-  const allProducts = [...demoProducts, ...adminProducts];
+    return cartProduct ? cartProduct.quantity : 0;
+  };
 
-  // Search + Category Filter
-  const filteredProducts = allProducts.filter((product) => {
-    const matchesSearch = product.name
-      ?.toLowerCase()
-      .includes(searchQuery.toLowerCase());
-
-    const matchesCategory =
+  const filteredProducts = products.filter((product) => {
+    const categoryMatch =
       selectedCategory === "All" ||
       product.category?.toLowerCase() ===
         selectedCategory.toLowerCase();
 
-    return matchesSearch && matchesCategory;
+    const searchMatch =
+      product.name?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return categoryMatch && searchMatch;
   });
 
-  // Select Category
-  const handleCategory = (category) => {
-    setSelectedCategory(category);
-
-    document
-      .getElementById("all-products")
-      ?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  // Clear Search
-  const clearSearch = () => {
-    setSearchQuery("");
-    setSelectedCategory("All");
-  };
-
   return (
-    <div className="home-page">
+    <main className="organigo-home">
 
-      {/* HERO BANNER */}
-      <section className="hero-banner">
-
+      {/* HERO SECTION */}
+      <section className="organigo-hero">
         <div className="hero-content">
-
           <span className="hero-tag">
-            FRESH & HEALTHY
+            FRESHNESS YOU CAN TRUST
           </span>
 
           <h1>
-            Fresh Groceries
+            Eat Healthy.
             <br />
-            Delivered to Your Doorstep!
+            <span>Live Fresh.</span>
           </h1>
 
           <p>
-            Get fresh fruits, vegetables and daily essentials
-            at great prices.
+            Fresh fruits, vegetables, dairy, bakery and healthy snacks
+            delivered straight to your doorstep.
           </p>
 
-          <button
-            onClick={() =>
-              document
-                .getElementById("all-products")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
-          >
-            Shop Now →
-          </button>
+          <a href="#shop-products" className="hero-button">
+            Shop Fresh Products →
+          </a>
 
+          <div className="hero-features">
+            <span>✓ Fresh Quality</span>
+            <span>✓ Great Prices</span>
+            <span>✓ Quick Delivery</span>
+          </div>
         </div>
 
-        <div className="hero-image">
-          🥬 🥑 🍎
-        </div>
+        <div className="hero-visual">
+          <img
+            className="hero-real-image"
+            src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=900&q=90"
+            alt="Fresh fruits and vegetables"
+          />
 
+          <div className="hero-fresh-badge">
+            <strong>100%</strong>
+            <span>Freshness</span>
+          </div>
+        </div>
       </section>
 
-      {/* CATEGORIES */}
-      <section className="category-section">
-
-        <h2>Shop by Category</h2>
-
-        <p>Explore our fresh grocery categories</p>
-
-        <div className="category-grid">
-
-          {categories.map((category) => (
-
-            <div
-              className={`category-card ${
-                selectedCategory === category.name
-                  ? "active-category"
-                  : ""
-              }`}
-              key={category.name}
-              onClick={() => handleCategory(category.name)}
-            >
-
-              <span>{category.icon}</span>
-
-              <h3>{category.name}</h3>
-
-            </div>
-
-          ))}
-
+      {/* BENEFITS */}
+      <section className="organigo-benefits">
+        <div>
+          <span>✓</span>
+          <div>
+            <h4>Fresh Products</h4>
+            <p>Quality you deserve</p>
+          </div>
         </div>
-
-      </section>
-
-      {/* OFFER BANNER */}
-      <section className="offer-banner">
 
         <div>
-          <h2>Fresh Deals, Great Savings!</h2>
-
-          <p>
-            Save more on your everyday groceries.
-          </p>
+          <span>🚚</span>
+          <div>
+            <h4>Fast Delivery</h4>
+            <p>At your doorstep</p>
+          </div>
         </div>
 
-        <span>🛍️</span>
+        <div>
+          <span>♥</span>
+          <div>
+            <h4>Healthy Choices</h4>
+            <p>Eat better every day</p>
+          </div>
+        </div>
 
+        <div>
+          <span>★</span>
+          <div>
+            <h4>Best Quality</h4>
+            <p>Freshness matters</p>
+          </div>
+        </div>
       </section>
 
-      {/* ALL PRODUCTS */}
-      <section className="products-section" id="all-products">
-
+      {/* REAL PHOTO CATEGORIES */}
+      <section className="organigo-categories">
         <div className="section-heading">
-
           <div>
+            <span className="section-label">EXPLORE ORGANIGO</span>
+            <h2>Shop by Category</h2>
+          </div>
+
+          <p>Everything fresh, all in one place.</p>
+        </div>
+
+        <div className="category-list">
+          {categories.map((category) => (
+            <button
+              key={category.name}
+              className={`category-item ${
+                selectedCategory === category.name ? "active" : ""
+              }`}
+              onClick={() => setSelectedCategory(category.name)}
+            >
+              <div className="category-image">
+                <img
+                  src={category.image}
+                  alt={category.name}
+                  loading="lazy"
+                />
+              </div>
+
+              <strong>{category.name}</strong>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* PRODUCTS */}
+      <section
+        className="organigo-products-section"
+        id="shop-products"
+      >
+        <div className="section-heading">
+          <div>
+            <span className="section-label">FRESH PICKS FOR YOU</span>
 
             <h2>
               {selectedCategory === "All"
-                ? "All Products"
+                ? "Our Fresh Products"
                 : selectedCategory}
             </h2>
-
-            <p>
-              {filteredProducts.length} Products Available
-            </p>
-
           </div>
 
-          <span onClick={clearSearch}>
-            View All →
+          <span className="product-count">
+            {filteredProducts.length} Products
           </span>
-
         </div>
 
-        {/* SEARCH INFO */}
-        {searchQuery && (
-          <div className="search-result-info">
-            Search Results for: <strong>{searchQuery}</strong>
-
-            <button onClick={clearSearch}>
-              Clear ✕
-            </button>
-          </div>
-        )}
-
-        {/* PRODUCT GRID */}
         {filteredProducts.length > 0 ? (
+          <div className="organigo-product-grid">
+            {filteredProducts.map((product) => {
+              const quantity = getProductQuantity(product);
 
-          <div className="product-grid">
+              return (
+                <div
+                  className="organigo-product-card"
+                  key={product._id || product.id || product.name}
+                >
+                  <div className="product-image-box">
+                    {product.image ? (
+                      <img src={product.image} alt={product.name} />
+                    ) : (
+                      <span className="product-placeholder">
+                        {product.icon || "🥬"}
+                      </span>
+                    )}
 
-            {filteredProducts.map((product, index) => (
+                    <span className="fresh-tag">FRESH</span>
+                  </div>
 
-              <div
-                className="product-card"
-                key={product.id || `${product.name}-${index}`}
-              >
+                  <div className="product-details">
+                    <span className="product-category">
+                      {product.category || "Fresh"}
+                    </span>
 
-                {/* PRODUCT IMAGE */}
-                <div className="product-image">
+                    <h3>{product.name}</h3>
 
-                  {product.image ? (
+                    <p className="product-unit">
+                      {product.quantity || product.unit || "1 Unit"}
+                    </p>
 
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                    />
+                    <div className="product-bottom">
+                      <div className="product-price">
+                        <strong>₹{product.price}</strong>
+                      </div>
 
-                  ) : (
+                      {quantity === 0 ? (
+                        <button
+                          className="product-add-button"
+                          onClick={() => addToCart(product)}
+                        >
+                          ADD +
+                        </button>
+                      ) : (
+                        <div className="product-quantity-control">
+                          <button
+                            onClick={() =>
+                              decreaseQuantity(
+                                product._id || product.id || product.name
+                              )
+                            }
+                          >
+                            −
+                          </button>
 
-                    product.icon || "🛒"
+                          <span>{quantity}</span>
 
-                  )}
-
+                          <button
+                            onClick={() =>
+                              increaseQuantity(
+                                product._id || product.id || product.name
+                              )
+                            }
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-
-                {/* PRODUCT DETAILS */}
-                <h3>{product.name}</h3>
-
-                <p>{product.weight || "Available"}</p>
-
-                {/* PRICE */}
-                <div className="product-price">
-
-                  <strong>₹{product.price}</strong>
-
-                  {product.oldPrice && (
-                    <del>₹{product.oldPrice}</del>
-                  )}
-
-                </div>
-
-                {/* ADD TO CART */}
-              <button
-            className="add-cart-btn"
-          onClick={() => {
-          addToCart(product);
-           alert(`${product.name} added to cart!`);
-            }}
-            >
-             ADD +
-              </button>
-
-              </div>
-
-            ))}
-
+              );
+            })}
           </div>
-
         ) : (
-
-          <div className="no-products">
-
-            <h2>😕 No Products Found</h2>
+          <div className="organigo-empty-state">
+            <span>🥬</span>
+            <h3>No Products Found</h3>
 
             <p>
-              Try another product name or category.
+              {products.length === 0
+                ? "Our fresh products will appear here when the Admin adds them."
+                : "Try another category or search for a different product."}
             </p>
 
-            <button
-              className="add-cart-btn"
-              onClick={clearSearch}
-            >
-              Show All Products
-            </button>
-
+            {selectedCategory !== "All" && (
+              <button onClick={() => setSelectedCategory("All")}>
+                View All Products
+              </button>
+            )}
           </div>
-
         )}
-
       </section>
 
-    </div>
+      {/* BOTTOM BANNER */}
+      <section className="organigo-bottom-banner">
+        <div>
+          <span>A HEALTHIER WAY OF LIVING</span>
+          <h2>Good Food. Good Mood.</h2>
+
+          <p>
+            Make every meal fresh, colourful and full of goodness.
+          </p>
+        </div>
+
+        <div className="banner-emoji">
+          Fresh & Healthy
+        </div>
+      </section>
+
+    </main>
   );
 }
 

@@ -1,0 +1,145 @@
+/* ORGANIGO LOGIN & SIGNUP DESIGN */
+
+.auth-container {
+  min-height: 85vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 16px;
+  background: linear-gradient(135deg, #f0fff4, #ffffff, #e9f9ed);
+  font-family: "DM Sans", Arial, sans-serif;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  padding: 38px;
+  border-radius: 22px;
+  box-shadow: 0 12px 45px rgba(20, 100, 50, 0.10);
+  border: 1px solid #e8f3e9;
+}
+
+.auth-card h1 {
+  color: #159447;
+  font-size: 32px;
+  font-weight: 900;
+  text-align: center;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.auth-card > p:first-of-type {
+  color: #777;
+  text-align: center;
+  font-size: 13px;
+  margin: 5px 0 30px;
+}
+
+.auth-card h2 {
+  color: #183b27;
+  font-size: 25px;
+  margin-bottom: 7px;
+}
+
+.auth-card h2 + p {
+  color: #777;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-card label {
+  color: #344b3b;
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.auth-card input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 15px;
+  border: 1px solid #dce9df;
+  border-radius: 10px;
+  outline: none;
+  font-size: 14px;
+  background: #fbfdfb;
+  transition: 0.3s;
+}
+
+.auth-card input:focus {
+  border-color: #159447;
+  box-shadow: 0 0 0 3px rgba(21, 148, 71, 0.10);
+  background: #fff;
+}
+
+.auth-card button {
+  margin-top: 18px;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background: #159447;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.auth-card button:hover {
+  background: #087a35;
+  transform: translateY(-2px);
+}
+
+.auth-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-card a {
+  color: #159447;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.auth-card a:hover {
+  text-decoration: underline;
+}
+
+.auth-card > p {
+  font-size: 14px;
+  color: #666;
+  margin-top: 20px;
+}
+
+.auth-card > a {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 20px 12px;
+    min-height: 80vh;
+  }
+
+  .auth-card {
+    padding: 25px 20px;
+    border-radius: 16px;
+  }
+
+  .auth-card h1 {
+    font-size: 28px;
+  }
+
+  .auth-card h2 {
+    font-size: 22px;
+  }
+}

@@ -11,13 +11,16 @@ export function CartProvider({ children }) {
     }
   });
 
+  // Cart automatically save hoga
   useEffect(() => {
     localStorage.setItem("organigoCart", JSON.stringify(cartItems));
   }, [cartItems]);
 
   // Add Product
   const addToCart = (product) => {
-    const productId = String(product.id || product.name);
+    const productId = String(
+      product._id || product.id || product.name
+    );
 
     setCartItems((previousItems) => {
       const existing = previousItems.find(
@@ -27,7 +30,10 @@ export function CartProvider({ children }) {
       if (existing) {
         return previousItems.map((item) =>
           String(item.id) === productId
-            ? { ...item, quantity: item.quantity + 1 }
+            ? {
+                ...item,
+                quantity: Number(item.quantity || 0) + 1,
+              }
             : item
         );
       }
@@ -48,7 +54,7 @@ export function CartProvider({ children }) {
     setCartItems((items) =>
       items.map((item) =>
         String(item.id) === String(id)
-          ? { ...item, quantity: item.quantity + 1 }
+          ? { ...item, quantity: Number(item.quantity || 0) + 1 }
           : item
       )
     );
@@ -60,7 +66,7 @@ export function CartProvider({ children }) {
       items
         .map((item) =>
           String(item.id) === String(id)
-            ? { ...item, quantity: item.quantity - 1 }
+            ? { ...item, quantity: Number(item.quantity || 0) - 1 }
             : item
         )
         .filter((item) => item.quantity > 0)
@@ -75,15 +81,20 @@ export function CartProvider({ children }) {
   };
 
   // Clear Cart
-  const clearCart = () => setCartItems([]);
+  const clearCart = () => {
+    setCartItems([]);
+  };
 
+  // Total Items
   const cartCount = cartItems.reduce(
-    (total, item) => total + item.quantity,
+    (total, item) => total + Number(item.quantity || 0),
     0
   );
 
+  // Total Price
   const cartTotal = cartItems.reduce(
-    (total, item) => total + Number(item.price) * item.quantity,
+    (total, item) =>
+      total + Number(item.price || 0) * Number(item.quantity || 0),
     0
   );
 

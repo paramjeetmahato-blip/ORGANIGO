@@ -1,63 +1,100 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import "../styles/Header.css";
 
 function Header() {
-  const { cartCount } = useCart();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { cartItems } = useCart();
+
+  const cartCount = cartItems.reduce(
+    (total, item) => total + Number(item.quantity || 0),
+    0
+  );
 
   const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
     window.dispatchEvent(
       new CustomEvent("organigoSearch", {
-        detail: e.target.value,
+        detail: value,
       })
     );
   };
 
   return (
     <header className="Organigo-header">
+
+      {/* MOBILE APP DOWNLOAD BANNER */}
+      <div className="organigo-app-banner">
+        <div className="app-banner-icon">🥬</div>
+
+        <div className="app-banner-text">
+          <strong>ORGANIGO APP</strong>
+          <small>Get a fresher shopping experience!</small>
+        </div>
+
+        <button
+          className="app-download-button"
+          type="button"
+          disabled
+        >
+          Coming Soon
+        </button>
+      </div>
+
       <div className="header-container">
 
-        {/* Logo */}
+        {/* LOGO */}
         <a href="/" className="Organigo-logo">
-          ORGANIGO
-          <span className="veg-symbol">
-            <span></span>
-          </span>
+          <img
+            src="/organigo-logo.png"
+            alt="ORGANIGO"
+          />
         </a>
 
-        {/* Delivery Location */}
+        {/* DELIVERY LOCATION */}
         <div className="delivery-location">
-          <span className="veg-mark">📍</span>
+          <span className="location-icon">📍</span>
 
           <div>
             <small>Delivering to</small>
-            <h4>Chaibasa, Jharkhand</h4>
+            <strong>Chaibasa, Jharkhand</strong>
           </div>
         </div>
 
-        {/* Search */}
+        {/* SEARCH */}
         <div className="header-search">
           <span>🔍</span>
 
           <input
-            type="search"
-            placeholder="Search fruits, vegetables and groceries..."
+            type="text"
+            placeholder="Search fruits, vegetables, juice..."
+            value={searchQuery}
             onChange={handleSearch}
           />
         </div>
 
-        {/* Login */}
-        <a href="/login" className="header-login">
-          Login
-        </a>
+        {/* HYGIENE */}
+        <div className="hygiene-badge">
+          <span className="hygiene-icon">🛡️</span>
 
-        {/* Cart */}
+          <div>
+            <strong>100% SANITIZED</strong>
+            <small>SAFE & HYGIENIC HUB</small>
+          </div>
+        </div>
+
+        {/* CART */}
         <a href="/cart" className="header-cart">
-          🛒 My Cart
+          <span className="cart-icon">🛒</span>
+          <span>My Cart</span>
 
-          <span className="cart-count">
-            {cartCount}
-          </span>
+          {cartCount > 0 && (
+            <span className="cart-count">
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
         </a>
 
       </div>

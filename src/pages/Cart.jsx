@@ -1,7 +1,10 @@
 import { useCart } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 import "../styles/Cart.css";
 
 function Cart() {
+  const navigate = useNavigate();
+
   const {
     cartItems,
     increaseQuantity,
@@ -12,7 +15,15 @@ function Cart() {
   } = useCart();
 
   const handleCheckout = () => {
-    window.location.href = "/checkout";
+    const token = localStorage.getItem("organigoToken");
+
+    if (token) {
+      navigate("/checkout");
+    } else {
+      navigate("/login", {
+        state: { from: "/checkout" },
+      });
+    }
   };
 
   return (
@@ -30,9 +41,12 @@ function Cart() {
           <h2>Your Cart is Empty!</h2>
           <p>Add some fresh products to your cart.</p>
 
-          <a href="/" className="continue-shopping">
+          <button
+            className="continue-shopping"
+            onClick={() => navigate("/")}
+          >
             Continue Shopping
-          </a>
+          </button>
         </div>
 
       ) : (
