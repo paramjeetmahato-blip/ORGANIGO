@@ -1,7 +1,67 @@
 const mongoose = require("mongoose");
 
-const OrderSchema = new mongoose.Schema(
+const orderItemSchema = new mongoose.Schema({
+  productId: {
+    type: String,
+    default: "",
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  image: {
+    type: String,
+    default: "",
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  unit: {
+    type: String,
+    default: "",
+  },
+});
+
+const customerSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  phone: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  city: String,
+  state: String,
+  pincode: String,
+});
+
+const locationSchema = new mongoose.Schema({
+  name: String,
+  fullAddress: String,
+  latitude: Number,
+  longitude: Number,
+});
+
+const orderSchema = new mongoose.Schema(
   {
+    // Customer account link
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+      index: true,
+    },
+
     orderId: {
       type: String,
       required: true,
@@ -9,46 +69,16 @@ const OrderSchema = new mongoose.Schema(
     },
 
     customer: {
-      name: {
-        type: String,
-        required: true,
-      },
-      phone: {
-        type: String,
-        required: true,
-      },
-      address: {
-        type: String,
-        required: true,
-      },
-      city: String,
-      state: String,
-      pincode: String,
+      type: customerSchema,
+      required: true,
     },
 
-    location: {
-      name: String,
-      fullAddress: String,
-      latitude: Number,
-      longitude: Number,
-    },
+    location: locationSchema,
 
-    items: [
-      {
-        productId: String,
-        name: String,
-        image: String,
-        price: {
-          type: Number,
-          required: true,
-        },
-        quantity: {
-          type: Number,
-          required: true,
-        },
-        unit: String,
-      },
-    ],
+    items: {
+      type: [orderItemSchema],
+      required: true,
+    },
 
     total: {
       type: Number,
@@ -67,11 +97,13 @@ const OrderSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      default: "Placed",
+      default: "Order Placed",
     },
 
     mapLink: String,
+
     deliveryDistance: Number,
+
     orderDate: {
       type: Date,
       default: Date.now,
@@ -82,4 +114,4 @@ const OrderSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Order", OrderSchema);
+module.exports = mongoose.model("Order", orderSchema);

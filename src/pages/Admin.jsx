@@ -1,6 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "../styles/Admin.css";
+
+const API_URL = "http://localhost:5000/api";
 
 const defaultDeliverySettings = {
   businessName: "ORGANIGO",
@@ -29,6 +31,23 @@ function getSavedDeliverySettings() {
 }
 
 function Admin() {
+  // ADMIN AUTHENTICATION
+  const token = localStorage.getItem("organigoToken");
+
+  let currentUser = null;
+
+  try {
+    currentUser = JSON.parse(
+      localStorage.getItem("organigoUser") || "null"
+    );
+  } catch {
+    currentUser = null;
+  }
+
+  const isAdmin =
+    Boolean(token) && currentUser?.role === "admin";
+
+  // PRODUCT STATE
   const [product, setProduct] = useState({
     name: "",
     category: "Fruits",
@@ -42,22 +61,62 @@ function Admin() {
 
   const [preview, setPreview] = useState("");
 
+  // DELIVERY SETTINGS
   const [deliverySettings, setDeliverySettings] = useState(
     getSavedDeliverySettings
   );
 
   const [settingsMessage, setSettingsMessage] = useState("");
 
-  // CUSTOMER ORDERS
-  const [orders, setOrders] = useState(() => {
-    try {
-      return JSON.parse(
-        localStorage.getItem("organigoOrders") || "[]"
-      );
-    } catch {
-      return [];
+  // ORDERS STATE
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState("");
+
+  // FETCH ORDERS FROM MONGODB
+  const fetchOrders = useCallback(async () => {
+    if (!token || currentUser?.role !== "admin") {
+      setOrdersError("Please login with an Admin account.");
+      setOrders([]);
+      return;
     }
-  });
+
+    try {
+      setOrdersLoading(true);
+      setOrdersError("");
+
+      const response = await fetch(`${API_URL}/orders`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.status === 401 || response.status === 403) {
+        throw new Error(
+          data.message || "Admin access denied. Please login again."
+        );
+      }
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Unable to fetch orders.");
+      }
+
+      setOrders(Array.isArray(data.orders) ? data.orders : []);
+    } catch (error) {
+      console.error("Fetch Orders Error:", error);
+      setOrdersError(error.message);
+    } finally {
+      setOrdersLoading(false);
+    }
+  }, [token, currentUser?.role]);
+
+  // LOAD ORDERS WHEN ADMIN OPENS
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   // PRODUCT INPUT
   const handleChange = (e) => {
@@ -73,20 +132,31 @@ function Admin() {
   const handleImage = (e) => {
     const file = e.target.files[0];
 
-    if (file) {
-      const reader = new FileReader();
+    if (!file) return;
 
-      reader.onloadend = () => {
-        setProduct((prev) => ({
-          ...prev,
-          image: reader.result,
-        }));
-
-        setPreview(reader.result);
-      };
-
-      reader.readAsDataURL(file);
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image.");
+      return;
     }
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image size should be less than 2 MB.");
+      e.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setProduct((prev) => ({
+        ...prev,
+        image: reader.result,
+      }));
+
+      setPreview(reader.result);
+    };
+
+    reader.readAsDataURL(file);
   };
 
   // SAVE PRODUCT
@@ -98,43 +168,51 @@ function Admin() {
       return;
     }
 
-    const savedProducts = JSON.parse(
-      localStorage.getItem("organigoProducts") || "[]"
-    );
+    try {
+      const savedProducts = JSON.parse(
+        localStorage.getItem("organigoProducts") || "[]"
+      );
 
-    const newProduct = {
-      id: Date.now(),
-      name: product.name,
-      category: product.category,
-      weight: product.weight,
-      price: Number(product.price),
-      oldPrice: Number(product.oldPrice),
-      stock: Number(product.stock),
-      description: product.description,
-      image: product.image,
-    };
+      const newProduct = {
+        id: Date.now(),
+        name: product.name.trim(),
+        category: product.category,
+        weight: product.weight.trim(),
+        price: Number(product.price),
+        oldPrice: Number(product.oldPrice),
+        stock: Number(product.stock),
+        description: product.description,
+        image: product.image,
+      };
 
-    localStorage.setItem(
-      "organigoProducts",
-      JSON.stringify([...savedProducts, newProduct])
-    );
+      localStorage.setItem(
+        "organigoProducts",
+        JSON.stringify([...savedProducts, newProduct])
+      );
 
-    window.dispatchEvent(new Event("organigoProductsUpdated"));
+      window.dispatchEvent(
+        new Event("organigoProductsUpdated")
+      );
 
-    alert("Product Added Successfully!");
+      alert("Product Added Successfully!");
 
-    setProduct({
-      name: "",
-      category: "Fruits",
-      weight: "",
-      price: "",
-      oldPrice: "",
-      stock: "",
-      description: "",
-      image: null,
-    });
+      setProduct({
+        name: "",
+        category: "Fruits",
+        weight: "",
+        price: "",
+        oldPrice: "",
+        stock: "",
+        description: "",
+        image: null,
+      });
 
-    setPreview("");
+      setPreview("");
+      e.target.reset();
+    } catch (error) {
+      console.error(error);
+      alert("Unable to save product. Please check image size.");
+    }
   };
 
   // DELIVERY SETTINGS INPUT
@@ -162,7 +240,7 @@ function Admin() {
       !deliverySettings.city.trim() ||
       !deliverySettings.state.trim()
     ) {
-      alert("Please enter the complete hub address.");
+      alert("Please enter complete hub address.");
       return;
     }
 
@@ -171,7 +249,7 @@ function Admin() {
       latitude < -90 ||
       latitude > 90
     ) {
-      alert("Please enter a valid latitude between -90 and 90.");
+      alert("Invalid latitude.");
       return;
     }
 
@@ -180,12 +258,12 @@ function Admin() {
       longitude < -180 ||
       longitude > 180
     ) {
-      alert("Please enter a valid longitude between -180 and 180.");
+      alert("Invalid longitude.");
       return;
     }
 
     if (!Number.isFinite(radius) || radius <= 0) {
-      alert("Please enter a valid delivery radius.");
+      alert("Invalid delivery radius.");
       return;
     }
 
@@ -212,12 +290,10 @@ function Admin() {
     alert("Delivery Settings Updated Successfully!");
   };
 
-  // OPEN HUB ON GOOGLE MAPS
+  // OPEN HUB MAP
   const openHubMap = () => {
-    const { latitude, longitude } = deliverySettings;
-
     window.open(
-      `https://www.google.com/maps?q=${latitude},${longitude}`,
+      `https://www.google.com/maps?q=${deliverySettings.latitude},${deliverySettings.longitude}`,
       "_blank",
       "noopener,noreferrer"
     );
@@ -225,39 +301,73 @@ function Admin() {
 
   // REFRESH ORDERS
   const refreshOrders = () => {
+    fetchOrders();
+  };
+
+  // UPDATE ORDER STATUS IN MONGODB
+  const updateOrderStatus = async (orderId, newStatus) => {
+    if (!token || currentUser?.role !== "admin") {
+      alert("Please login with an Admin account.");
+      return;
+    }
+
     try {
-      const savedOrders = JSON.parse(
-        localStorage.getItem("organigoOrders") || "[]"
+      const response = await fetch(
+        `${API_URL}/orders/${encodeURIComponent(orderId)}/status`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            status: newStatus,
+          }),
+        }
       );
 
-      setOrders(savedOrders);
-    } catch {
-      setOrders([]);
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Status update failed.");
+      }
+
+      setOrders((previousOrders) =>
+        previousOrders.map((order) =>
+          order.orderId === orderId ? data.order : order
+        )
+      );
+
+      alert("Order Status Updated Successfully!");
+    } catch (error) {
+      console.error("Update Status Error:", error);
+      alert(error.message);
+      fetchOrders();
     }
   };
 
-  // UPDATE ORDER STATUS
-  const updateOrderStatus = (orderId, newStatus) => {
-    const updatedOrders = orders.map((order) =>
-      order.orderId === orderId
-        ? { ...order, status: newStatus }
-        : order
+  // BLOCK NON-ADMIN USERS
+  if (!isAdmin) {
+    return (
+      <div className="admin-page">
+        <div className="no-orders">
+          <h2>🔒 Admin Access Required</h2>
+          <p>Please login using your ORGANIGO Admin account.</p>
+        </div>
+      </div>
     );
-
-    localStorage.setItem(
-      "organigoOrders",
-      JSON.stringify(updatedOrders)
-    );
-
-    setOrders(updatedOrders);
-  };
+  }
 
   return (
     <div className="admin-page">
 
+      {/* ADMIN HEADING */}
+
       <div className="admin-heading">
         <h1>ORGANIGO Admin Panel</h1>
-        <p>Manage your grocery products, delivery settings and customer orders.</p>
+        <p>
+          Manage your grocery products, delivery settings and customer orders.
+        </p>
       </div>
 
       {/* DELIVERY SETTINGS */}
@@ -286,8 +396,8 @@ function Admin() {
           <div className="delivery-settings-note">
             <strong>📍 Current Hub Location</strong>
             <p>
-              This address is used as the temporary ORGANIGO delivery
-              centre. You can update it whenever your business location changes.
+              This address is used as the ORGANIGO delivery centre.
+              You can update it whenever your business location changes.
             </p>
           </div>
 
@@ -300,7 +410,6 @@ function Admin() {
                 name="businessName"
                 value={deliverySettings.businessName}
                 onChange={handleDeliveryChange}
-                placeholder="ORGANIGO"
                 required
               />
             </div>
@@ -312,7 +421,6 @@ function Admin() {
                 name="pincode"
                 value={deliverySettings.pincode}
                 onChange={handleDeliveryChange}
-                placeholder="Enter PIN Code"
                 maxLength="6"
               />
             </div>
@@ -335,7 +443,6 @@ function Admin() {
                 name="city"
                 value={deliverySettings.city}
                 onChange={handleDeliveryChange}
-                placeholder="Chaibasa"
                 required
               />
             </div>
@@ -347,7 +454,6 @@ function Admin() {
                 name="state"
                 value={deliverySettings.state}
                 onChange={handleDeliveryChange}
-                placeholder="Jharkhand"
                 required
               />
             </div>
@@ -360,7 +466,6 @@ function Admin() {
                 step="any"
                 value={deliverySettings.latitude}
                 onChange={handleDeliveryChange}
-                placeholder="22.5504"
                 required
               />
             </div>
@@ -373,7 +478,6 @@ function Admin() {
                 step="any"
                 value={deliverySettings.longitude}
                 onChange={handleDeliveryChange}
-                placeholder="85.8025"
                 required
               />
             </div>
@@ -387,11 +491,10 @@ function Admin() {
                 step="0.5"
                 value={deliverySettings.radius}
                 onChange={handleDeliveryChange}
-                placeholder="10"
                 required
               />
               <small className="field-help">
-                Example: 10 KM means a 10 kilometre radius around your hub.
+                Example: 10 KM delivery radius around your hub.
               </small>
             </div>
 
@@ -447,7 +550,7 @@ function Admin() {
         </form>
       </div>
 
-      {/* ADD PRODUCT SECTION */}
+      {/* ADD PRODUCT */}
 
       <div className="admin-container">
 
@@ -522,7 +625,6 @@ function Admin() {
               <input
                 type="number"
                 name="price"
-                placeholder="Enter price"
                 min="0"
                 value={product.price}
                 onChange={handleChange}
@@ -535,7 +637,6 @@ function Admin() {
               <input
                 type="number"
                 name="oldPrice"
-                placeholder="Enter original price"
                 min="0"
                 value={product.oldPrice}
                 onChange={handleChange}
@@ -548,7 +649,6 @@ function Admin() {
               <input
                 type="number"
                 name="stock"
-                placeholder="Available quantity"
                 min="0"
                 value={product.stock}
                 onChange={handleChange}
@@ -575,7 +675,7 @@ function Admin() {
         </form>
       </div>
 
-      {/* CUSTOMER ORDERS SECTION */}
+      {/* CUSTOMER ORDERS */}
 
       <div className="admin-orders-container">
 
@@ -586,14 +686,36 @@ function Admin() {
           </div>
 
           <button
+            type="button"
             className="refresh-orders-btn"
             onClick={refreshOrders}
+            disabled={ordersLoading}
           >
-            ↻ Refresh Orders
+            {ordersLoading ? "Loading..." : "↻ Refresh Orders"}
           </button>
         </div>
 
-        {orders.length === 0 ? (
+        {ordersLoading && orders.length === 0 ? (
+
+          <div className="no-orders">
+            <h3>Loading Orders...</h3>
+          </div>
+
+        ) : ordersError ? (
+
+          <div className="no-orders">
+            <h3>Unable to Load Orders</h3>
+            <p>{ordersError}</p>
+            <button
+              type="button"
+              className="refresh-orders-btn"
+              onClick={refreshOrders}
+            >
+              Try Again
+            </button>
+          </div>
+
+        ) : orders.length === 0 ? (
 
           <div className="no-orders">
             <span>📦</span>
@@ -610,16 +732,17 @@ function Admin() {
               <div className="admin-order-card" key={order.orderId}>
 
                 <div className="admin-order-top">
-
                   <div>
                     <h3>Order #{order.orderId}</h3>
-                    <p>{order.orderDate}</p>
+                    <p>
+                      {order.orderDate ||
+                        new Date(order.createdAt).toLocaleString()}
+                    </p>
                   </div>
 
                   <span className="order-status-badge">
                     {order.status || "Order Placed"}
                   </span>
-
                 </div>
 
                 <hr />
@@ -707,7 +830,7 @@ function Admin() {
 
                     <div
                       className="admin-order-product"
-                      key={`${order.orderId}-${item.id}-${index}`}
+                      key={`${order.orderId}-${item.productId || index}-${index}`}
                     >
                       <span>
                         {item.name} × {item.quantity}

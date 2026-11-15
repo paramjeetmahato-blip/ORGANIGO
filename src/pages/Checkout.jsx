@@ -1,7 +1,10 @@
+
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "../styles/Checkout.css";
+
+const API_URL = "http://localhost:5000/api/orders";
 
 const DEFAULT_HUB = {
   latitude: 22.5504,
@@ -12,7 +15,6 @@ const DEFAULT_HUB = {
   state: "Jharkhand",
 };
 
-// Saved customer location
 function getSavedLocation() {
   try {
     const saved = localStorage.getItem("organigoSelectedLocation");
@@ -22,7 +24,6 @@ function getSavedLocation() {
   }
 }
 
-// Admin delivery settings
 function getHubSettings() {
   try {
     const saved = localStorage.getItem("organigoDeliverySettings");
@@ -35,10 +36,8 @@ function getHubSettings() {
   }
 }
 
-// Calculate distance
 function getDistanceKm(lat1, lon1, lat2, lon2) {
   const toRad = (value) => (value * Math.PI) / 180;
-
   const earthRadius = 6371;
 
   const dLat = toRad(lat2 - lat1);
@@ -53,7 +52,6 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
   return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// Verify delivery
 function verifyDelivery(location) {
   const settings = getHubSettings();
 
@@ -73,7 +71,6 @@ function verifyDelivery(location) {
 
   const customerLat = Number(location.latitude);
   const customerLon = Number(location.longitude);
-
   const hubLat = Number(settings.latitude);
   const hubLon = Number(settings.longitude);
   const radius = Number(settings.radius);
@@ -126,9 +123,17 @@ function Checkout() {
   const savedLocation = getSavedLocation();
   const hubSettings = getHubSettings();
 
+  const savedUser = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("organigoUser") || "null");
+    } catch {
+      return null;
+    }
+  })();
+
   const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
+    name: savedUser?.name || "",
+    phone: savedUser?.phone || "",
     address: savedLocation?.fullAddress || "",
     city: hubSettings.city || "Chaibasa",
     state: hubSettings.state || "Jharkhand",
@@ -136,7 +141,6 @@ function Checkout() {
   });
 
   const [location, setLocation] = useState(savedLocation);
-
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationMessage, setLocationMessage] = useState("");
 
@@ -145,11 +149,11 @@ function Checkout() {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderId, setOrderId] = useState("");
 
+  const [placingOrder, setPlacingOrder] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const delivery = verifyDelivery(location);
 
-  // Form input
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -161,7 +165,10 @@ function Checkout() {
     setErrorMessage("");
   };
 
-  // Get current GPS location
+  // =================================
+  // GET CURRENT GPS LOCATION
+  // =================================
+
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       setLocationMessage("Your browser does not support location.");
@@ -182,8 +189,6 @@ function Checkout() {
           source: "gps",
           updatedAt: new Date().toISOString(),
         };
-
-        setLocation(selectedLocation);
 
         try {
           const response = await fetch(
@@ -233,9 +238,7 @@ function Checkout() {
           JSON.stringify(selectedLocation)
         );
 
-        window.dispatchEvent(
-          new Event("organigoLocationUpdated")
-        );
+        window.dispatchEvent(new Event("organigoLocationUpdated"));
 
         const result = verifyDelivery(selectedLocation);
 
@@ -245,7 +248,6 @@ function Checkout() {
 
         setLocationLoading(false);
       },
-
       (error) => {
         if (error.code === 1) {
           setLocationMessage(
@@ -259,7 +261,6 @@ function Checkout() {
 
         setLocationLoading(false);
       },
-
       {
         enableHighAccuracy: true,
         timeout: 20000,
@@ -268,14 +269,29 @@ function Checkout() {
     );
   };
 
-  // Place order
-  const handlePlaceOrder = (e) => {
+  // =================================
+  // PLACE ORDER IN MONGODB
+  // =================================
+
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
 
     setErrorMessage("");
 
+    if (placingOrder) return;
+
     if (cartItems.length === 0) {
       setErrorMessage("Your cart is empty.");
+      return;
+    }
+
+    // Check login token
+    const token = localStorage.getItem("organigoToken");
+
+    if (!token) {
+      navigate("/login", {
+        state: { from: "/checkout" },
+      });
       return;
     }
 
@@ -289,7 +305,6 @@ function Checkout() {
       return;
     }
 
-    // Final delivery verification
     const finalDelivery = verifyDelivery(location);
 
     if (!finalDelivery.available) {
@@ -302,8 +317,11 @@ function Checkout() {
       return;
     }
 
-    const newOrderId =
-      "ORG" + Date.now().toString().slice(-8);
+    const newOrderId = "ORG" + Date.now().toString().slice(-8);
+
+    const mapLink = location
+      ? `https://www.google.com/maps?q=${location.latitude},${location.longitude}`
+      : "";
 
     const newOrder = {
       orderId: newOrderId,
@@ -312,52 +330,103 @@ function Checkout() {
         ...formData,
       },
 
-      location: location,
+      location: {
+        name: location?.name || "",
+        fullAddress: location?.fullAddress || "",
+        latitude: Number(location.latitude),
+        longitude: Number(location.longitude),
+      },
 
-      mapLink: location
-        ? `https://www.google.com/maps?q=${location.latitude},${location.longitude}`
-        : "",
+      mapLink,
 
-      items: cartItems,
+      items: cartItems.map((item) => ({
+        productId: String(item.id || item._id || ""),
+        name: item.name,
+        image: item.image || item.imageUrl || "",
+        price: Number(item.price),
+        quantity: Number(item.quantity),
+        unit: item.unit || "",
+      })),
 
-      total: cartTotal,
+      total: Number(cartTotal),
 
-      paymentMethod,
+      paymentMethod: "Cash on Delivery",
 
       paymentStatus: "Pending - Cash on Delivery",
 
-      deliveryDistance: finalDelivery.distance,
+      deliveryDistance: Number(finalDelivery.distance),
 
       status: "Order Placed",
 
-      orderDate: new Date().toLocaleString(),
+      orderDate: new Date().toISOString(),
     };
 
     try {
+      setPlacingOrder(true);
+
+      // Send order with login token
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newOrder),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        if (response.status === 401) {
+          localStorage.removeItem("organigoToken");
+          localStorage.removeItem("organigoUser");
+
+          navigate("/login", {
+            state: { from: "/checkout" },
+          });
+
+          return;
+        }
+
+        throw new Error(
+          result.message || "Unable to place your order."
+        );
+      }
+
+      // Save local copy for existing Admin Panel
       const savedOrders = JSON.parse(
         localStorage.getItem("organigoOrders") || "[]"
       );
 
       localStorage.setItem(
         "organigoOrders",
-        JSON.stringify([...savedOrders, newOrder])
+        JSON.stringify([...savedOrders, result.order])
       );
 
-      setOrderId(newOrderId);
+      setOrderId(result.order.orderId || newOrderId);
 
       clearCart();
 
       setOrderPlaced(true);
-    } catch {
-      setErrorMessage("Unable to save your order. Please try again.");
+    } catch (error) {
+      console.error("Order Placement Error:", error);
+
+      setErrorMessage(
+        error.message ||
+          "Unable to connect to ORGANIGO server. Please try again."
+      );
+    } finally {
+      setPlacingOrder(false);
     }
   };
 
-  // Order success screen
+  // =================================
+  // SUCCESS SCREEN
+  // =================================
+
   if (orderPlaced) {
     return (
       <div className="checkout-success">
-
         <div className="success-icon">✓</div>
 
         <h1>Order Placed Successfully!</h1>
@@ -380,10 +449,21 @@ function Checkout() {
 
         <br />
 
-        <a href="/" className="success-home-btn">
+        <button
+          className="success-home-btn"
+          onClick={() => navigate("/")}
+        >
           Continue Shopping
-        </a>
+        </button>
 
+        <br />
+
+        <button
+          className="success-home-btn"
+          onClick={() => navigate("/my-orders")}
+        >
+          View My Orders
+        </button>
       </div>
     );
   }
@@ -392,6 +472,7 @@ function Checkout() {
     return (
       <div className="checkout-empty">
         <h2>Your Cart is Empty 🛒</h2>
+
         <button onClick={() => navigate("/")}>
           Continue Shopping
         </button>
@@ -399,23 +480,22 @@ function Checkout() {
     );
   }
 
+  // =================================
+  // CHECKOUT PAGE
+  // =================================
+
   return (
     <div className="checkout-page">
-
       <div className="checkout-heading">
         <h1>Checkout</h1>
         <p>Complete your order details</p>
       </div>
 
       <div className="checkout-container">
-
-        {/* DELIVERY FORM */}
-
         <form
           className="checkout-form"
           onSubmit={handlePlaceOrder}
         >
-
           <h2>Delivery Information</h2>
 
           <label>Full Name</label>
@@ -441,10 +521,7 @@ function Checkout() {
             required
           />
 
-          {/* LOCATION */}
-
           <div className="location-box">
-
             <h3>📍 Delivery Location</h3>
 
             <p>
@@ -488,10 +565,7 @@ function Checkout() {
                 </a>
               </div>
             )}
-
           </div>
-
-          {/* ADDRESS */}
 
           <label>House No. / Street / Landmark</label>
 
@@ -504,7 +578,6 @@ function Checkout() {
           />
 
           <div className="checkout-input-row">
-
             <div>
               <label>City</label>
 
@@ -530,7 +603,6 @@ function Checkout() {
                 required
               />
             </div>
-
           </div>
 
           <label>PIN Code</label>
@@ -544,8 +616,6 @@ function Checkout() {
             maxLength="6"
             required
           />
-
-          {/* DELIVERY STATUS */}
 
           <div
             className={`checkout-delivery-status ${
@@ -567,14 +637,10 @@ function Checkout() {
             )}
           </div>
 
-          {/* PAYMENT */}
-
           <div className="payment-method">
-
             <h3>Payment Method</h3>
 
             <label className="payment-option">
-
               <input
                 type="radio"
                 name="payment"
@@ -584,11 +650,9 @@ function Checkout() {
               />
 
               <span>💵 Cash on Delivery</span>
-
             </label>
 
             <label className="payment-option payment-disabled">
-
               <input
                 type="radio"
                 name="payment"
@@ -597,12 +661,8 @@ function Checkout() {
               />
 
               <span>📱 UPI Payment (Coming Soon)</span>
-
             </label>
-
           </div>
-
-          {/* ERROR */}
 
           {errorMessage && (
             <div className="checkout-error">
@@ -613,23 +673,17 @@ function Checkout() {
           <button
             type="submit"
             className="place-order-btn"
-            disabled={!delivery.available}
+            disabled={!delivery.available || placingOrder}
           >
-            Place Order →
+            {placingOrder ? "Placing Order..." : "Place Order →"}
           </button>
-
         </form>
 
-        {/* ORDER SUMMARY */}
-
         <div className="checkout-summary">
-
           <h2>Order Summary</h2>
 
           {cartItems.map((item) => (
-
             <div className="checkout-item" key={item.id}>
-
               <span>
                 {item.name} × {item.quantity}
               </span>
@@ -637,15 +691,14 @@ function Checkout() {
               <strong>
                 ₹{Number(item.price) * item.quantity}
               </strong>
-
             </div>
-
           ))}
 
           <hr />
 
           <div className="checkout-total">
             <span>Total Amount</span>
+
             <strong>₹{cartTotal}</strong>
           </div>
 
@@ -656,11 +709,8 @@ function Checkout() {
           <p className="checkout-secure">
             🔒 Your delivery details will be used to process your order.
           </p>
-
         </div>
-
       </div>
-
     </div>
   );
 }
