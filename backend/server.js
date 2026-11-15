@@ -12,6 +12,9 @@ app.use(express.json());
 // Authentication Routes
 app.use("/api/auth", require("./routes/Auth"));
 
+// Order Routes
+app.use("/api/orders", require("./routes/Order"));
+
 // Test API
 app.get("/", (req, res) => {
   res.json({

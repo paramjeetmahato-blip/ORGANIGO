@@ -1,10 +1,20 @@
-/* ORGANIGO ADMIN PANEL */
+
+/* =========================================
+   ORGANIGO ADMIN PANEL
+========================================= */
+
+.admin-page,
+.admin-page * {
+  box-sizing: border-box;
+}
 
 .admin-page {
   min-height: 100vh;
+  width: 100%;
   padding: 35px 5%;
   background: #f5f8f5;
   color: #1f2937;
+  overflow-x: hidden;
 }
 
 .admin-heading {
@@ -20,74 +30,30 @@
 .admin-heading p {
   color: #78847b;
   margin-top: 8px;
+  line-height: 1.5;
 }
 
-.admin-container {
-  max-width: 950px;
-  margin: auto;
-  padding: 35px;
-  background: white;
-  border-radius: 16px;
-  border: 1px solid #e5eee5;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-}
-
-.admin-container h2 {
-  font-size: 23px;
-  margin-bottom: 25px;
-  color: #166534;
-}
-
-/* IMAGE UPLOAD */
-
-.image-upload {
-  margin-bottom: 25px;
-}
-
-.image-upload label,
-.form-group label {
-  display: block;
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 9px;
-}
-
-.image-preview {
-  width: 180px;
-  height: 160px;
-  border: 2px dashed #86c99b;
-  border-radius: 12px;
-  background: #f0fdf4;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  margin-bottom: 12px;
-  color: #15803d;
-  font-size: 13px;
-  text-align: center;
-}
-
-.image-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.image-upload input {
-  font-size: 13px;
-}
-
-/* FORM GRID */
+/* =========================================
+   COMMON FORM STYLES
+========================================= */
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
 
 .form-group {
   margin-bottom: 20px;
+  min-width: 0;
+}
+
+.form-group label,
+.image-upload label {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 9px;
 }
 
 .form-group input,
@@ -116,7 +82,278 @@
   resize: vertical;
 }
 
-/* SAVE BUTTON */
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.field-help {
+  display: block;
+  margin-top: 7px;
+  color: #7b897e;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================
+   DELIVERY SETTINGS
+========================================= */
+
+.delivery-settings-container {
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto 35px;
+  padding: 30px;
+  background: #ffffff;
+  border: 1px solid #e2eee4;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+.delivery-settings-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.delivery-settings-heading h2 {
+  color: #166534;
+  font-size: 23px;
+  margin-bottom: 7px;
+}
+
+.delivery-settings-heading p {
+  color: #78847b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.delivery-active-badge,
+.delivery-inactive-badge {
+  padding: 8px 13px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.delivery-active-badge {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.delivery-inactive-badge {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.delivery-settings-note {
+  padding: 17px;
+  margin-bottom: 25px;
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  border-radius: 10px;
+}
+
+.delivery-settings-note strong {
+  display: block;
+  color: #166534;
+  margin-bottom: 7px;
+}
+
+.delivery-settings-note p {
+  color: #647568;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.delivery-service-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 18px;
+  margin: 10px 0 20px;
+  background: #f8faf8;
+  border: 1px solid #e5eee5;
+  border-radius: 10px;
+}
+
+.delivery-service-toggle strong {
+  color: #166534;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.delivery-service-toggle p {
+  font-size: 12px;
+  color: #78847b;
+}
+
+/* TOGGLE SWITCH */
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #cbd5ce;
+  border-radius: 30px;
+  transition: 0.3s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+  background: #16a34a;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(24px);
+}
+
+/* MAP PREVIEW */
+
+.delivery-map-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 17px;
+  margin-bottom: 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.delivery-map-preview strong {
+  display: block;
+  color: #26372b;
+  margin-bottom: 5px;
+}
+
+.delivery-map-preview p {
+  font-size: 13px;
+  color: #78847b;
+}
+
+.view-hub-map-btn {
+  padding: 11px 14px;
+  background: #e0f2fe;
+  color: #0369a1;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.view-hub-map-btn:hover {
+  background: #bae6fd;
+}
+
+.settings-success-message {
+  padding: 13px;
+  margin-bottom: 15px;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.save-delivery-settings-btn {
+  width: 100%;
+  padding: 15px;
+  background: #166534;
+  color: white;
+  border: none;
+  border-radius: 9px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.save-delivery-settings-btn:hover {
+  background: #14532d;
+  transform: translateY(-2px);
+}
+
+/* =========================================
+   ADD PRODUCT SECTION
+========================================= */
+
+.admin-container {
+  width: 100%;
+  max-width: 950px;
+  margin: auto;
+  padding: 35px;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5eee5;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+.admin-container h2 {
+  font-size: 23px;
+  margin-bottom: 25px;
+  color: #166534;
+}
+
+.image-upload {
+  margin-bottom: 25px;
+}
+
+.image-preview {
+  width: 180px;
+  height: 160px;
+  border: 2px dashed #86c99b;
+  border-radius: 12px;
+  background: #f0fdf4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  margin-bottom: 12px;
+  color: #15803d;
+  font-size: 13px;
+  text-align: center;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.image-upload input {
+  font-size: 13px;
+}
 
 .save-product-btn {
   width: 100%;
@@ -136,153 +373,12 @@
   transform: translateY(-2px);
 }
 
-/* MOBILE RESPONSIVE */
-
-@media (max-width: 600px) {
-  .admin-page {
-    padding: 20px 4%;
-  }
-
-  .admin-heading h1 {
-    font-size: 23px;
-  }
-
-  .admin-container {
-    padding: 20px;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .image-preview {
-    width: 100%;
-    max-width: 180px;
-  }
-}
 /* =========================================
-   ORGANIGO ADMIN - RESPONSIVE FIX
+   CUSTOMER ORDERS MANAGEMENT
 ========================================= */
 
-.admin-page,
-.admin-page * {
-  box-sizing: border-box;
-}
-
-.admin-page {
-  width: 100%;
-  overflow-x: hidden;
-}
-
-.admin-container {
-  width: 100%;
-}
-
-/* TABLET */
-@media (max-width: 768px) {
-
-  .admin-page {
-    padding: 25px 4%;
-  }
-
-  .admin-container {
-    padding: 25px;
-  }
-
-  .form-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 15px;
-  }
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-
-  .admin-page {
-    padding: 18px 12px;
-  }
-
-  .admin-heading {
-    margin-bottom: 20px;
-  }
-
-  .admin-heading h1 {
-    font-size: 23px;
-  }
-
-  .admin-heading p {
-    font-size: 13px;
-  }
-
-  .admin-container {
-    padding: 17px;
-    border-radius: 12px;
-  }
-
-  .admin-container h2 {
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .form-group {
-    margin-bottom: 17px;
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    width: 100%;
-    padding: 12px;
-    font-size: 14px;
-  }
-
-  .image-preview {
-    width: 100%;
-    max-width: 200px;
-    height: 150px;
-  }
-
-  .image-upload input {
-    max-width: 100%;
-    font-size: 12px;
-  }
-
-  .save-product-btn {
-    padding: 14px;
-    font-size: 14px;
-  }
-}
-
-/* SMALL MOBILE */
-@media (max-width: 360px) {
-
-  .admin-page {
-    padding: 14px 9px;
-  }
-
-  .admin-container {
-    padding: 13px;
-  }
-
-  .admin-heading h1 {
-    font-size: 21px;
-  }
-
-  .admin-container h2 {
-    font-size: 18px;
-  }
-}
-/* ================================
-   CUSTOMER ORDERS MANAGEMENT
-================================ */
-
 .admin-orders-container {
+  width: 100%;
   max-width: 1100px;
   margin: 40px auto;
   padding: 28px;
@@ -460,9 +556,112 @@
   font-size: 15px;
 }
 
+/* =========================================
+   TABLET RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+  .admin-page {
+    padding: 25px 4%;
+  }
+
+  .admin-container,
+  .delivery-settings-container {
+    padding: 25px;
+  }
+
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+  }
+}
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
 @media (max-width: 600px) {
+  .admin-page {
+    padding: 18px 12px;
+  }
+
+  .admin-heading {
+    margin-bottom: 20px;
+  }
+
+  .admin-heading h1 {
+    font-size: 23px;
+  }
+
+  .admin-heading p {
+    font-size: 13px;
+  }
+
+  .delivery-settings-container,
+  .admin-container {
+    padding: 17px;
+    border-radius: 12px;
+  }
+
+  .delivery-settings-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .delivery-settings-heading h2,
+  .admin-container h2 {
+    font-size: 20px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+
+  .form-group {
+    margin-bottom: 17px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .image-preview {
+    width: 100%;
+    max-width: 200px;
+    height: 150px;
+  }
+
+  .image-upload input {
+    max-width: 100%;
+    font-size: 12px;
+  }
+
+  .save-product-btn,
+  .save-delivery-settings-btn {
+    padding: 14px;
+    font-size: 14px;
+  }
+
+  .delivery-map-preview {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .view-hub-map-btn {
+    width: 100%;
+  }
+
   .admin-orders-container {
-    margin: 25px 12px;
+    margin: 25px 0;
     padding: 17px;
   }
 
@@ -483,5 +682,37 @@
 
   .admin-order-product {
     font-size: 14px;
+  }
+
+  .delivery-service-toggle {
+    padding: 14px;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 360px) {
+  .admin-page {
+    padding: 14px 9px;
+  }
+
+  .admin-container,
+  .delivery-settings-container {
+    padding: 13px;
+  }
+
+  .admin-heading h1 {
+    font-size: 21px;
+  }
+
+  .admin-container h2,
+  .delivery-settings-heading h2 {
+    font-size: 18px;
+  }
+
+  .delivery-settings-note {
+    padding: 13px;
   }
 }

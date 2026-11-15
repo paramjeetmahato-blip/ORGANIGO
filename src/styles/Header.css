@@ -1,6 +1,6 @@
-/* =================================
-   ORGANIGO RESPONSIVE HEADER
-================================= */
+/* =========================================
+   ORGANIGO - PREMIUM MODERN HEADER
+========================================= */
 
 .Organigo-header,
 .Organigo-header * {
@@ -15,106 +15,182 @@
   z-index: 1000;
   font-family: 'DM Sans', Arial, sans-serif;
   border-bottom: 1px solid #e8eee9;
+  box-shadow: 0 3px 15px rgba(20, 80, 40, 0.035);
 }
-
-/* APP BANNER - DESKTOP HIDDEN */
 
 .organigo-app-banner {
   display: none;
 }
 
-/* HEADER CONTAINER */
+/* =========================================
+   MAIN HEADER
+========================================= */
 
 .header-container {
   width: 100%;
   max-width: 1500px;
-  min-height: 85px;
+  min-height: 76px;
   margin: auto;
-  padding: 10px 28px;
-
+  padding: 8px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 14px;
 }
 
-/* LOGO */
+/* =========================================
+   LOGO
+========================================= */
 
 .Organigo-logo {
-  flex: 0 0 155px;
+  flex: 0 0 118px;
+  height: 58px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border-radius: 12px;
+  transition: 0.25s ease;
 }
 
 .Organigo-logo img {
-  width: 155px;
-  height: 65px;
+  width: 118px;
+  height: 56px;
   object-fit: contain;
+  transition: transform 0.25s ease;
 }
 
-/* LOCATION */
+.Organigo-logo:hover img {
+  transform: scale(1.04);
+}
+
+/* =========================================
+   DELIVERY LOCATION BUTTON
+========================================= */
 
 .delivery-location {
+  flex: 0 0 auto;
+  min-width: 205px;
+  min-height: 49px;
+  padding: 7px 12px;
+
   display: flex;
   align-items: center;
-  gap: 8px;
-  white-space: nowrap;
+  gap: 10px;
+
+  background: #f7fbf7;
+  border: 1px solid #dceade;
+  border-radius: 11px;
+
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+
+  transition: 0.25s ease;
+}
+
+.delivery-location:hover {
+  border-color: #159447;
+  background: #f0faf2;
 }
 
 .location-icon {
-  font-size: 22px;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #e5f6e9;
+  border-radius: 9px;
+  font-size: 18px;
 }
 
 .delivery-location div {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  min-width: 0;
 }
 
 .delivery-location small {
-  color: #777;
-  font-size: 11px;
+  color: #718075;
+  font-size: 10px;
+  font-weight: 500;
 }
 
 .delivery-location strong {
-  color: #222;
-  font-size: 13px;
+  color: #173d26;
+  font-size: 12px;
   font-weight: 800;
+  white-space: nowrap;
 }
 
-/* SEARCH */
+/* =========================================
+   SEARCH BAR
+========================================= */
 
 .header-search {
   flex: 1;
-  max-width: 470px;
+  max-width: 520px;
   min-width: 150px;
-  height: 46px;
+  height: 45px;
 
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
 
   padding: 0 15px;
+
   background: #f5f8f5;
-  border: 1px solid #e5ebe5;
+  border: 1px solid #e0e9e1;
   border-radius: 12px;
+
+  transition: all 0.25s ease;
+}
+
+.header-search:focus-within {
+  background: #ffffff;
+  border-color: #159447;
+  box-shadow: 0 0 0 3px rgba(21, 148, 71, 0.09);
+}
+
+.header-search > span {
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
 .header-search input {
   width: 100%;
+  min-width: 0;
   border: none;
   outline: none;
   background: transparent;
+  color: #25382b;
+  font-family: inherit;
   font-size: 13px;
 }
 
-/* HYGIENE */
+.header-search input::placeholder {
+  color: #8b978d;
+}
+
+/* =========================================
+   HYGIENE BADGE
+========================================= */
 
 .hygiene-badge {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 8px;
   white-space: nowrap;
+}
+
+.hygiene-icon {
+  font-size: 20px;
 }
 
 .hygiene-badge div {
@@ -125,34 +201,49 @@
 
 .hygiene-badge strong {
   color: #12843e;
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 900;
 }
 
 .hygiene-badge small {
-  color: #777;
-  font-size: 9px;
+  color: #829087;
+  font-size: 8px;
 }
 
-/* CART */
+/* =========================================
+   CART BUTTON
+========================================= */
 
 .header-cart {
+  min-width: 120px;
   min-height: 44px;
-  padding: 0 16px;
+  padding: 0 15px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 9px;
 
   position: relative;
   flex-shrink: 0;
 
   color: white;
   background: #159447;
+  border: 1px solid #159447;
   border-radius: 10px;
+
   text-decoration: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
+
+  transition: all 0.25s ease;
+}
+
+.header-cart:hover {
+  background: #087a36;
+  border-color: #087a36;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(21, 148, 71, 0.2);
 }
 
 .cart-icon {
@@ -176,47 +267,432 @@
   background: #ff3535;
   border: 2px solid white;
   border-radius: 50px;
+
   font-size: 10px;
+  font-weight: 800;
 }
 
-/* TABLET */
+/* =========================================
+   LOCATION POPUP / MODAL
+========================================= */
+
+/* Overlay */
+
+.location-modal-overlay,
+.location-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 18px;
+
+  background: rgba(10, 25, 15, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Main popup */
+
+.location-modal,
+.location-modal-content {
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+
+  padding: 25px;
+
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.2);
+
+  animation: locationPopup 0.25s ease;
+}
+
+@keyframes locationPopup {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Popup heading */
+
+.location-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.location-modal-header h2,
+.location-modal h2,
+.location-modal-title {
+  margin: 0;
+  color: #173d26;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.location-modal-header p {
+  margin: 6px 0 0;
+  color: #7b897e;
+  font-size: 12px;
+}
+
+/* Close button */
+
+.location-close-btn,
+.location-modal-close {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f1f5f1;
+  color: #304b37;
+
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.location-close-btn:hover,
+.location-modal-close:hover {
+  background: #ffe8e8;
+  color: #e33434;
+}
+
+/* =========================================
+   GPS LOCATION BUTTON
+========================================= */
+
+.gps-location-btn,
+.use-current-location-btn,
+.current-location-btn {
+  width: 100%;
+  min-height: 53px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 12px 15px;
+
+  color: #ffffff;
+  background: #159447;
+  border: none;
+  border-radius: 12px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.gps-location-btn:hover,
+.use-current-location-btn:hover,
+.current-location-btn:hover {
+  background: #087a36;
+  box-shadow: 0 5px 15px rgba(21, 148, 71, 0.18);
+}
+
+.gps-location-btn:disabled,
+.use-current-location-btn:disabled,
+.current-location-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   DIVIDER
+========================================= */
+
+.location-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin: 20px 0;
+
+  color: #9aa59c;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.location-divider::before,
+.location-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e8eee9;
+}
+
+/* =========================================
+   MANUAL ADDRESS SEARCH
+========================================= */
+
+.location-search-box,
+.manual-location-search {
+  width: 100%;
+  min-height: 48px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 0 14px;
+
+  background: #f7faf7;
+  border: 1px solid #dce8de;
+  border-radius: 11px;
+
+  transition: 0.2s ease;
+}
+
+.location-search-box:focus-within,
+.manual-location-search:focus-within {
+  background: #ffffff;
+  border-color: #159447;
+  box-shadow: 0 0 0 3px rgba(21, 148, 71, 0.08);
+}
+
+.location-search-box input,
+.manual-location-search input,
+.location-modal input {
+  width: 100%;
+  min-width: 0;
+
+  padding: 13px 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+  color: #25382b;
+
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.location-search-box input::placeholder,
+.manual-location-search input::placeholder,
+.location-modal input::placeholder {
+  color: #98a39a;
+}
+
+/* =========================================
+   LOCATION SEARCH RESULTS
+========================================= */
+
+.location-results,
+.location-suggestions {
+  width: 100%;
+  margin-top: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.location-result-item,
+.location-suggestion {
+  width: 100%;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+
+  padding: 12px;
+
+  background: #ffffff;
+  border: 1px solid #edf1ed;
+  border-radius: 10px;
+
+  text-align: left;
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.location-result-item:hover,
+.location-suggestion:hover {
+  background: #f0faf2;
+  border-color: #b9dfc2;
+}
+
+.location-result-item span,
+.location-suggestion span {
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.location-result-item div,
+.location-suggestion div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.location-result-item strong,
+.location-suggestion strong {
+  color: #24452e;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.location-result-item small,
+.location-suggestion small {
+  color: #879289;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* =========================================
+   LOCATION STATUS / MESSAGES
+========================================= */
+
+.location-message,
+.location-status,
+.location-error {
+  margin-top: 12px;
+  padding: 11px 13px;
+
+  border-radius: 9px;
+
+  color: #536457;
+  background: #f4f7f4;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.location-error {
+  color: #b52b2b;
+  background: #fff0f0;
+  border: 1px solid #ffdada;
+}
+
+.location-success {
+  color: #087a36;
+  background: #eaf8ee;
+  border: 1px solid #c9ebd2;
+}
+
+/* =========================================
+   SELECTED LOCATION
+========================================= */
+
+.selected-location,
+.saved-location {
+  margin-top: 18px;
+  padding: 13px;
+
+  background: #f3faf4;
+  border: 1px solid #d7ecdc;
+  border-radius: 12px;
+}
+
+.selected-location strong,
+.saved-location strong {
+  display: block;
+  margin-bottom: 6px;
+
+  color: #12843e;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.selected-location p,
+.saved-location p {
+  margin: 0;
+  color: #536457;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* =========================================
+   DELIVERY AVAILABILITY
+========================================= */
+
+.delivery-available {
+  color: #087a36;
+  background: #eaf8ee;
+}
+
+.delivery-not-available {
+  color: #c02b2b;
+  background: #fff0f0;
+}
+
+/* =========================================
+   TABLET
+========================================= */
 
 @media (max-width: 1100px) {
+
   .header-container {
-    gap: 12px;
-    padding: 10px 16px;
+    gap: 10px;
+    padding: 8px 15px;
   }
 
   .Organigo-logo {
-    flex-basis: 125px;
+    flex-basis: 100px;
   }
 
   .Organigo-logo img {
-    width: 125px;
+    width: 100px;
+  }
+
+  .delivery-location {
+    min-width: 180px;
+    padding: 7px 9px;
   }
 
   .hygiene-badge {
     display: none;
   }
+
+  .header-cart {
+    min-width: 105px;
+    padding: 0 11px;
+  }
 }
 
-/* =================================
+/* =========================================
    MOBILE HEADER
-================================= */
+========================================= */
 
 @media (max-width: 650px) {
 
   .Organigo-header {
-    position: sticky;
-    top: 0;
     background: #ffffff;
   }
 
-  /* APP DOWNLOAD BANNER */
+  /* APP BANNER */
 
   .organigo-app-banner {
     width: 100%;
-    min-height: 58px;
+    min-height: 55px;
     padding: 7px 12px;
 
     display: flex;
@@ -228,8 +704,8 @@
   }
 
   .app-banner-icon {
-    width: 37px;
-    height: 37px;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
 
     display: flex;
@@ -238,7 +714,7 @@
 
     background: white;
     border-radius: 10px;
-    font-size: 22px;
+    font-size: 21px;
   }
 
   .app-banner-text {
@@ -279,58 +755,68 @@
 
   .header-container {
     min-height: auto;
-    padding: 11px 12px;
+    padding: 10px 12px;
 
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
+
     grid-template-areas:
       "location cart"
       "search search";
 
     align-items: center;
-    column-gap: 8px;
-    row-gap: 11px;
+    column-gap: 9px;
+    row-gap: 10px;
   }
-
-  /* DESKTOP LOGO HIDDEN ON MOBILE */
 
   .Organigo-logo {
     display: none;
   }
 
-  /* ADDRESS */
+  /* LOCATION */
 
   .delivery-location {
     grid-area: location;
+
+    width: fit-content;
+    max-width: 100%;
     min-width: 0;
+    min-height: 43px;
+
+    padding: 5px 9px;
     gap: 7px;
-    white-space: normal;
   }
 
   .location-icon {
-    font-size: 22px;
+    width: 29px;
+    height: 29px;
+    font-size: 16px;
   }
 
   .delivery-location div {
-    min-width: 0;
     gap: 2px;
   }
 
   .delivery-location small {
-    font-size: 10px;
+    font-size: 9px;
   }
 
   .delivery-location strong {
-    font-size: 13px;
-    font-weight: 800;
+    max-width: 190px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 11px;
   }
 
   /* CART */
 
   .header-cart {
     grid-area: cart;
-    min-height: 41px;
-    padding: 0 13px;
+
+    min-width: 100px;
+    min-height: 40px;
+    padding: 0 11px;
+
     font-size: 12px;
   }
 
@@ -338,10 +824,12 @@
 
   .header-search {
     grid-area: search;
+
     width: 100%;
     max-width: none;
     min-width: 0;
-    height: 43px;
+    height: 42px;
+
     padding: 0 12px;
     border-radius: 10px;
   }
@@ -353,26 +841,82 @@
   .hygiene-badge {
     display: none;
   }
+
+  /* MOBILE LOCATION POPUP */
+
+  .location-modal-overlay,
+  .location-modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .location-modal,
+  .location-modal-content {
+    width: 100%;
+    max-width: 100%;
+    max-height: 88vh;
+
+    padding: 22px 17px 28px;
+
+    border-radius: 22px 22px 0 0;
+  }
+
+  .location-modal-header h2,
+  .location-modal h2,
+  .location-modal-title {
+    font-size: 19px;
+  }
+
+  .gps-location-btn,
+  .use-current-location-btn,
+  .current-location-btn {
+    min-height: 50px;
+    font-size: 13px;
+  }
+
+  .location-search-box,
+  .manual-location-search {
+    min-height: 47px;
+  }
+
+  .location-result-item,
+  .location-suggestion {
+    padding: 11px;
+  }
 }
 
-/* VERY SMALL MOBILE */
+/* =========================================
+   SMALL MOBILE
+========================================= */
 
 @media (max-width: 360px) {
+
   .header-container {
-    padding: 9px 9px;
+    padding: 9px;
     column-gap: 5px;
   }
 
+  .delivery-location {
+    padding: 5px 7px;
+  }
+
   .delivery-location strong {
-    font-size: 11px;
+    max-width: 155px;
+    font-size: 10px;
   }
 
   .header-cart {
-    padding: 0 9px;
+    min-width: 90px;
+    padding: 0 8px;
     font-size: 11px;
   }
 
   .app-banner-text small {
     font-size: 8px;
+  }
+
+  .location-modal,
+  .location-modal-content {
+    padding: 19px 14px 24px;
   }
 }

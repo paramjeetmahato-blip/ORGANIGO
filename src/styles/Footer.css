@@ -1,0 +1,315 @@
+/* =====================================
+   ORGANIGO FOOTER - DESKTOP
+===================================== */
+
+.organigo-footer {
+  width: 100%;
+  background: #f7faf7;
+  color: #26352a;
+  font-family: Arial, sans-serif;
+}
+
+.footer-desktop {
+  display: block;
+}
+
+.footer-mobile {
+  display: none;
+}
+
+.footer-main {
+  max-width: 1400px;
+  margin: auto;
+  padding: 55px 5%;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1.2fr 1.3fr;
+  gap: 35px;
+}
+
+.footer-brand img {
+  width: 175px;
+  height: auto;
+  object-fit: contain;
+}
+
+.footer-brand h3 {
+  font-size: 17px;
+  margin: 15px 0 10px;
+  color: #16833b;
+}
+
+.footer-brand p {
+  color: #69766d;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.footer-app {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #e8f5e9;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 20px;
+  width: fit-content;
+}
+
+.footer-app span {
+  font-size: 27px;
+}
+
+.footer-app strong,
+.footer-app small {
+  display: block;
+}
+
+.footer-app strong {
+  font-size: 12px;
+  color: #16833b;
+}
+
+.footer-app small {
+  font-size: 11px;
+  margin-top: 4px;
+  color: #69766d;
+}
+
+.footer-column h4 {
+  font-size: 15px;
+  margin-bottom: 20px;
+  color: #183d25;
+}
+
+.footer-column a {
+  display: block;
+  text-decoration: none;
+  color: #68756b;
+  font-size: 13px;
+  margin-bottom: 13px;
+  transition: 0.2s;
+}
+
+.footer-column a:hover {
+  color: #16833b;
+  padding-left: 4px;
+}
+
+.footer-contact p {
+  font-size: 13px;
+  color: #68756b;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+.footer-download {
+  max-width: 1300px;
+  margin: 0 auto 30px;
+  padding: 22px 30px;
+  background: #e8f5e9;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-download strong {
+  font-size: 17px;
+  color: #176b32;
+}
+
+.footer-download p {
+  font-size: 13px;
+  color: #69766d;
+  margin-top: 5px;
+}
+
+.footer-download span {
+  background: #16833b;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.footer-bottom {
+  border-top: 1px solid #e1e9e2;
+  padding: 22px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-bottom p,
+.footer-bottom a {
+  font-size: 12px;
+  color: #78837a;
+}
+
+.footer-bottom div {
+  display: flex;
+  gap: 25px;
+}
+
+.footer-bottom a {
+  text-decoration: none;
+}
+
+
+/* =====================================
+   ORGANIGO FOOTER - MOBILE
+===================================== */
+
+@media (max-width: 767px) {
+
+  .footer-desktop {
+    display: none !important;
+  }
+
+  .footer-mobile {
+    display: block !important;
+    padding: 28px 18px 18px;
+  }
+
+  .mobile-footer-brand {
+    text-align: center;
+    padding-bottom: 22px;
+  }
+
+  .mobile-footer-brand img {
+    width: 155px;
+    height: auto;
+  }
+
+  .mobile-footer-brand h3 {
+    font-size: 16px;
+    color: #16833b;
+    margin: 10px 0 6px;
+  }
+
+  .mobile-footer-brand p {
+    font-size: 12px;
+    color: #718075;
+  }
+
+  .mobile-footer-app {
+    background: #e8f5e9;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .mobile-footer-app strong {
+    font-size: 13px;
+    color: #176b32;
+  }
+
+  .mobile-footer-app p {
+    font-size: 11px;
+    color: #69766d;
+    margin-top: 5px;
+  }
+
+  .mobile-footer-app span {
+    background: #16833b;
+    color: white;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  .mobile-footer-links {
+    border-top: 1px solid #e1e9e2;
+  }
+
+  .mobile-footer-links details {
+    border-bottom: 1px solid #e1e9e2;
+    padding: 16px 2px;
+  }
+
+  .mobile-footer-links summary {
+    list-style: none;
+    font-size: 14px;
+    font-weight: 700;
+    color: #24452d;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-footer-links summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mobile-footer-links summary::after {
+    content: "+";
+    font-size: 20px;
+    color: #16833b;
+  }
+
+  .mobile-footer-links details[open] summary::after {
+    content: "−";
+  }
+
+  .mobile-footer-links details a {
+    display: block;
+    text-decoration: none;
+    color: #718075;
+    font-size: 13px;
+    padding: 12px 8px 0;
+  }
+
+  .mobile-footer-location {
+    padding: 20px 0;
+    border-bottom: 1px solid #e1e9e2;
+  }
+
+  .mobile-footer-location strong {
+    font-size: 13px;
+    color: #24452d;
+  }
+
+  .mobile-footer-location p {
+    color: #718075;
+    font-size: 12px;
+    margin-top: 7px;
+  }
+
+  .mobile-footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+  }
+
+  .mobile-footer-bottom p {
+    color: #526256;
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  .mobile-footer-bottom div {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+  }
+
+  .mobile-footer-bottom a {
+    color: #718075;
+    text-decoration: none;
+    font-size: 11px;
+  }
+
+  .mobile-footer-bottom small {
+    display: block;
+    color: #16833b;
+    font-size: 11px;
+    margin-top: 17px;
+  }
+}

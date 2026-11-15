@@ -1,35 +1,167 @@
-
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 import "../styles/Checkout.css";
 
+const DEFAULT_HUB = {
+  latitude: 22.5504,
+  longitude: 85.8025,
+  radius: 10,
+  active: true,
+  city: "Chaibasa",
+  state: "Jharkhand",
+};
+
+// Saved customer location
+function getSavedLocation() {
+  try {
+    const saved = localStorage.getItem("organigoSelectedLocation");
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Admin delivery settings
+function getHubSettings() {
+  try {
+    const saved = localStorage.getItem("organigoDeliverySettings");
+
+    return saved
+      ? { ...DEFAULT_HUB, ...JSON.parse(saved) }
+      : DEFAULT_HUB;
+  } catch {
+    return DEFAULT_HUB;
+  }
+}
+
+// Calculate distance
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  const toRad = (value) => (value * Math.PI) / 180;
+
+  const earthRadius = 6371;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) ** 2;
+
+  return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Verify delivery
+function verifyDelivery(location) {
+  const settings = getHubSettings();
+
+  if (!location) {
+    return {
+      available: false,
+      message: "Please select your delivery location.",
+    };
+  }
+
+  if (!settings.active) {
+    return {
+      available: false,
+      message: "ORGANIGO delivery is currently unavailable.",
+    };
+  }
+
+  const customerLat = Number(location.latitude);
+  const customerLon = Number(location.longitude);
+
+  const hubLat = Number(settings.latitude);
+  const hubLon = Number(settings.longitude);
+  const radius = Number(settings.radius);
+
+  if (
+    !Number.isFinite(customerLat) ||
+    !Number.isFinite(customerLon) ||
+    !Number.isFinite(hubLat) ||
+    !Number.isFinite(hubLon) ||
+    !Number.isFinite(radius) ||
+    Math.abs(customerLat) > 90 ||
+    Math.abs(customerLon) > 180 ||
+    Math.abs(hubLat) > 90 ||
+    Math.abs(hubLon) > 180 ||
+    radius <= 0
+  ) {
+    return {
+      available: false,
+      message: "Invalid location. Please select your location again.",
+    };
+  }
+
+  const distance = getDistanceKm(
+    hubLat,
+    hubLon,
+    customerLat,
+    customerLon
+  );
+
+  if (distance <= radius) {
+    return {
+      available: true,
+      distance: distance.toFixed(2),
+      message: "Delivery is available at your location!",
+    };
+  }
+
+  return {
+    available: false,
+    distance: distance.toFixed(2),
+    message: `Your location is outside our ${radius} km delivery area.`,
+  };
+}
+
 function Checkout() {
+  const navigate = useNavigate();
+
   const { cartItems, cartTotal, clearCart } = useCart();
+
+  const savedLocation = getSavedLocation();
+  const hubSettings = getHubSettings();
 
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    address: "",
-    city: "",
-    state: "",
+    address: savedLocation?.fullAddress || "",
+    city: hubSettings.city || "Chaibasa",
+    state: hubSettings.state || "Jharkhand",
     pincode: "",
   });
 
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState(savedLocation);
+
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationMessage, setLocationMessage] = useState("");
+
+  const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
 
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderId, setOrderId] = useState("");
 
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const delivery = verifyDelivery(location);
+
+  // Form input
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+
+    setErrorMessage("");
   };
 
-  // GET CUSTOMER CURRENT LOCATION
+  // Get current GPS location
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       setLocationMessage("Your browser does not support location.");
@@ -44,23 +176,34 @@ function Checkout() {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
 
-        setLocation({ latitude, longitude });
+        let selectedLocation = {
+          latitude,
+          longitude,
+          source: "gps",
+          updatedAt: new Date().toISOString(),
+        };
 
-        setLocationMessage("Location captured successfully!");
+        setLocation(selectedLocation);
 
         try {
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&addressdetails=1`
           );
 
           if (response.ok) {
             const data = await response.json();
             const address = data.address || {};
 
+            selectedLocation = {
+              ...selectedLocation,
+              name: data.name || data.display_name,
+              fullAddress: data.display_name,
+              postcode: address.postcode || "",
+            };
+
             setFormData((previous) => ({
               ...previous,
-              address:
-                data.display_name || previous.address,
+              address: data.display_name || previous.address,
               city:
                 address.city ||
                 address.town ||
@@ -71,14 +214,33 @@ function Checkout() {
               pincode: address.postcode || previous.pincode,
             }));
 
+            setLocationMessage("Address filled successfully!");
+          } else {
             setLocationMessage(
-              "Location captured and address filled successfully!"
+              "Location captured. Please enter your address manually."
             );
           }
-        } catch (error) {
+        } catch {
           setLocationMessage(
             "Location captured. Please enter your address manually."
           );
+        }
+
+        setLocation(selectedLocation);
+
+        localStorage.setItem(
+          "organigoSelectedLocation",
+          JSON.stringify(selectedLocation)
+        );
+
+        window.dispatchEvent(
+          new Event("organigoLocationUpdated")
+        );
+
+        const result = verifyDelivery(selectedLocation);
+
+        if (!result.available) {
+          setLocationMessage(result.message);
         }
 
         setLocationLoading(false);
@@ -90,7 +252,7 @@ function Checkout() {
             "Location permission denied. Please allow location access."
           );
         } else if (error.code === 2) {
-          setLocationMessage("Location is unavailable. Try again.");
+          setLocationMessage("Location unavailable. Please try again.");
         } else {
           setLocationMessage("Location request timed out. Try again.");
         }
@@ -100,44 +262,74 @@ function Checkout() {
 
       {
         enableHighAccuracy: true,
-        timeout: 15000,
+        timeout: 20000,
         maximumAge: 0,
       }
     );
   };
 
-  // PLACE ORDER
+  // Place order
   const handlePlaceOrder = (e) => {
     e.preventDefault();
 
+    setErrorMessage("");
+
     if (cartItems.length === 0) {
-      alert("Your cart is empty!");
+      setErrorMessage("Your cart is empty.");
       return;
     }
 
     if (!/^[6-9]\d{9}$/.test(formData.phone)) {
-      alert("Please enter a valid 10-digit mobile number.");
+      setErrorMessage("Please enter a valid 10-digit mobile number.");
       return;
     }
 
     if (!/^\d{6}$/.test(formData.pincode)) {
-      alert("Please enter a valid 6-digit PIN code.");
+      setErrorMessage("Please enter a valid 6-digit PIN code.");
       return;
     }
 
-    const newOrderId = "ORG" + Date.now().toString().slice(-8);
+    // Final delivery verification
+    const finalDelivery = verifyDelivery(location);
+
+    if (!finalDelivery.available) {
+      setErrorMessage(finalDelivery.message);
+      return;
+    }
+
+    if (paymentMethod !== "Cash on Delivery") {
+      setErrorMessage("Online UPI payment is coming soon. Please select COD.");
+      return;
+    }
+
+    const newOrderId =
+      "ORG" + Date.now().toString().slice(-8);
 
     const newOrder = {
       orderId: newOrderId,
-      customer: formData,
+
+      customer: {
+        ...formData,
+      },
+
       location: location,
+
       mapLink: location
         ? `https://www.google.com/maps?q=${location.latitude},${location.longitude}`
         : "",
+
       items: cartItems,
+
       total: cartTotal,
-      paymentMethod: "Cash on Delivery",
+
+      paymentMethod,
+
+      paymentStatus: "Pending - Cash on Delivery",
+
+      deliveryDistance: finalDelivery.distance,
+
       status: "Order Placed",
+
       orderDate: new Date().toLocaleString(),
     };
 
@@ -152,20 +344,28 @@ function Checkout() {
       );
 
       setOrderId(newOrderId);
+
       clearCart();
+
       setOrderPlaced(true);
-    } catch (error) {
-      alert("Unable to save your order. Please try again.");
+    } catch {
+      setErrorMessage("Unable to save your order. Please try again.");
     }
   };
 
+  // Order success screen
   if (orderPlaced) {
     return (
       <div className="checkout-success">
+
         <div className="success-icon">✓</div>
+
         <h1>Order Placed Successfully!</h1>
+
         <p>Thank you for shopping with ORGANIGO.</p>
+
         <h3>Order ID: {orderId}</h3>
+
         <p>Payment Method: Cash on Delivery</p>
 
         {location && (
@@ -183,6 +383,7 @@ function Checkout() {
         <a href="/" className="success-home-btn">
           Continue Shopping
         </a>
+
       </div>
     );
   }
@@ -191,23 +392,34 @@ function Checkout() {
     return (
       <div className="checkout-empty">
         <h2>Your Cart is Empty 🛒</h2>
-        <a href="/">Continue Shopping</a>
+        <button onClick={() => navigate("/")}>
+          Continue Shopping
+        </button>
       </div>
     );
   }
 
   return (
     <div className="checkout-page">
+
       <div className="checkout-heading">
         <h1>Checkout</h1>
         <p>Complete your order details</p>
       </div>
 
       <div className="checkout-container">
-        <form className="checkout-form" onSubmit={handlePlaceOrder}>
+
+        {/* DELIVERY FORM */}
+
+        <form
+          className="checkout-form"
+          onSubmit={handlePlaceOrder}
+        >
+
           <h2>Delivery Information</h2>
 
           <label>Full Name</label>
+
           <input
             type="text"
             name="name"
@@ -218,6 +430,7 @@ function Checkout() {
           />
 
           <label>Mobile Number</label>
+
           <input
             type="tel"
             name="phone"
@@ -228,11 +441,15 @@ function Checkout() {
             required
           />
 
-          {/* CURRENT LOCATION BUTTON */}
+          {/* LOCATION */}
+
           <div className="location-box">
+
             <h3>📍 Delivery Location</h3>
 
-            <p>Use your current location for delivery.</p>
+            <p>
+              Your selected location will be used to verify delivery availability.
+            </p>
 
             <button
               type="button"
@@ -252,29 +469,45 @@ function Checkout() {
             )}
 
             {location && (
-              <a
-                className="map-link"
-                href={`https://www.google.com/maps?q=${location.latitude},${location.longitude}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                View Location on Google Maps ↗
-              </a>
+              <div className="checkout-selected-location">
+                <strong>Selected Location</strong>
+
+                <p>
+                  {location.fullAddress ||
+                    location.name ||
+                    "GPS location selected"}
+                </p>
+
+                <a
+                  className="map-link"
+                  href={`https://www.google.com/maps?q=${location.latitude},${location.longitude}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  View on Google Maps ↗
+                </a>
+              </div>
             )}
+
           </div>
 
-          <label>Full Address</label>
+          {/* ADDRESS */}
+
+          <label>House No. / Street / Landmark</label>
+
           <textarea
             name="address"
-            placeholder="House number, street, landmark"
+            placeholder="Enter house number, street, area and landmark"
             value={formData.address}
             onChange={handleChange}
             required
           />
 
           <div className="checkout-input-row">
+
             <div>
               <label>City</label>
+
               <input
                 type="text"
                 name="city"
@@ -287,6 +520,7 @@ function Checkout() {
 
             <div>
               <label>State</label>
+
               <input
                 type="text"
                 name="state"
@@ -296,9 +530,11 @@ function Checkout() {
                 required
               />
             </div>
+
           </div>
 
           <label>PIN Code</label>
+
           <input
             type="text"
             name="pincode"
@@ -309,21 +545,91 @@ function Checkout() {
             required
           />
 
-          <div className="payment-method">
-            <h3>Payment Method</h3>
-            <p>💵 Cash on Delivery</p>
+          {/* DELIVERY STATUS */}
+
+          <div
+            className={`checkout-delivery-status ${
+              delivery.available ? "available" : "unavailable"
+            }`}
+          >
+            <strong>
+              {delivery.available
+                ? "✓ Delivery Available"
+                : "✕ Delivery Not Available"}
+            </strong>
+
+            <p>{delivery.message}</p>
+
+            {delivery.distance && (
+              <small>
+                Distance from hub: {delivery.distance} km
+              </small>
+            )}
           </div>
 
-          <button type="submit" className="place-order-btn">
+          {/* PAYMENT */}
+
+          <div className="payment-method">
+
+            <h3>Payment Method</h3>
+
+            <label className="payment-option">
+
+              <input
+                type="radio"
+                name="payment"
+                value="Cash on Delivery"
+                checked={paymentMethod === "Cash on Delivery"}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              />
+
+              <span>💵 Cash on Delivery</span>
+
+            </label>
+
+            <label className="payment-option payment-disabled">
+
+              <input
+                type="radio"
+                name="payment"
+                value="UPI"
+                disabled
+              />
+
+              <span>📱 UPI Payment (Coming Soon)</span>
+
+            </label>
+
+          </div>
+
+          {/* ERROR */}
+
+          {errorMessage && (
+            <div className="checkout-error">
+              {errorMessage}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="place-order-btn"
+            disabled={!delivery.available}
+          >
             Place Order →
           </button>
+
         </form>
 
+        {/* ORDER SUMMARY */}
+
         <div className="checkout-summary">
+
           <h2>Order Summary</h2>
 
           {cartItems.map((item) => (
+
             <div className="checkout-item" key={item.id}>
+
               <span>
                 {item.name} × {item.quantity}
               </span>
@@ -331,7 +637,9 @@ function Checkout() {
               <strong>
                 ₹{Number(item.price) * item.quantity}
               </strong>
+
             </div>
+
           ))}
 
           <hr />
@@ -344,8 +652,15 @@ function Checkout() {
           <p className="checkout-delivery">
             🚚 Free Delivery
           </p>
+
+          <p className="checkout-secure">
+            🔒 Your delivery details will be used to process your order.
+          </p>
+
         </div>
+
       </div>
+
     </div>
   );
 }
