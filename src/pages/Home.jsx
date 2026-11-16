@@ -1,8 +1,9 @@
-
 import React, { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import Footer from "../components/Footer";
 import "../styles/Home.css";
+
+const API_URL = "http://localhost:5000/api";
 
 const categories = [
   {
@@ -46,41 +47,75 @@ function Home() {
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const loadProducts = () => {
+  // MongoDB se Products Load karna
+  const loadProducts = async () => {
     try {
-      const savedProducts = JSON.parse(
-        localStorage.getItem("organigoProducts") || "[]"
-      );
+      setError("");
 
-      setProducts(savedProducts);
-    } catch {
-      setProducts([]);
+      const response = await fetch(`${API_URL}/products`);
+
+      if (!response.ok) {
+        throw new Error("Products load nahi ho paaye.");
+      }
+
+      const data = await response.json();
+
+      const productList = Array.isArray(data)
+        ? data
+        : data.products || data.data || [];
+
+      const formattedProducts = productList.map((product) => ({
+        ...product,
+        id: String(product._id || product.id || product.name),
+        quantity: product.quantity || product.unit || "1 Unit",
+        oldPrice: product.originalPrice || product.oldPrice || 0,
+      }));
+
+      setProducts(formattedProducts);
+    } catch (err) {
+      console.error("Product Loading Error:", err);
+      setError(
+        "Products load nahi ho pa rahe hain. Backend check karo."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     loadProducts();
 
-    window.addEventListener("storage", loadProducts);
-    window.addEventListener("organigoProductsUpdated", loadProducts);
+    // Admin se product update hone par reload
+    const handleProductUpdate = () => {
+      loadProducts();
+    };
 
+    // Search event
     const handleSearch = (event) => {
       setSearchQuery(event.detail || "");
     };
 
+    window.addEventListener(
+      "organigoProductsUpdated",
+      handleProductUpdate
+    );
+
     window.addEventListener("organigoSearch", handleSearch);
 
     return () => {
-      window.removeEventListener("storage", loadProducts);
       window.removeEventListener(
         "organigoProductsUpdated",
-        loadProducts
+        handleProductUpdate
       );
+
       window.removeEventListener("organigoSearch", handleSearch);
     };
   }, []);
 
+  // Cart me product ki quantity
   const getProductQuantity = (product) => {
     const productId = String(
       product._id || product.id || product.name
@@ -93,18 +128,21 @@ function Home() {
     return cartProduct ? cartProduct.quantity : 0;
   };
 
-  const filteredProducts = products.filter((product) => {
-    const categoryMatch =
-      selectedCategory === "All" ||
-      product.category?.toLowerCase() ===
-        selectedCategory.toLowerCase();
+  // Category aur Search Filter
+ const filteredProducts = products.filter((product) => {
+  const categoryMatch =
+    selectedCategory === "All" ||
+    product.category?.toLowerCase() ===
+      selectedCategory.toLowerCase();
 
-    const searchMatch =
-      product.name?.toLowerCase().includes(searchQuery.toLowerCase());
+  const searchMatch = product.name
+    ?.toLowerCase()
+    .includes(searchQuery.toLowerCase());
 
-    return categoryMatch && searchMatch;
-  });
+  const inStock = Number(product.stock) > 0;
 
+  return categoryMatch && searchMatch && inStock;
+});
   return (
     <>
       <main className="organigo-home">
@@ -194,6 +232,7 @@ function Home() {
               <span className="section-label">
                 EXPLORE ORGANIGO
               </span>
+
               <h2>Shop by Category</h2>
             </div>
 
@@ -207,7 +246,9 @@ function Home() {
                 className={`category-item ${
                   selectedCategory === category.name ? "active" : ""
                 }`}
-                onClick={() => setSelectedCategory(category.name)}
+                onClick={() =>
+                  setSelectedCategory(category.name)
+                }
               >
                 <div className="category-image">
                   <img
@@ -246,7 +287,24 @@ function Home() {
             </span>
           </div>
 
-          {filteredProducts.length > 0 ? (
+          {/* LOADING */}
+          {loading ? (
+            <div className="organigo-empty-state">
+              <span>🥬</span>
+              <h3>Loading Fresh Products...</h3>
+              <p>Please wait while we load products.</p>
+            </div>
+          ) : error ? (
+            <div className="organigo-empty-state">
+              <span>⚠️</span>
+              <h3>Something Went Wrong</h3>
+              <p>{error}</p>
+
+              <button onClick={loadProducts}>
+                Try Again
+              </button>
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="organigo-product-grid">
               {filteredProducts.map((product) => {
                 const quantity = getProductQuantity(product);
@@ -279,7 +337,7 @@ function Home() {
                       <h3>{product.name}</h3>
 
                       <p className="product-unit">
-                        {product.quantity || product.unit || "1 Unit"}
+                        {product.quantity || "1 Unit"}
                       </p>
 
                       <div className="product-bottom">
@@ -298,11 +356,7 @@ function Home() {
                           <div className="product-quantity-control">
                             <button
                               onClick={() =>
-                                decreaseQuantity(
-                                  product._id ||
-                                  product.id ||
-                                  product.name
-                                )
+                                decreaseQuantity(product.id)
                               }
                             >
                               −
@@ -312,11 +366,7 @@ function Home() {
 
                             <button
                               onClick={() =>
-                                increaseQuantity(
-                                  product._id ||
-                                  product.id ||
-                                  product.name
-                                )
+                                increaseQuantity(product.id)
                               }
                             >
                               +
@@ -351,7 +401,6 @@ function Home() {
           )}
         </section>
 
-      
       </main>
 
       {/* ORGANIGO FOOTER */}

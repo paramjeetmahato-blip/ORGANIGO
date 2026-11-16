@@ -920,3 +920,399 @@
     padding: 19px 14px 24px;
   }
 }
+/* =========================================
+   ORGANIGO LOGIN / MY ACCOUNT
+========================================= */
+
+.header-account {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.header-account-button {
+  min-height: 44px;
+  padding: 5px 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  background: #f2faf4;
+  border: 1px solid #d8ebdc;
+  border-radius: 10px;
+
+  color: #173d26;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.header-account-button:hover {
+  background: #e8f7ec;
+  border-color: #159447;
+}
+
+.account-icon {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #dff3e4;
+  border-radius: 50%;
+  font-size: 17px;
+}
+
+.account-button-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.account-button-text small {
+  color: #718075;
+  font-size: 9px;
+}
+
+.account-button-text strong {
+  color: #173d26;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.account-arrow {
+  font-size: 14px;
+  color: #159447;
+}
+
+/* DROPDOWN */
+
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+
+  width: 245px;
+  padding: 10px;
+
+  background: #ffffff;
+  border: 1px solid #e2eee4;
+  border-radius: 14px;
+
+  box-shadow: 0 12px 35px rgba(20, 80, 40, 0.15);
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  z-index: 9999;
+  animation: accountDropdown 0.2s ease;
+}
+
+@keyframes accountDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.account-dropdown-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  padding: 12px;
+  margin-bottom: 5px;
+
+  background: #f0faf2;
+  border-radius: 10px;
+}
+
+.account-dropdown-heading strong {
+  color: #173d26;
+  font-size: 13px;
+}
+
+.account-dropdown-heading small {
+  color: #718075;
+  font-size: 11px;
+  word-break: break-word;
+}
+
+.account-dropdown > a,
+.account-logout-button {
+  width: 100%;
+  padding: 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+
+  color: #344b3b;
+  text-decoration: none;
+  text-align: left;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.account-dropdown > a:hover {
+  background: #eff9f1;
+  color: #087a36;
+  text-decoration: none;
+}
+
+.account-logout-button {
+  color: #d33434;
+}
+
+.account-logout-button:hover {
+  background: #fff0f0;
+}
+
+/* =========================================
+   MOBILE ACCOUNT
+========================================= */
+
+@media (max-width: 650px) {
+
+  .header-container {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+
+    grid-template-areas:
+      "location account cart"
+      "search search search";
+
+    column-gap: 6px;
+  }
+
+  .header-account {
+    grid-area: account;
+  }
+
+  .header-account-button {
+    min-height: 40px;
+    padding: 4px 7px;
+    gap: 5px;
+  }
+
+  .account-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+  }
+
+  .account-button-text {
+    gap: 2px;
+  }
+
+  .account-button-text small {
+    font-size: 8px;
+  }
+
+  .account-button-text strong {
+    max-width: 75px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 9px;
+  }
+
+  .account-arrow {
+    font-size: 11px;
+  }
+
+  .account-dropdown {
+    width: 230px;
+    right: 0;
+    top: calc(100% + 9px);
+  }
+}
+
+/* SMALL MOBILE */
+
+@media (max-width: 360px) {
+
+  .header-container {
+    column-gap: 4px;
+  }
+
+  .header-account-button {
+    padding: 4px 5px;
+    gap: 3px;
+  }
+
+  .account-button-text strong {
+    max-width: 60px;
+    font-size: 8px;
+  }
+
+  .account-icon {
+    width: 25px;
+    height: 25px;
+    font-size: 13px;
+  }
+
+  .account-arrow {
+    font-size: 10px;
+  }
+
+  .account-dropdown {
+    width: 215px;
+  }
+}
+/* =========================================
+   ORGANIGO - FULL WIDTH PREMIUM HEADER
+========================================= */
+
+/* DESKTOP */
+@media (min-width: 1101px) {
+  .header-container {
+    width: 100%;
+    max-width: 1700px;
+    min-height: 84px;
+    padding: 10px 35px;
+
+    display: grid;
+    grid-template-columns: 130px 230px minmax(280px, 1fr) auto auto;
+    align-items: center;
+    justify-content: stretch;
+    gap: 20px;
+  }
+
+  .Organigo-logo {
+    width: 130px;
+    height: 65px;
+  }
+
+  .Organigo-logo img {
+    width: 130px;
+    height: 62px;
+  }
+
+  .delivery-location {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .header-search {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    height: 49px;
+  }
+
+  .header-account-button {
+    min-height: 49px;
+    padding: 6px 13px;
+  }
+
+  .header-cart {
+    min-width: 125px;
+    min-height: 49px;
+  }
+}
+
+/* TABLET / SMALL LAPTOP */
+@media (min-width: 651px) and (max-width: 1100px) {
+  .header-container {
+    display: grid;
+    grid-template-columns: 105px minmax(150px, 1fr) auto auto;
+    grid-template-areas:
+      "logo location account cart"
+      "search search search search";
+
+    gap: 10px;
+    padding: 12px 18px;
+  }
+
+  .Organigo-logo {
+    grid-area: logo;
+    flex-basis: auto;
+    width: 105px;
+  }
+
+  .Organigo-logo img {
+    width: 105px;
+  }
+
+  .delivery-location {
+    grid-area: location;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .header-search {
+    grid-area: search;
+    width: 100%;
+    max-width: none;
+    height: 44px;
+  }
+
+  .header-account {
+    grid-area: account;
+  }
+
+  .header-cart {
+    grid-area: cart;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 650px) {
+  .header-container {
+    width: 100%;
+    padding: 11px 12px;
+    column-gap: 7px;
+    row-gap: 11px;
+  }
+
+  .delivery-location {
+    width: 100%;
+  }
+
+  .header-search {
+    width: 100%;
+    height: 45px;
+  }
+
+  .header-account-button {
+    min-height: 42px;
+  }
+
+  .header-cart {
+    min-height: 42px;
+  }
+}
+
+/* SMALL MOBILE */
+@media (max-width: 360px) {
+  .header-container {
+    padding: 9px 7px;
+    column-gap: 4px;
+  }
+
+  .header-account-button {
+    padding: 4px;
+  }
+
+  .header-cart {
+    min-width: 85px;
+  }
+}

@@ -7,13 +7,16 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "5mb" }));
 
 // Authentication Routes
 app.use("/api/auth", require("./routes/Auth"));
 
 // Order Routes
 app.use("/api/orders", require("./routes/Order"));
+
+// Product Routes
+app.use("/api/products", require("./routes/products"));
 
 // Test API
 app.get("/", (req, res) => {
