@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import "../styles/Header.css";
 
@@ -48,9 +48,14 @@ function getSavedLocation() {
   }
 }
 
+// GET CUSTOMER FROM LOCAL OR SESSION STORAGE
 function getSavedUser() {
   try {
-    return JSON.parse(localStorage.getItem("organigoUser") || "null");
+    const savedUser =
+      localStorage.getItem("organigoUser") ||
+      sessionStorage.getItem("organigoUser");
+
+    return savedUser ? JSON.parse(savedUser) : null;
   } catch {
     return null;
   }
@@ -58,6 +63,7 @@ function getSavedUser() {
 
 function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
   const accountRef = useRef(null);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -80,11 +86,16 @@ function Header() {
     0
   );
 
+  // =====================================
   // LOGIN STATUS UPDATE
+  // =====================================
+
   useEffect(() => {
     const refreshUser = () => {
       setUser(getSavedUser());
     };
+
+    refreshUser();
 
     window.addEventListener("organigoAuthChanged", refreshUser);
     window.addEventListener("storage", refreshUser);
@@ -93,9 +104,12 @@ function Header() {
       window.removeEventListener("organigoAuthChanged", refreshUser);
       window.removeEventListener("storage", refreshUser);
     };
-  }, []);
+  }, [location.pathname]);
 
-  // CLOSE DROPDOWN ON OUTSIDE CLICK AND ESCAPE
+  // =====================================
+  // CLOSE DROPDOWN
+  // =====================================
+
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (
@@ -124,10 +138,16 @@ function Header() {
     };
   }, []);
 
+  // =====================================
   // LOGOUT
+  // =====================================
+
   const handleLogout = () => {
     localStorage.removeItem("organigoToken");
     localStorage.removeItem("organigoUser");
+
+    sessionStorage.removeItem("organigoToken");
+    sessionStorage.removeItem("organigoUser");
 
     setUser(null);
     setAccountOpen(false);
@@ -137,7 +157,10 @@ function Header() {
     navigate("/");
   };
 
+  // =====================================
   // PRODUCT SEARCH
+  // =====================================
+
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
@@ -149,7 +172,10 @@ function Header() {
     );
   };
 
+  // =====================================
   // REFRESH DELIVERY SETTINGS
+  // =====================================
+
   useEffect(() => {
     const refreshSettings = () => {
       setHubSettings(getHubSettings());
@@ -172,7 +198,10 @@ function Header() {
     };
   }, []);
 
+  // =====================================
   // CHECK DELIVERY DISTANCE
+  // =====================================
+
   const checkDelivery = (latitude, longitude) => {
     const hub = getHubSettings();
 
@@ -191,7 +220,10 @@ function Header() {
     };
   };
 
+  // =====================================
   // SAVE CUSTOMER LOCATION
+  // =====================================
+
   const saveLocation = (location) => {
     const result = checkDelivery(
       location.latitude,
@@ -217,7 +249,10 @@ function Header() {
     setLocationMessage("");
   };
 
+  // =====================================
   // SEARCH ADDRESS
+  // =====================================
+
   useEffect(() => {
     if (!locationOpen || locationQuery.trim().length < 3) {
       setLocationResults([]);
@@ -258,7 +293,10 @@ function Header() {
     return () => clearTimeout(timer);
   }, [locationQuery, locationOpen]);
 
+  // =====================================
   // SELECT MANUAL ADDRESS
+  // =====================================
+
   const selectAddress = (place) => {
     const address = place.address || {};
 
@@ -282,7 +320,10 @@ function Header() {
     });
   };
 
+  // =====================================
   // CURRENT GPS LOCATION
+  // =====================================
+
   const useCurrentLocation = () => {
     if (!navigator.geolocation) {
       setLocationMessage(
@@ -370,6 +411,9 @@ function Header() {
 
   return (
     <header className="Organigo-header">
+
+      {/* APP BANNER */}
+
       <div className="organigo-app-banner">
         <div className="app-banner-icon">🥬</div>
 
@@ -384,12 +428,15 @@ function Header() {
       </div>
 
       <div className="header-container">
+
         {/* LOGO */}
+
         <Link to="/" className="Organigo-logo">
           <img src="/organigo-logo.png" alt="ORGANIGO" />
         </Link>
 
         {/* LOCATION */}
+
         <button
           type="button"
           className="delivery-location"
@@ -429,6 +476,7 @@ function Header() {
         </button>
 
         {/* SEARCH */}
+
         <div className="header-search">
           <span>🔍</span>
 
@@ -440,37 +488,46 @@ function Header() {
           />
         </div>
 
-        {/* ACCOUNT */}
+        {/* CUSTOMER ACCOUNT */}
+
         <div className="header-account" ref={accountRef}>
-          <button
-            type="button"
-            className="header-account-button"
-            aria-expanded={accountOpen}
-            onClick={() => setAccountOpen((previous) => !previous)}
-          >
-            <span className="account-icon">👤</span>
 
-            <span className="account-button-text">
-              {user ? (
-                <>
+          {!user ? (
+            <button
+              type="button"
+              className="header-account-button"
+              onClick={() => navigate("/login")}
+            >
+              <span className="account-icon">👤</span>
+
+              <span className="account-button-text">
+                <strong>Login</strong>
+              </span>
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="header-account-button"
+                aria-expanded={accountOpen}
+                onClick={() => setAccountOpen((previous) => !previous)}
+              >
+                <span className="account-icon">👤</span>
+
+                <span className="account-button-text">
                   <small>Hello,</small>
-                  <strong>{user.name?.split(" ")[0] || "My Account"}</strong>
-                </>
-              ) : (
-                <>
-                  <small>Welcome</small>
-                  <strong>Login / Sign Up</strong>
-                </>
-              )}
-            </span>
 
-            <span className="account-arrow">⌄</span>
-          </button>
+                  <strong>
+                    {user.name?.split(" ")[0] || "My Account"}
+                  </strong>
+                </span>
 
-          {accountOpen && (
-            <div className="account-dropdown">
-              {user ? (
-                <>
+                <span className="account-arrow">⌄</span>
+              </button>
+
+              {accountOpen && (
+                <div className="account-dropdown">
+
                   <div className="account-dropdown-heading">
                     <strong>{user.name}</strong>
                     <small>{user.phone}</small>
@@ -480,10 +537,9 @@ function Header() {
                     to="/account"
                     onClick={() => setAccountOpen(false)}
                   >
-                    👤 My Account
+                    👤 My Profile
                   </Link>
 
-                  {/* MY ORDERS LINK */}
                   <Link
                     to="/my-orders"
                     onClick={() => setAccountOpen(false)}
@@ -498,41 +554,16 @@ function Header() {
                   >
                     ↪ Logout
                   </button>
-                </>
-              ) : (
-                <>
-                  <div className="account-dropdown-heading">
-                    <strong>Welcome to ORGANIGO!</strong>
-                    <small>Login to manage your account.</small>
-                  </div>
 
-                  <Link
-                    to="/login"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    🔐 Login
-                  </Link>
-
-                  <Link
-                    to="/signup"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    ✨ Create My Account
-                  </Link>
-
-                  <Link
-                    to="/forgot-password"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    🔑 Forgot Password?
-                  </Link>
-                </>
+                </div>
               )}
-            </div>
+            </>
           )}
+
         </div>
 
         {/* CART */}
+
         <Link to="/cart" className="header-cart">
           <span className="cart-icon">🛒</span>
           <span>My Cart</span>
@@ -543,9 +574,11 @@ function Header() {
             </span>
           )}
         </Link>
+
       </div>
 
       {/* LOCATION MODAL */}
+
       {locationOpen && (
         <div
           className="location-modal-backdrop"
@@ -558,6 +591,7 @@ function Header() {
             aria-labelledby="location-modal-title"
             onClick={(e) => e.stopPropagation()}
           >
+
             <div className="location-modal-heading">
               <div>
                 <h2 id="location-modal-title">
@@ -661,9 +695,11 @@ function Header() {
               Delivery availability is calculated using your selected
               location and the current ORGANIGO delivery radius.
             </p>
+
           </div>
         </div>
       )}
+
     </header>
   );
 }

@@ -19,6 +19,7 @@ import Signup from "./pages/Signup";
 import MyOrders from "./pages/MyOrders";
 import OrderTracking from "./pages/OrderTracking";
 import RiderDashboard from "./pages/RiderDashboard";
+import Account from "./pages/Account";
 
 // CUSTOMER LAYOUT
 function CustomerLayout() {
@@ -45,17 +46,29 @@ function App() {
 
           {/* CUSTOMER ROUTES */}
           <Route element={<CustomerLayout />}>
+
             <Route path="/" element={<Home />} />
+
             <Route path="/cart" element={<Cart />} />
+
             <Route path="/checkout" element={<Checkout />} />
+
             <Route path="/login" element={<Login />} />
+
             <Route path="/signup" element={<Signup />} />
+
+            {/* CUSTOMER ACCOUNT */}
+            <Route path="/account" element={<Account />} />
+
+            {/* CUSTOMER ORDERS */}
             <Route path="/my-orders" element={<MyOrders />} />
 
+            {/* ORDER TRACKING */}
             <Route
               path="/track-order/:orderId"
               element={<OrderTracking />}
             />
+
           </Route>
 
         </Routes>

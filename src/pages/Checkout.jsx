@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "../styles/Checkout.css";
 
-const API_URL = "http://localhost:5000/api/orders";
+const API_URL = "http://10.124.82.244:5000/api/orders";
 
 const DEFAULT_HUB = {
   latitude: 22.5504,

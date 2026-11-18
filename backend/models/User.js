@@ -27,15 +27,55 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
+    // USER ROLE
     role: {
       type: String,
-      enum: ["customer", "admin", "rider"],
+      enum: ["customer", "admin", "superadmin", "rider"],
       default: "customer",
     },
 
     isActive: {
       type: Boolean,
       default: true,
+    },
+
+    // OTP SECURITY
+    otpHash: {
+      type: String,
+      default: null,
+    },
+
+    otpExpiresAt: {
+      type: Date,
+      default: null,
+    },
+
+    otpPurpose: {
+      type: String,
+      enum: [
+        "signup",
+        "admin-login",
+        "reset-password",
+        "login",
+        null,
+      ],
+      default: null,
+    },
+
+    otpAttempts: {
+      type: Number,
+      default: 0,
+    },
+
+    otpLastSentAt: {
+      type: Date,
+      default: null,
+    },
+
+    // ACCOUNT SECURITY
+    passwordChangedAt: {
+      type: Date,
+      default: null,
     },
   },
   {

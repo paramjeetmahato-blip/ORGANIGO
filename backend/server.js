@@ -12,6 +12,9 @@ app.use(express.json({ limit: "5mb" }));
 // Authentication Routes
 app.use("/api/auth", require("./routes/Auth"));
 
+// Customer Profile Routes
+app.use("/api/customer", require("./routes/Customer"));
+
 // Order Routes
 app.use("/api/orders", require("./routes/Order"));
 
