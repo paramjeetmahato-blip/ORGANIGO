@@ -2,21 +2,99 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const CartContext = createContext();
 
-export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("organigoCart") || "[]");
-    } catch {
-      return [];
+// =====================================
+// GET CURRENT CUSTOMER CART KEY
+// =====================================
+
+const getCartKey = () => {
+  try {
+    const user = JSON.parse(
+      localStorage.getItem("organigoUser") || "null"
+    );
+
+    if (!user) {
+      return "organigoCart_guest";
     }
-  });
 
-  // Cart automatically save hoga
+    const userId = user._id || user.id || user.phone;
+
+    if (!userId) {
+      return "organigoCart_guest";
+    }
+
+    return `organigoCart_${String(userId)}`;
+  } catch {
+    return "organigoCart_guest";
+  }
+};
+
+// =====================================
+// LOAD CUSTOMER CART
+// =====================================
+
+const loadCart = (key) => {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "[]");
+  } catch {
+    return [];
+  }
+};
+
+export function CartProvider({ children }) {
+  const [cartKey, setCartKey] = useState(getCartKey);
+
+  const [cartItems, setCartItems] = useState(() =>
+    loadCart(getCartKey())
+  );
+
+  // =====================================
+  // ACCOUNT CHANGE DETECTION
+  // =====================================
+
   useEffect(() => {
-    localStorage.setItem("organigoCart", JSON.stringify(cartItems));
-  }, [cartItems]);
+    const handleAccountChange = () => {
+      const newKey = getCartKey();
 
-  // Add Product
+      setCartKey(newKey);
+      setCartItems(loadCart(newKey));
+    };
+
+    window.addEventListener(
+      "organigo-auth-changed",
+      handleAccountChange
+    );
+
+    window.addEventListener("storage", handleAccountChange);
+
+    return () => {
+      window.removeEventListener(
+        "organigo-auth-changed",
+        handleAccountChange
+      );
+
+      window.removeEventListener("storage", handleAccountChange);
+    };
+  }, []);
+
+  // =====================================
+  // SAVE CART ACCOUNT-WISE
+  // =====================================
+
+  useEffect(() => {
+    if (cartKey !== getCartKey()) {
+      return;
+    }
+
+    localStorage.setItem(
+      cartKey,
+      JSON.stringify(cartItems)
+    );
+  }, [cartItems, cartKey]);
+
+  // =====================================
+  // ADD PRODUCT
+  // =====================================
+
   const addToCart = (product) => {
     const productId = String(
       product._id || product.id || product.name
@@ -49,52 +127,81 @@ export function CartProvider({ children }) {
     });
   };
 
-  // Increase Quantity
+  // =====================================
+  // INCREASE QUANTITY
+  // =====================================
+
   const increaseQuantity = (id) => {
     setCartItems((items) =>
       items.map((item) =>
         String(item.id) === String(id)
-          ? { ...item, quantity: Number(item.quantity || 0) + 1 }
+          ? {
+              ...item,
+              quantity: Number(item.quantity || 0) + 1,
+            }
           : item
       )
     );
   };
 
-  // Decrease Quantity
+  // =====================================
+  // DECREASE QUANTITY
+  // =====================================
+
   const decreaseQuantity = (id) => {
     setCartItems((items) =>
       items
         .map((item) =>
           String(item.id) === String(id)
-            ? { ...item, quantity: Number(item.quantity || 0) - 1 }
+            ? {
+                ...item,
+                quantity: Number(item.quantity || 0) - 1,
+              }
             : item
         )
         .filter((item) => item.quantity > 0)
     );
   };
 
-  // Remove Product
+  // =====================================
+  // REMOVE PRODUCT
+  // =====================================
+
   const removeFromCart = (id) => {
     setCartItems((items) =>
-      items.filter((item) => String(item.id) !== String(id))
+      items.filter(
+        (item) => String(item.id) !== String(id)
+      )
     );
   };
 
-  // Clear Cart
+  // =====================================
+  // CLEAR CART
+  // =====================================
+
   const clearCart = () => {
     setCartItems([]);
   };
 
-  // Total Items
+  // =====================================
+  // TOTAL ITEMS
+  // =====================================
+
   const cartCount = cartItems.reduce(
-    (total, item) => total + Number(item.quantity || 0),
+    (total, item) =>
+      total + Number(item.quantity || 0),
     0
   );
 
-  // Total Price
+  // =====================================
+  // TOTAL PRICE
+  // =====================================
+
   const cartTotal = cartItems.reduce(
     (total, item) =>
-      total + Number(item.price || 0) * Number(item.quantity || 0),
+      total +
+      Number(item.price || 0) *
+        Number(item.quantity || 0),
     0
   );
 
