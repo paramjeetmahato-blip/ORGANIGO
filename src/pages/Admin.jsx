@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Admin.css";
 
-const API_URL = "http://10.124.82.244:5000/api";
+const API_URL = "http://localhost:5000/api";
 
 const defaultDeliverySettings = {
   businessName: "ORGANIGO",
@@ -44,7 +44,9 @@ function Admin() {
     currentUser = null;
   }
 
-  const isAdmin = Boolean(token) && currentUser?.role === "admin";
+  const isAdmin =
+  Boolean(token) &&
+  ["admin", "superadmin"].includes(currentUser?.role);
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -154,7 +156,7 @@ function Admin() {
   // FETCH PRODUCTS
 
   const fetchProducts = useCallback(async () => {
-    if (!token || currentUser?.role !== "admin") return;
+    if (!token || !["admin", "superadmin"].includes(currentUser?.role)) return;
 
     try {
       setProductsLoading(true);
@@ -362,7 +364,7 @@ function Admin() {
   // FETCH ORDERS
 
   const fetchOrders = useCallback(async () => {
-    if (!token || currentUser?.role !== "admin") {
+    if (!token || !["admin", "superadmin"].includes(currentUser?.role)) {
       setOrdersError("Please log in with an Admin account.");
       setOrders([]);
       return;
@@ -403,7 +405,7 @@ function Admin() {
   // FETCH ACTIVE RIDERS
 
   const fetchRiders = useCallback(async () => {
-    if (!token || currentUser?.role !== "admin") return;
+    if (!token || !["admin", "superadmin"].includes(currentUser?.role)) return;
 
     try {
       setRidersLoading(true);
@@ -549,7 +551,7 @@ function Admin() {
       return;
     }
 
-    if (!token || currentUser?.role !== "admin") {
+    if (!token || !["admin", "superadmin"].includes(currentUser?.role)) {
       logoutAdmin("Please log in with an Admin account.");
       return;
     }
@@ -695,7 +697,7 @@ function Admin() {
   // UPDATE ORDER STATUS
 
   const updateOrderStatus = async (orderId, newStatus) => {
-    if (!token || currentUser?.role !== "admin") {
+    if (!token || !["admin", "superadmin"].includes(currentUser?.role)) {
       logoutAdmin("Please log in with an Admin account.");
       return;
     }

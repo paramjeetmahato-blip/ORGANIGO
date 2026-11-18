@@ -414,7 +414,7 @@ html {
 .organigo-home .product-image-box {
   height: 145px;
   width: 100%;
-  background: #ffffff;
+  background: #f7fcf7;
   padding: 12px;
   position: relative;
   display: flex;
@@ -1007,7 +1007,57 @@ html {
     overflow: visible;
   }
 
-  .organigo-home .organigo-product-card {
-    width: 100%;
-  }
+ /* =========================================
+   ORGANIGO - PREMIUM LIGHT GREEN CARDS
+========================================= */
+
+.organigo-home .organigo-product-card {
+  width: 100%;
+  min-width: 0;
+  background: #f1faf2;
+  border: 1px solid #dcefe0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(22, 139, 69, 0.06);
+  transition: all 0.3s ease;
+}
+
+.organigo-home .organigo-product-card:hover {
+  background: #eaf7ec;
+  border-color: #b9dfc2;
+  box-shadow: 0 8px 22px rgba(22, 139, 69, 0.13);
+  transform: translateY(-5px);
+}
+}
+/* =========================================
+   PREMIUM PRODUCT DETAILS
+========================================= */
+
+.organigo-home .product-details {
+  background: transparent;
+  padding: 11px;
+}
+
+.organigo-home .product-details h3 {
+  color: #183b25;
+  font-weight: 800;
+}
+
+.organigo-home .product-price strong {
+  color: #086b32;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.organigo-home .product-add-button {
+  background: #ffffff;
+  border: 1px solid #168b45;
+  color: #168b45;
+  border-radius: 7px;
+  font-weight: 800;
+}
+
+.organigo-home .product-add-button:hover {
+  background: #168b45;
+  color: #ffffff;
 }

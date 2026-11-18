@@ -1,45 +1,32 @@
 const express = require("express");
 const router = express.Router();
-
+const mongoose = require("mongoose");
+const Product = require("../models/Product");
 const Order = require("../models/Order");
 const User = require("../models/User");
 
 const { protect, authorize } = require("../middleware/auth");
 
+
+
 // =================================
 // PLACE NEW ORDER - CUSTOMER ONLY
+// REGISTERED NAME + SECURE PRICE AND STOCK
 // =================================
 
 router.post("/", protect, authorize("customer"), async (req, res) => {
+  let session;
+
   try {
-    const {
-      orderId,
-      customer,
-      location,
-      items,
-      total,
-      mapLink,
-      deliveryDistance,
-      orderDate,
-    } = req.body;
+    session = await mongoose.startSession();
 
-    const user = await User.findById(req.user.userId);
-
-    if (!user || !user.isActive) {
-      return res.status(403).json({
-        success: false,
-        message: "Your account is inactive or unavailable.",
-      });
-    }
+    const { customer, location, items, mapLink } = req.body;
 
     if (
-      !customer?.name ||
       !customer?.phone ||
       !customer?.address ||
       !Array.isArray(items) ||
-      items.length === 0 ||
-      !Number.isFinite(Number(total)) ||
-      Number(total) <= 0
+      items.length === 0
     ) {
       return res.status(400).json({
         success: false,
@@ -47,58 +34,173 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
       });
     }
 
-    if (customer.phone !== user.phone) {
+    if (String(customer.phone) !== String(req.user.phone)) {
       return res.status(400).json({
         success: false,
         message: "Please use your registered mobile number.",
       });
     }
 
-    const newOrder = new Order({
-      userId: user._id,
-      orderId: orderId || `ORG-${Date.now()}`,
+    const address = String(customer.address).trim();
 
-      customer: {
-        ...customer,
-        phone: user.phone,
-      },
+    if (address.length < 5 || address.length > 300) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid delivery address.",
+      });
+    }
 
-      location,
-      items,
-      total: Number(total),
+    // Validate and combine duplicate products
+    const quantities = new Map();
 
-      paymentMethod: "Cash on Delivery",
-      paymentStatus: "Pending - Cash on Delivery",
+    for (const item of items) {
+      const productId = String(item.productId || "");
+      const quantity = Number(item.quantity);
 
-      status: "Order Placed",
+      if (
+        !/^[0-9a-fA-F]{24}$/.test(productId) ||
+        !Number.isInteger(quantity) ||
+        quantity < 1 ||
+        quantity > 100
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid product or quantity.",
+        });
+      }
 
-      statusHistory: [
-        {
-          status: "Order Placed",
-          message: "Your order has been placed successfully.",
-          updatedAt: new Date(),
+      const totalQuantity =
+        (quantities.get(productId) || 0) + quantity;
+
+      if (totalQuantity > 100) {
+        return res.status(400).json({
+          success: false,
+          message: "Maximum quantity per product is 100.",
+        });
+      }
+
+      quantities.set(productId, totalQuantity);
+    }
+
+    let savedOrder;
+
+    await session.withTransaction(async () => {
+      const user = await User.findById(req.user.userId).session(session);
+
+      if (!user || !user.isActive || user.role !== "customer") {
+        throw new Error("Your account is inactive or unavailable.");
+      }
+
+      if (!user.name || user.name.trim().length < 3) {
+        throw new Error(
+          "Please update your registered name before placing an order."
+        );
+      }
+
+      const orderItems = [];
+      let calculatedTotal = 0;
+
+      for (const [productId, quantity] of quantities) {
+        const product = await Product.findOneAndUpdate(
+          {
+            _id: productId,
+            isActive: true,
+            stock: { $gte: quantity },
+          },
+          {
+            $inc: { stock: -quantity },
+          },
+          {
+            new: true,
+            session,
+          }
+        );
+
+        if (!product) {
+          throw new Error(
+            "A product is unavailable or has insufficient stock. Please update your cart."
+          );
+        }
+
+        calculatedTotal += product.price * quantity;
+
+        orderItems.push({
+          productId: String(product._id),
+          name: product.name,
+          image: product.image,
+          price: product.price,
+          quantity,
+          unit: product.unit,
+        });
+      }
+
+      const newOrder = new Order({
+        userId: user._id,
+
+        orderId: `ORG-${Date.now()}-${Math.floor(
+          1000 + Math.random() * 9000
+        )}`,
+
+        // IMPORTANT: Name comes from MongoDB User account
+        customer: {
+          name: user.name.trim(),
+          phone: user.phone,
+          address: address,
+          city: String(customer.city || "").trim(),
+          state: String(customer.state || "").trim(),
+          pincode: String(customer.pincode || "").trim(),
         },
-      ],
 
-      mapLink,
-      deliveryDistance,
-      orderDate: orderDate || new Date(),
+        location: location || {},
+
+        items: orderItems,
+
+        total: Number(calculatedTotal.toFixed(2)),
+
+        paymentMethod: "Cash on Delivery",
+        paymentStatus: "Pending - Cash on Delivery",
+
+        status: "Order Placed",
+
+        statusHistory: [
+          {
+            status: "Order Placed",
+            message: "Your order has been placed successfully.",
+            updatedAt: new Date(),
+          },
+        ],
+
+        mapLink: mapLink || "",
+
+        orderDate: new Date(),
+      });
+
+      const createdOrders = await Order.create(
+        [newOrder],
+        { session }
+      );
+
+      savedOrder = createdOrders[0];
     });
-
-    const savedOrder = await newOrder.save();
 
     res.status(201).json({
       success: true,
       message: "Order placed successfully!",
       order: savedOrder,
     });
+
   } catch (error) {
     console.error("Place Order Error:", error);
 
-    res.status(500).json({
+    res.status(400).json({
       success: false,
-      message: "Unable to place your order.",
+      message: error.message || "Unable to place your order.",
     });
+
+  } finally {
+    if (session) {
+      await session.endSession();
+    }
   }
 });
 
@@ -236,7 +338,7 @@ router.patch(
 router.get(
   "/riders",
   protect,
-  authorize("admin"),
+  authorize("admin", "superadmin"),
   async (req, res) => {
     try {
       const riders = await User.find({
@@ -269,7 +371,7 @@ router.get(
 router.patch(
   "/:orderId/assign-rider",
   protect,
-  authorize("admin"),
+  authorize("admin", "superadmin"),
   async (req, res) => {
     try {
       const { riderId } = req.body;
@@ -546,7 +648,7 @@ router.patch(
 // ADMIN - GET ALL ORDERS
 // =================================
 
-router.get("/", protect, authorize("admin"), async (req, res) => {
+router.get("/", protect, authorize("admin", "superadmin"), async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
 
@@ -572,7 +674,7 @@ router.get("/", protect, authorize("admin"), async (req, res) => {
 router.patch(
   "/:orderId/status",
   protect,
-  authorize("admin"),
+  authorize("admin", "superadmin"),
   async (req, res) => {
     try {
       const { status } = req.body;

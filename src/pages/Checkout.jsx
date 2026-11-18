@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "../styles/Checkout.css";
 
-const API_URL = "http://10.124.82.244:5000/api/orders";
+const API_URL = "http://localhost:5000/api/orders";
 
 const DEFAULT_HUB = {
   latitude: 22.5504,
@@ -192,7 +192,7 @@ function Checkout() {
 
         try {
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&addressdetails=1`
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&addressdetails=1&accept-language=en`
           );
 
           if (response.ok) {
@@ -498,16 +498,16 @@ function Checkout() {
         >
           <h2>Delivery Information</h2>
 
-          <label>Full Name</label>
+         <label>Registered Full Name</label>
 
-          <input
-            type="text"
-            name="name"
-            placeholder="Enter your full name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+        <input
+  type="text"
+  name="name"
+  placeholder="Your registered name"
+  value={formData.name}
+  readOnly
+  required
+        />
 
           <label>Mobile Number</label>
 

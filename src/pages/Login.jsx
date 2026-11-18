@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../styles/Auth.css";
 
-const API_URL = "http://10.124.82.244:5000/api/auth";
+const API_URL = "http://localhost:5000/api/auth";
 
 function Login() {
   const navigate = useNavigate();

@@ -2,31 +2,84 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles/Auth.css";
 
+const API_URL = "http://localhost:5000/api/auth";
+
 function AdminLogin() {
   const navigate = useNavigate();
 
   const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
+  const [verificationToken, setVerificationToken] = useState("");
+
+  const [step, setStep] = useState("phone");
   const [message, setMessage] = useState("");
+  const [devOtp, setDevOtp] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const cleanPhone = phone.replace(/\D/g, "");
 
+  // STEP 1: REQUEST OTP
+  const requestOTP = async (e) => {
+    e.preventDefault();
     setMessage("");
+
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setMessage("Enter valid 10-digit mobile number.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const response = await fetch(
-        "http://10.124.82.244:5000/api/auth/login",
+        `${API_URL}/request-admin-login-otp`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: cleanPhone }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "OTP request failed.");
+        return;
+      }
+
+      setDevOtp(data.devOtp || "");
+      setStep("otp");
+      setMessage(data.message);
+
+    } catch (error) {
+      setMessage("Server connection failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // STEP 2: VERIFY OTP
+  const verifyOTP = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    if (!/^\d{6}$/.test(otp)) {
+      setMessage("Enter valid 6-digit OTP.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/verify-admin-login-otp`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            phone,
-            password,
+            phone: cleanPhone,
+            otp,
           }),
         }
       );
@@ -34,31 +87,78 @@ function AdminLogin() {
       const data = await response.json();
 
       if (!response.ok) {
-        setMessage(data.message || "Login failed");
+        setMessage(data.message || "OTP verification failed.");
         return;
       }
 
-      // Check Admin Role
-      if (data.user?.role !== "admin") {
-        setMessage("Access Denied! Admin account required.");
+      setVerificationToken(data.verificationToken);
+      setStep("password");
+      setMessage("OTP verified successfully!");
+
+    } catch (error) {
+      setMessage("Server connection failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // STEP 3: ADMIN LOGIN
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    if (!password) {
+      setMessage("Please enter your password.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/admin-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: cleanPhone,
+          password,
+          verificationToken,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Admin login failed.");
         return;
       }
 
-      // Save Admin Login
+      if (!["admin", "superadmin"].includes(data.user?.role)) {
+        setMessage("Admin account required.");
+        return;
+      }
+
+      localStorage.removeItem("organigoToken");
+      localStorage.removeItem("organigoUser");
+
+      sessionStorage.removeItem("organigoToken");
+      sessionStorage.removeItem("organigoUser");
+
       localStorage.setItem("organigoToken", data.token);
       localStorage.setItem(
         "organigoUser",
         JSON.stringify(data.user)
       );
 
+      window.dispatchEvent(new Event("organigoAuthChanged"));
+
       setMessage("Admin Login Successful!");
 
       setTimeout(() => {
         navigate("/admin", { replace: true });
-      }, 800);
+      }, 700);
 
     } catch (error) {
-      setMessage("Server connection failed. Please try again.");
+      setMessage("Server connection failed.");
     } finally {
       setLoading(false);
     }
@@ -71,39 +171,87 @@ function AdminLogin() {
         <h1>ORGANIGO</h1>
         <p>Admin Control Panel</p>
 
-        <h2>Admin Login</h2>
-        <p>Login to manage ORGANIGO.</p>
+        {step === "phone" && (
+          <>
+            <h2>Admin Login</h2>
+            <p>Enter your registered mobile number.</p>
 
-        <form onSubmit={handleLogin}>
+            <form onSubmit={requestOTP}>
+              <label>Mobile Number</label>
 
-          <label>Mobile Number</label>
+              <input
+                type="tel"
+                placeholder="10-digit mobile number"
+                value={phone}
+                onChange={(e) =>
+                  setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+                }
+                required
+              />
 
-          <input
-            type="tel"
-            placeholder="Enter 10-digit mobile number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            maxLength="10"
-            required
-          />
+              <button type="submit" disabled={loading}>
+                {loading ? "Sending OTP..." : "Send OTP"}
+              </button>
+            </form>
+          </>
+        )}
 
-          <label>Password</label>
+        {step === "otp" && (
+          <>
+            <h2>Verify OTP</h2>
+            <p>OTP verification for +91 {cleanPhone}</p>
 
-          <input
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+            {devOtp && (
+              <p>
+                Development OTP: <strong>{devOtp}</strong>
+              </p>
+            )}
 
-          <button type="submit" disabled={loading}>
-            {loading ? "Checking..." : "Admin Login"}
-          </button>
+            <form onSubmit={verifyOTP}>
+              <label>6-Digit OTP</label>
 
-        </form>
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                value={otp}
+                onChange={(e) =>
+                  setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
+                required
+              />
 
-        {message && <p>{message}</p>}
+              <button type="submit" disabled={loading}>
+                {loading ? "Verifying..." : "Verify OTP"}
+              </button>
+            </form>
+          </>
+        )}
+
+        {step === "password" && (
+          <>
+            <h2>Enter Password</h2>
+            <p>OTP verified. Now enter your admin password.</p>
+
+            <form onSubmit={handleLogin}>
+              <label>Password</label>
+
+              <input
+                type="password"
+                placeholder="Enter admin password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+
+              <button type="submit" disabled={loading}>
+                {loading ? "Logging in..." : "Login to Dashboard"}
+              </button>
+            </form>
+          </>
+        )}
+
+        {message && <p className="auth-message">{message}</p>}
 
         <Link to="/">Back to Website</Link>
 

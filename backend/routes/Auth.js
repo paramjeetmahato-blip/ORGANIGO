@@ -78,6 +78,47 @@ const sendOTPResponse = (res, otp, message) => {
   return res.json(response);
 };
 
+// =====================================
+// CUSTOMER NAME VALIDATION
+// =====================================
+
+const validName = (name) => {
+  if (typeof name !== "string") return false;
+
+  const cleanName = name.trim().replace(/\s+/g, " ");
+
+  if (cleanName.length < 3 || cleanName.length > 50) {
+    return false;
+  }
+
+  // English और Hindi अक्षर स्वीकार होंगे
+  // Numbers और गलत special characters स्वीकार नहीं होंगे
+  const namePattern =
+    /^[\p{L}\p{M}]+(?:[ '\u2019-][\p{L}\p{M}]+)*$/u;
+
+  if (!namePattern.test(cleanName)) {
+    return false;
+  }
+
+  const blockedNames = [
+    "demo",
+    "test",
+    "testing",
+    "guest",
+    "unknown",
+  ];
+
+  if (blockedNames.includes(cleanName.toLowerCase())) {
+    return false;
+  }
+
+  return true;
+};
+
+const cleanName = (name) => {
+  return name.trim().replace(/\s+/g, " ");
+};
+
 const validPhone = (phone) => {
   return /^[6-9]\d{9}$/.test(phone || "");
 };
@@ -101,10 +142,18 @@ router.post("/request-signup-otp", async (req, res) => {
   try {
     const { name, phone, email, password } = req.body;
 
-    if (!name || !validPhone(phone) || !password) {
+    if (!validName(name)) {
       return res.status(400).json({
         success: false,
-        message: "Name, valid phone and password are required.",
+        message:
+          "Please enter a valid name. Name must contain 3 to 50 letters.",
+      });
+    }
+
+    if (!validPhone(phone) || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid phone and password are required.",
       });
     }
 
@@ -142,7 +191,7 @@ router.post("/request-signup-otp", async (req, res) => {
     await SignupOTP.findOneAndUpdate(
       { phone },
       {
-        name: name.trim(),
+        name: cleanName(name),
         phone,
         email: email || undefined,
         passwordHash,
@@ -199,6 +248,15 @@ router.post("/verify-signup-otp", async (req, res) => {
       });
     }
 
+    if (!validName(pending.name)) {
+      await SignupOTP.deleteOne({ _id: pending._id });
+
+      return res.status(400).json({
+        success: false,
+        message: "Invalid customer name. Please register again.",
+      });
+    }
+
     if (pending.otpExpiresAt < new Date()) {
       await SignupOTP.deleteOne({ _id: pending._id });
 
@@ -239,7 +297,7 @@ router.post("/verify-signup-otp", async (req, res) => {
     }
 
     await User.create({
-      name: pending.name,
+      name: cleanName(pending.name),
       phone: pending.phone,
       email: pending.email || undefined,
       password: pending.passwordHash,

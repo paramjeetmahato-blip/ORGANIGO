@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/Account.css";
 
-const API_URL = "http://10.124.82.244:5000/api/customer";
+const API_URL = "http://localhost:5000/api/customer";
 
 function getToken() {
   return (

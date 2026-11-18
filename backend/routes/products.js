@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
 // =====================================
 // GET ACTIVE PRODUCTS (ADMIN INVENTORY)
 // =====================================
-router.get("/admin/all", protect, authorize("admin"), async (req, res) => {
+router.get("/admin/all", protect, authorize("admin", "superadmin"), async (req, res) => {
   try {
     const products = await Product.find({ isActive: true }).sort({
       createdAt: -1,
@@ -54,7 +54,7 @@ router.get("/admin/all", protect, authorize("admin"), async (req, res) => {
 router.get(
   "/admin/deleted",
   protect,
-  authorize("admin"),
+  authorize("admin", "superadmin"),
   async (req, res) => {
     try {
       const products = await Product.find({ isActive: false }).sort({
@@ -81,7 +81,7 @@ router.get(
 router.patch(
   "/:id/restore",
   protect,
-  authorize("admin"),
+  authorize("admin", "superadmin"),
   async (req, res) => {
     try {
       const product = await Product.findByIdAndUpdate(
@@ -114,7 +114,7 @@ router.patch(
 // =====================================
 // ADD NEW PRODUCT (ADMIN)
 // =====================================
-router.post("/", protect, authorize("admin"), async (req, res) => {
+router.post("/", protect, authorize("admin", "superadmin"), async (req, res) => {
   try {
     const {
       name,
@@ -161,7 +161,7 @@ router.post("/", protect, authorize("admin"), async (req, res) => {
 // =====================================
 // UPDATE PRODUCT (ADMIN)
 // =====================================
-router.put("/:id", protect, authorize("admin"), async (req, res) => {
+router.put("/:id", protect, authorize("admin", "superadmin"), async (req, res) => {
   try {
     const allowedFields = [
       "name",
@@ -215,7 +215,7 @@ router.put("/:id", protect, authorize("admin"), async (req, res) => {
 // =====================================
 // DELETE PRODUCT (SOFT DELETE)
 // =====================================
-router.delete("/:id", protect, authorize("admin"), async (req, res) => {
+router.delete("/:id", protect, authorize("admin", "superadmin"), async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
