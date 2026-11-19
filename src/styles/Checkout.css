@@ -464,3 +464,30 @@
     font-size: 14px;
   }
 }
+.saved-address-section {
+  background: #f4faf5;
+  border: 1px solid #dcecdf;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 22px;
+}
+
+.saved-address-section h3 {
+  color: #168a43;
+  margin-top: 0;
+}
+
+.saved-address-section select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dce5dd;
+  border-radius: 7px;
+  background: white;
+  font-size: 14px;
+}
+
+.saved-address-details {
+  color: #555;
+  font-size: 14px;
+  margin: 12px 0;
+}

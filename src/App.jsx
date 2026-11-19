@@ -21,6 +21,7 @@ import OrderTracking from "./pages/OrderTracking";
 import RiderDashboard from "./pages/RiderDashboard";
 import Account from "./pages/Account";
 import About from "./pages/About";
+import Addresses from "./pages/Addresses";
 
 // CUSTOMER LAYOUT
 import { useLocation } from "react-router-dom";
@@ -65,6 +66,8 @@ function App() {
 
             {/* CUSTOMER ACCOUNT */}
             <Route path="/account" element={<Account />} />
+            {/* CUSTOMER SAVED ADDRESSES */}
+            <Route path="/addresses" element={<Addresses />} />     
 
             {/* CUSTOMER ABOUT */}
             <Route path="/about" element={<About />} />

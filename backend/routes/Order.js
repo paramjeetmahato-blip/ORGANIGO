@@ -1,17 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+
 const Product = require("../models/Product");
 const Order = require("../models/Order");
 const User = require("../models/User");
+const DeliverySettings = require("../models/DeliverySettings");
+
+const { calculateDistance } = require("../config/delivery");
 
 const { protect, authorize } = require("../middleware/auth");
 
-
-
 // =================================
 // PLACE NEW ORDER - CUSTOMER ONLY
-// REGISTERED NAME + SECURE PRICE AND STOCK
+// SECURE ADDRESS, PRICE, STOCK & DELIVERY
 // =================================
 
 router.post("/", protect, authorize("customer"), async (req, res) => {
@@ -20,20 +22,24 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
   try {
     session = await mongoose.startSession();
 
-    const { customer, location, items, mapLink } = req.body;
+    const {
+      customer,
+      location,
+      items,
+      mapLink,
+      selectedAddressId,
+      deliveryAddressType,
+    } = req.body;
 
-    if (
-      !customer?.phone ||
-      !customer?.address ||
-      !Array.isArray(items) ||
-      items.length === 0
-    ) {
+    // REQUIRED DETAILS
+    if (!customer?.phone || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({
         success: false,
         message: "Please provide all required order details.",
       });
     }
 
+    // VERIFY REGISTERED PHONE
     if (String(customer.phone) !== String(req.user.phone)) {
       return res.status(400).json({
         success: false,
@@ -41,16 +47,15 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
       });
     }
 
-    const address = String(customer.address).trim();
-
-    if (address.length < 5 || address.length > 300) {
+    // VERIFY DELIVERY MODE
+    if (!["saved", "gps"].includes(deliveryAddressType)) {
       return res.status(400).json({
         success: false,
-        message: "Please enter a valid delivery address.",
+        message: "Please select a valid delivery address type.",
       });
     }
 
-    // Validate and combine duplicate products
+    // VALIDATE PRODUCT QUANTITIES
     const quantities = new Map();
 
     for (const item of items) {
@@ -69,8 +74,7 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
         });
       }
 
-      const totalQuantity =
-        (quantities.get(productId) || 0) + quantity;
+      const totalQuantity = (quantities.get(productId) || 0) + quantity;
 
       if (totalQuantity > 100) {
         return res.status(400).json({
@@ -85,6 +89,11 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
     let savedOrder;
 
     await session.withTransaction(async () => {
+
+      // =================================
+      // GET CUSTOMER FROM DATABASE
+      // =================================
+
       const user = await User.findById(req.user.userId).session(session);
 
       if (!user || !user.isActive || user.role !== "customer") {
@@ -97,10 +106,180 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
         );
       }
 
+      let orderAddress = "";
+      let orderCity = "";
+      let orderState = "";
+      let orderPincode = "";
+      let orderLocation = {};
+      let verifiedAddressId = null;
+
+      // =================================
+      // MODE 1: SAVED ADDRESS
+      // =================================
+
+      if (deliveryAddressType === "saved") {
+
+        if (
+          !selectedAddressId ||
+          !/^[0-9a-fA-F]{24}$/.test(String(selectedAddressId))
+        ) {
+          throw new Error("Please select a valid saved address.");
+        }
+
+        const selectedAddress = user.addresses.id(selectedAddressId);
+
+        if (!selectedAddress) {
+          throw new Error(
+            "Selected address does not belong to your account."
+          );
+        }
+
+        orderAddress = [
+          selectedAddress.houseNo,
+          selectedAddress.area,
+          selectedAddress.landmark,
+        ]
+          .filter(Boolean)
+          .join(", ");
+
+        orderCity = String(selectedAddress.city || "").trim();
+        orderState = String(selectedAddress.state || "").trim();
+        orderPincode = String(selectedAddress.pincode || "").trim();
+
+        if (orderAddress.length < 5) {
+          throw new Error("Your saved address is incomplete.");
+        }
+
+        const lat = Number(selectedAddress.latitude);
+        const lng = Number(selectedAddress.longitude);
+
+        if (
+          !Number.isFinite(lat) ||
+          !Number.isFinite(lng) ||
+          lat < -90 ||
+          lat > 90 ||
+          lng < -180 ||
+          lng > 180
+        ) {
+          throw new Error(
+            "Please update your saved address location before ordering."
+          );
+        }
+
+        verifiedAddressId = selectedAddress._id;
+
+        orderLocation = {
+          name: selectedAddress.label || "Saved Address",
+          fullAddress: [
+            orderAddress,
+            orderCity,
+            orderState,
+            orderPincode,
+          ]
+            .filter(Boolean)
+            .join(", "),
+          latitude: lat,
+          longitude: lng,
+        };
+      }
+
+      // =================================
+      // MODE 2: CURRENT GPS LOCATION
+      // =================================
+
+      else if (deliveryAddressType === "gps") {
+
+        orderAddress = String(customer.address || "").trim();
+        orderCity = String(customer.city || "").trim();
+        orderState = String(customer.state || "").trim();
+        orderPincode = String(customer.pincode || "").trim();
+
+        if (orderAddress.length < 5 || orderAddress.length > 300) {
+          throw new Error("Please provide a valid GPS delivery address.");
+        }
+
+        const lat = Number(location?.latitude);
+        const lng = Number(location?.longitude);
+
+        if (
+          !Number.isFinite(lat) ||
+          !Number.isFinite(lng) ||
+          lat < -90 ||
+          lat > 90 ||
+          lng < -180 ||
+          lng > 180
+        ) {
+          throw new Error("Please provide a valid GPS location.");
+        }
+
+        orderLocation = {
+          name: String(location?.name || "Current GPS Location"),
+          fullAddress: String(
+            location?.fullAddress || orderAddress
+          ).slice(0, 500),
+          latitude: lat,
+          longitude: lng,
+        };
+
+        verifiedAddressId = null;
+      }
+
+      // =================================
+      // FINAL ADDRESS VALIDATION
+      // =================================
+
+      if (
+        !orderCity ||
+        !orderState ||
+        !/^\d{6}$/.test(orderPincode)
+      ) {
+        throw new Error(
+          "Please provide a valid city, state and 6-digit pincode."
+        );
+      }
+
+      // =================================
+      // DYNAMIC DELIVERY SETTINGS FROM MONGODB
+      // =================================
+
+      const deliverySettings = await DeliverySettings.findOne({
+        storeCode: "CHAIBASA_MAIN",
+      }).session(session);
+
+      if (!deliverySettings) {
+        throw new Error("Delivery settings not found!");
+      }
+
+      if (!deliverySettings.isDeliveryActive) {
+        throw new Error("Sorry! Delivery is currently unavailable.");
+      }
+
+      // =================================
+      // SERVER-SIDE DELIVERY RADIUS CHECK
+      // =================================
+
+      const deliveryDistance = calculateDistance(
+        deliverySettings.hubLatitude,
+        deliverySettings.hubLongitude,
+        orderLocation.latitude,
+        orderLocation.longitude
+      );
+
+      if (deliveryDistance > deliverySettings.deliveryRadiusKm) {
+        throw new Error(
+          `Sorry! Delivery is available only within ${deliverySettings.deliveryRadiusKm} KM of our store. Your location is ${deliveryDistance.toFixed(2)} KM away.`
+        );
+      }
+
+      // =================================
+      // CHECK STOCK AND DATABASE PRICES
+      // =================================
+
       const orderItems = [];
       let calculatedTotal = 0;
 
       for (const [productId, quantity] of quantities) {
+
         const product = await Product.findOneAndUpdate(
           {
             _id: productId,
@@ -134,30 +313,39 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
         });
       }
 
+      // =================================
+      // CREATE NEW ORDER
+      // =================================
+
       const newOrder = new Order({
+
         userId: user._id,
+
+        selectedAddressId: verifiedAddressId,
 
         orderId: `ORG-${Date.now()}-${Math.floor(
           1000 + Math.random() * 9000
         )}`,
 
-        // IMPORTANT: Name comes from MongoDB User account
         customer: {
           name: user.name.trim(),
           phone: user.phone,
-          address: address,
-          city: String(customer.city || "").trim(),
-          state: String(customer.state || "").trim(),
-          pincode: String(customer.pincode || "").trim(),
+          address: orderAddress,
+          city: orderCity,
+          state: orderState,
+          pincode: orderPincode,
         },
 
-        location: location || {},
+        location: orderLocation,
 
         items: orderItems,
 
         total: Number(calculatedTotal.toFixed(2)),
 
+        deliveryDistance: Number(deliveryDistance.toFixed(2)),
+
         paymentMethod: "Cash on Delivery",
+
         paymentStatus: "Pending - Cash on Delivery",
 
         status: "Order Placed",
@@ -170,7 +358,7 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
           },
         ],
 
-        mapLink: mapLink || "",
+        mapLink: typeof mapLink === "string" ? mapLink : "",
 
         orderDate: new Date(),
       });
@@ -183,21 +371,23 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
       savedOrder = createdOrders[0];
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Order placed successfully!",
       order: savedOrder,
     });
 
   } catch (error) {
+
     console.error("Place Order Error:", error);
 
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: error.message || "Unable to place your order.",
     });
 
   } finally {
+
     if (session) {
       await session.endSession();
     }
@@ -208,26 +398,32 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
 // CUSTOMER - GET MY ORDERS
 // =================================
 
-router.get("/my-orders", protect, authorize("customer"), async (req, res) => {
-  try {
-    const orders = await Order.find({
-      userId: req.user.userId,
-    }).sort({ createdAt: -1 });
+router.get(
+  "/my-orders",
+  protect,
+  authorize("customer"),
+  async (req, res) => {
+    try {
+      const orders = await Order.find({
+        userId: req.user.userId,
+      }).sort({ createdAt: -1 });
 
-    res.status(200).json({
-      success: true,
-      totalOrders: orders.length,
-      orders,
-    });
-  } catch (error) {
-    console.error("My Orders Error:", error);
+      res.status(200).json({
+        success: true,
+        totalOrders: orders.length,
+        orders,
+      });
 
-    res.status(500).json({
-      success: false,
-      message: "Unable to fetch your orders.",
-    });
+    } catch (error) {
+      console.error("My Orders Error:", error);
+
+      res.status(500).json({
+        success: false,
+        message: "Unable to fetch your orders.",
+      });
+    }
   }
-});
+);
 
 // =================================
 // CUSTOMER - GET ONE OWN ORDER
@@ -255,6 +451,7 @@ router.get(
         success: true,
         order,
       });
+
     } catch (error) {
       console.error("Order Details Error:", error);
 
@@ -320,6 +517,7 @@ router.patch(
         message: "Your order has been cancelled successfully.",
         order,
       });
+
     } catch (error) {
       console.error("Cancel Order Error:", error);
 
@@ -353,6 +551,7 @@ router.get(
         totalRiders: riders.length,
         riders,
       });
+
     } catch (error) {
       console.error("Get Riders Error:", error);
 
@@ -439,6 +638,7 @@ router.patch(
         message: "Rider assigned successfully!",
         order,
       });
+
     } catch (error) {
       console.error("Assign Rider Error:", error);
 
@@ -469,6 +669,7 @@ router.get(
         totalOrders: orders.length,
         orders,
       });
+
     } catch (error) {
       console.error("Rider Orders Error:", error);
 
@@ -523,20 +724,14 @@ router.patch(
         });
       }
 
-      if (
-        status === "Out for Delivery" &&
-        order.status !== "Packed"
-      ) {
+      if (status === "Out for Delivery" && order.status !== "Packed") {
         return res.status(400).json({
           success: false,
           message: "Order must be packed before delivery.",
         });
       }
 
-      if (
-        status === "Delivered" &&
-        order.status !== "Out for Delivery"
-      ) {
+      if (status === "Delivered" && order.status !== "Out for Delivery") {
         return res.status(400).json({
           success: false,
           message: "Order must be out for delivery first.",
@@ -561,6 +756,7 @@ router.patch(
         message: "Delivery status updated successfully!",
         order,
       });
+
     } catch (error) {
       console.error("Rider Status Error:", error);
 
@@ -633,6 +829,7 @@ router.patch(
         message: "Rider location updated successfully.",
         riderLocation: order.riderLocation,
       });
+
     } catch (error) {
       console.error("Rider Location Error:", error);
 
@@ -648,24 +845,30 @@ router.patch(
 // ADMIN - GET ALL ORDERS
 // =================================
 
-router.get("/", protect, authorize("admin", "superadmin"), async (req, res) => {
-  try {
-    const orders = await Order.find().sort({ createdAt: -1 });
+router.get(
+  "/",
+  protect,
+  authorize("admin", "superadmin"),
+  async (req, res) => {
+    try {
+      const orders = await Order.find().sort({ createdAt: -1 });
 
-    res.status(200).json({
-      success: true,
-      totalOrders: orders.length,
-      orders,
-    });
-  } catch (error) {
-    console.error("Get All Orders Error:", error);
+      res.status(200).json({
+        success: true,
+        totalOrders: orders.length,
+        orders,
+      });
 
-    res.status(500).json({
-      success: false,
-      message: "Unable to fetch orders.",
-    });
+    } catch (error) {
+      console.error("Get All Orders Error:", error);
+
+      res.status(500).json({
+        success: false,
+        message: "Unable to fetch orders.",
+      });
+    }
   }
-});
+);
 
 // =================================
 // ADMIN - UPDATE ORDER STATUS
@@ -736,6 +939,7 @@ router.patch(
         message: "Order status updated successfully!",
         order: updatedOrder,
       });
+
     } catch (error) {
       console.error("Update Order Error:", error);
 
@@ -746,5 +950,9 @@ router.patch(
     }
   }
 );
+
+// =================================
+// EXPORT ROUTER
+// =================================
 
 module.exports = router;

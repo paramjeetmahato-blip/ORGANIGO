@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { saveSession, clearSession } from "../utils/auth";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../styles/Auth.css";
 
@@ -71,25 +72,8 @@ function Login() {
         return;
       }
 
-      // CLEAR OLD SESSIONS
-
-      localStorage.removeItem("organigoToken");
-      localStorage.removeItem("organigoUser");
-
-      sessionStorage.removeItem("organigoToken");
-      sessionStorage.removeItem("organigoUser");
-
-      // SAVE CUSTOMER SESSION
-
-      const storage = rememberMe ? localStorage : sessionStorage;
-
-      storage.setItem("organigoToken", data.token);
-      storage.setItem("organigoUser", JSON.stringify(data.user));
-
-      // UPDATE HEADER IMMEDIATELY
-
-      window.dispatchEvent(new Event("organigoAuthChanged"));
-
+     clearSession();
+saveSession(data.token, data.user);
       setMessage("Login successful!");
 
       const redirectPath = location.state?.from || "/";

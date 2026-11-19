@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { getToken, getUser } from "../utils/auth";
 import { Link, useNavigate } from "react-router-dom";
 
 const API_URL = "http://localhost:5000/api";
@@ -12,10 +13,8 @@ function MyOrders() {
   const [cancelling, setCancelling] = useState("");
 
   const fetchOrders = useCallback(async () => {
-    const token = localStorage.getItem("organigoToken");
-    const user = JSON.parse(
-      localStorage.getItem("organigoUser") || "null"
-    );
+    const token = getToken();
+    const user = getUser();
 
     if (!token || user?.role !== "customer") {
       setLoading(false);
@@ -69,7 +68,7 @@ function MyOrders() {
     try {
       setCancelling(orderId);
 
-      const token = localStorage.getItem("organigoToken");
+      const token = getToken();
 
       const response = await fetch(
         `${API_URL}/orders/my-orders/${orderId}/cancel`,

@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { getUser } from "../utils/auth";
 
 const CartContext = createContext();
 
@@ -8,9 +9,7 @@ const CartContext = createContext();
 
 const getCartKey = () => {
   try {
-    const user = JSON.parse(
-      localStorage.getItem("organigoUser") || "null"
-    );
+    const user = getUser();
 
     if (!user) {
       return "organigoCart_guest";
@@ -60,7 +59,7 @@ export function CartProvider({ children }) {
     };
 
     window.addEventListener(
-      "organigo-auth-changed",
+      "organigoAuthChanged",
       handleAccountChange
     );
 
@@ -68,7 +67,7 @@ export function CartProvider({ children }) {
 
     return () => {
       window.removeEventListener(
-        "organigo-auth-changed",
+        "organigoAuthChanged",
         handleAccountChange
       );
 

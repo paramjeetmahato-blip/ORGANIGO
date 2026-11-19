@@ -1,10 +1,12 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getToken, getUser, clearSession } from "../utils/auth";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "../styles/Checkout.css";
 
 const API_URL = "http://localhost:5000/api/orders";
+const ADDRESS_API = "http://localhost:5000/api/addresses";
+const DELIVERY_SETTINGS_API = "http://localhost:5000/api/delivery-settings";
 
 const DEFAULT_HUB = {
   latitude: 22.5504,
@@ -24,18 +26,6 @@ function getSavedLocation() {
   }
 }
 
-function getHubSettings() {
-  try {
-    const saved = localStorage.getItem("organigoDeliverySettings");
-
-    return saved
-      ? { ...DEFAULT_HUB, ...JSON.parse(saved) }
-      : DEFAULT_HUB;
-  } catch {
-    return DEFAULT_HUB;
-  }
-}
-
 function getDistanceKm(lat1, lon1, lat2, lon2) {
   const toRad = (value) => (value * Math.PI) / 180;
   const earthRadius = 6371;
@@ -52,9 +42,7 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
   return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function verifyDelivery(location) {
-  const settings = getHubSettings();
-
+function verifyDelivery(location, settings = DEFAULT_HUB) {
   if (!location) {
     return {
       available: false,
@@ -115,34 +103,84 @@ function verifyDelivery(location) {
   };
 }
 
+function getAddressLocation(address) {
+  if (
+    !address ||
+    address.latitude === null ||
+    address.latitude === undefined ||
+    address.longitude === null ||
+    address.longitude === undefined
+  ) {
+    return null;
+  }
+
+  const latitude = Number(address.latitude);
+  const longitude = Number(address.longitude);
+
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    Math.abs(latitude) > 90 ||
+    Math.abs(longitude) > 180
+  ) {
+    return null;
+  }
+
+  const fullAddress = [
+    address.houseNo,
+    address.area,
+    address.landmark,
+    address.city,
+    address.state,
+    address.pincode,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  return {
+    latitude,
+    longitude,
+    name: address.label || "Saved Address",
+    fullAddress,
+    source: "saved-address",
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 function Checkout() {
   const navigate = useNavigate();
-
   const { cartItems, cartTotal, clearCart } = useCart();
 
   const savedLocation = getSavedLocation();
-  const hubSettings = getHubSettings();
 
-  const savedUser = (() => {
-    try {
-      return JSON.parse(localStorage.getItem("organigoUser") || "null");
-    } catch {
-      return null;
-    }
-  })();
+  const [hubSettings, setHubSettings] = useState({
+    ...DEFAULT_HUB,
+    active: false,
+  });
+
+  const [deliverySettingsLoading, setDeliverySettingsLoading] =
+    useState(true);
+
+  // CURRENT TAB KA LOGGED-IN USER
+  const savedUser = getUser();
 
   const [formData, setFormData] = useState({
     name: savedUser?.name || "",
     phone: savedUser?.phone || "",
     address: savedLocation?.fullAddress || "",
-    city: hubSettings.city || "Chaibasa",
-    state: hubSettings.state || "Jharkhand",
+    city: DEFAULT_HUB.city,
+    state: DEFAULT_HUB.state,
     pincode: "",
   });
 
   const [location, setLocation] = useState(savedLocation);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationMessage, setLocationMessage] = useState("");
+
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState("");
+  const [deliveryAddressType, setDeliveryAddressType] = useState("saved");
+  const [addressLoading, setAddressLoading] = useState(true);
 
   const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
 
@@ -152,8 +190,178 @@ function Checkout() {
   const [placingOrder, setPlacingOrder] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const delivery = verifyDelivery(location);
+  const delivery = verifyDelivery(location, hubSettings);
 
+  // APPLY SELECTED SAVED ADDRESS
+  const applyAddress = (address) => {
+    setDeliveryAddressType("saved");
+
+    if (!address) return;
+
+    setSelectedAddressId(address._id);
+
+    setFormData((previous) => ({
+      ...previous,
+      name: address.fullName || previous.name,
+      phone: address.phone || previous.phone,
+      address: [
+        address.houseNo,
+        address.area,
+        address.landmark,
+      ]
+        .filter(Boolean)
+        .join(", "),
+      city: address.city || previous.city,
+      state: address.state || previous.state,
+      pincode: address.pincode || previous.pincode,
+    }));
+
+    const addressLocation = getAddressLocation(address);
+
+    setLocation(addressLocation);
+
+    if (addressLocation) {
+      localStorage.setItem(
+        "organigoSelectedLocation",
+        JSON.stringify(addressLocation)
+      );
+
+      setLocationMessage("Saved address selected successfully.");
+    } else {
+      localStorage.removeItem("organigoSelectedLocation");
+
+      setLocationMessage(
+        "Address selected. Please confirm your GPS location."
+      );
+    }
+
+    window.dispatchEvent(new Event("organigoLocationUpdated"));
+  };
+
+  // LOAD LIVE DELIVERY SETTINGS FROM MONGODB
+  useEffect(() => {
+    const loadDeliverySettings = async () => {
+      try {
+        const response = await fetch(DELIVERY_SETTINGS_API);
+        const data = await response.json();
+
+        if (!response.ok || !data.success || !data.settings) {
+          throw new Error(data.message || "Delivery settings load nahi hui.");
+        }
+
+        const settings = data.settings;
+        const latitude = Number(settings.hubLatitude);
+        const longitude = Number(settings.hubLongitude);
+        const radius = Number(settings.deliveryRadiusKm);
+
+        if (
+          !Number.isFinite(latitude) ||
+          !Number.isFinite(longitude) ||
+          !Number.isFinite(radius) ||
+          Math.abs(latitude) > 90 ||
+          Math.abs(longitude) > 180 ||
+          radius <= 0
+        ) {
+          throw new Error("MongoDB delivery settings invalid hain.");
+        }
+
+        const updatedSettings = {
+          latitude,
+          longitude,
+          radius,
+          active: Boolean(settings.isDeliveryActive),
+          city: "Chaibasa",
+          state: "Jharkhand",
+        };
+
+        setHubSettings(updatedSettings);
+
+        localStorage.setItem(
+          "organigoDeliverySettings",
+          JSON.stringify(updatedSettings)
+        );
+      } catch (error) {
+        console.error("Delivery Settings Error:", error);
+
+        setHubSettings((previous) => ({
+          ...previous,
+          active: false,
+        }));
+
+        setLocationMessage(
+          "Delivery settings load nahi hui. Please refresh and try again."
+        );
+      } finally {
+        setDeliverySettingsLoading(false);
+      }
+    };
+
+    loadDeliverySettings();
+  }, []);
+
+  // LOAD ADDRESSES FROM MONGODB
+  useEffect(() => {
+    const loadSavedAddresses = async () => {
+      try {
+        const token = getToken();
+
+        if (!token) {
+          setAddressLoading(false);
+          return;
+        }
+
+        const response = await fetch(ADDRESS_API, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Addresses load nahi hue.");
+        }
+
+        const addresses = data.addresses || [];
+        setSavedAddresses(addresses);
+
+        if (addresses.length === 0) {
+          return;
+        }
+
+        let selectedAddress = null;
+
+        if (data.selectedAddressId) {
+          selectedAddress = addresses.find(
+            (address) =>
+              address._id === String(data.selectedAddressId)
+          );
+        }
+
+        if (!selectedAddress) {
+          selectedAddress =
+            addresses.find((address) => address.isDefault) ||
+            addresses[0];
+        }
+
+        if (selectedAddress) {
+          applyAddress(selectedAddress);
+        }
+      } catch (error) {
+        console.error("Address Loading Error:", error);
+
+        setLocationMessage(
+          "Saved addresses load nahi ho paye. Please try again."
+        );
+      } finally {
+        setAddressLoading(false);
+      }
+    };
+
+    loadSavedAddresses();
+  }, []);
+
+  // HANDLE INPUT
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -165,11 +373,58 @@ function Checkout() {
     setErrorMessage("");
   };
 
-  // =================================
-  // GET CURRENT GPS LOCATION
-  // =================================
+  // SELECT ADDRESS FROM MONGODB
+  const handleSelectAddress = async (addressId) => {
+    const address = savedAddresses.find(
+      (item) => item._id === addressId
+    );
 
-  const handleGetLocation = () => {
+    if (!address) return;
+
+    const token = getToken();
+
+    if (!token) {
+      navigate("/login", {
+        state: { from: "/checkout" },
+      });
+      return;
+    }
+
+    try {
+      setErrorMessage("");
+
+      const response = await fetch(
+        `${ADDRESS_API}/${addressId}/select`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Address select nahi hua.");
+      }
+
+      applyAddress(address);
+
+      window.dispatchEvent(
+        new Event("organigoSelectedAddressUpdated")
+      );
+    } catch (error) {
+      console.error("Address Selection Error:", error);
+
+      setErrorMessage(
+        error.message || "Unable to select address."
+      );
+    }
+  };
+
+  // GET CURRENT GPS LOCATION
+  const handleGetLocation = async () => {
     if (!navigator.geolocation) {
       setLocationMessage("Your browser does not support location.");
       return;
@@ -180,6 +435,8 @@ function Checkout() {
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        setDeliveryAddressType("gps");
+
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
 
@@ -240,7 +497,7 @@ function Checkout() {
 
         window.dispatchEvent(new Event("organigoLocationUpdated"));
 
-        const result = verifyDelivery(selectedLocation);
+        const result = verifyDelivery(selectedLocation, hubSettings);
 
         if (!result.available) {
           setLocationMessage(result.message);
@@ -269,24 +526,24 @@ function Checkout() {
     );
   };
 
-  // =================================
   // PLACE ORDER IN MONGODB
-  // =================================
-
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
-
     setErrorMessage("");
 
     if (placingOrder) return;
+
+    if (deliverySettingsLoading) {
+      setErrorMessage("Please wait. Delivery settings are loading.");
+      return;
+    }
 
     if (cartItems.length === 0) {
       setErrorMessage("Your cart is empty.");
       return;
     }
 
-    // Check login token
-    const token = localStorage.getItem("organigoToken");
+    const token = getToken();
 
     if (!token) {
       navigate("/login", {
@@ -305,7 +562,12 @@ function Checkout() {
       return;
     }
 
-    const finalDelivery = verifyDelivery(location);
+    if (!formData.address.trim()) {
+      setErrorMessage("Please enter your delivery address.");
+      return;
+    }
+
+    const finalDelivery = verifyDelivery(location, hubSettings);
 
     if (!finalDelivery.available) {
       setErrorMessage(finalDelivery.message);
@@ -313,7 +575,9 @@ function Checkout() {
     }
 
     if (paymentMethod !== "Cash on Delivery") {
-      setErrorMessage("Online UPI payment is coming soon. Please select COD.");
+      setErrorMessage(
+        "Online UPI payment is coming soon. Please select COD."
+      );
       return;
     }
 
@@ -330,11 +594,18 @@ function Checkout() {
         ...formData,
       },
 
+      deliveryAddressType: deliveryAddressType,
+
+      selectedAddressId:
+        deliveryAddressType === "saved"
+          ? selectedAddressId || null
+          : null,
+
       location: {
         name: location?.name || "",
         fullAddress: location?.fullAddress || "",
-        latitude: Number(location.latitude),
-        longitude: Number(location.longitude),
+        latitude: Number(location?.latitude),
+        longitude: Number(location?.longitude),
       },
 
       mapLink,
@@ -349,22 +620,16 @@ function Checkout() {
       })),
 
       total: Number(cartTotal),
-
       paymentMethod: "Cash on Delivery",
-
       paymentStatus: "Pending - Cash on Delivery",
-
       deliveryDistance: Number(finalDelivery.distance),
-
       status: "Order Placed",
-
       orderDate: new Date().toISOString(),
     };
 
     try {
       setPlacingOrder(true);
 
-      // Send order with login token
       const response = await fetch(API_URL, {
         method: "POST",
         headers: {
@@ -378,8 +643,8 @@ function Checkout() {
 
       if (!response.ok || !result.success) {
         if (response.status === 401) {
-          localStorage.removeItem("organigoToken");
-          localStorage.removeItem("organigoUser");
+          // CLEAR ONLY CURRENT TAB LOGIN
+          clearSession();
 
           navigate("/login", {
             state: { from: "/checkout" },
@@ -388,12 +653,9 @@ function Checkout() {
           return;
         }
 
-        throw new Error(
-          result.message || "Unable to place your order."
-        );
+        throw new Error(result.message || "Unable to place your order.");
       }
 
-      // Save local copy for existing Admin Panel
       const savedOrders = JSON.parse(
         localStorage.getItem("organigoOrders") || "[]"
       );
@@ -406,7 +668,6 @@ function Checkout() {
       setOrderId(result.order.orderId || newOrderId);
 
       clearCart();
-
       setOrderPlaced(true);
     } catch (error) {
       console.error("Order Placement Error:", error);
@@ -420,21 +681,15 @@ function Checkout() {
     }
   };
 
-  // =================================
   // SUCCESS SCREEN
-  // =================================
-
   if (orderPlaced) {
     return (
       <div className="checkout-success">
         <div className="success-icon">✓</div>
 
         <h1>Order Placed Successfully!</h1>
-
         <p>Thank you for shopping with ORGANIGO.</p>
-
         <h3>Order ID: {orderId}</h3>
-
         <p>Payment Method: Cash on Delivery</p>
 
         {location && (
@@ -480,10 +735,7 @@ function Checkout() {
     );
   }
 
-  // =================================
   // CHECKOUT PAGE
-  // =================================
-
   return (
     <div className="checkout-page">
       <div className="checkout-heading">
@@ -498,16 +750,67 @@ function Checkout() {
         >
           <h2>Delivery Information</h2>
 
-         <label>Registered Full Name</label>
+          <div className="saved-address-section">
+            <h3>📍 Select Delivery Address</h3>
 
-        <input
-  type="text"
-  name="name"
-  placeholder="Your registered name"
-  value={formData.name}
-  readOnly
-  required
-        />
+            {addressLoading ? (
+              <p>Loading your saved addresses...</p>
+            ) : savedAddresses.length > 0 ? (
+              <>
+                <select
+                  value={selectedAddressId}
+                  onChange={(e) =>
+                    handleSelectAddress(e.target.value)
+                  }
+                >
+                  {savedAddresses.map((address) => (
+                    <option key={address._id} value={address._id}>
+                      {address.label} - {address.houseNo},{" "}
+                      {address.area}
+                      {address.isDefault ? " (Default)" : ""}
+                    </option>
+                  ))}
+                </select>
+
+                <p className="saved-address-details">
+                  {
+                    savedAddresses.find(
+                      (item) => item._id === selectedAddressId
+                    )?.fullName
+                  }
+                  {" — "}
+                  {
+                    savedAddresses.find(
+                      (item) => item._id === selectedAddressId
+                    )?.city
+                  }
+                </p>
+              </>
+            ) : (
+              <p>
+                No saved addresses found. Please enter your address manually.
+              </p>
+            )}
+
+            <button
+              type="button"
+              className="location-btn"
+              onClick={() => navigate("/addresses")}
+            >
+              + Manage / Add New Address
+            </button>
+          </div>
+
+          <label>Registered Full Name</label>
+
+          <input
+            type="text"
+            name="name"
+            placeholder="Your registered name"
+            value={formData.name}
+            readOnly
+            required
+          />
 
           <label>Mobile Number</label>
 
@@ -617,6 +920,12 @@ function Checkout() {
             required
           />
 
+          {deliverySettingsLoading && (
+            <p className="location-message">
+              Loading latest delivery availability...
+            </p>
+          )}
+
           <div
             className={`checkout-delivery-status ${
               delivery.available ? "available" : "unavailable"
@@ -673,7 +982,12 @@ function Checkout() {
           <button
             type="submit"
             className="place-order-btn"
-            disabled={!delivery.available || placingOrder}
+            disabled={
+              !delivery.available ||
+              placingOrder ||
+              addressLoading ||
+              deliverySettingsLoading
+            }
           >
             {placingOrder ? "Placing Order..." : "Place Order →"}
           </button>
@@ -683,7 +997,10 @@ function Checkout() {
           <h2>Order Summary</h2>
 
           {cartItems.map((item) => (
-            <div className="checkout-item" key={item.id}>
+            <div
+              className="checkout-item"
+              key={item.id || item._id}
+            >
               <span>
                 {item.name} × {item.quantity}
               </span>
@@ -698,7 +1015,6 @@ function Checkout() {
 
           <div className="checkout-total">
             <span>Total Amount</span>
-
             <strong>₹{cartTotal}</strong>
           </div>
 

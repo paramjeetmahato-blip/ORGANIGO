@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { getToken } from "../utils/auth";
 import { Link, useParams } from "react-router-dom";
 
 const API_URL = "http://localhost:5000/api";
@@ -45,7 +46,7 @@ function OrderTracking() {
 
   const fetchOrder = useCallback(async () => {
     try {
-      const token = localStorage.getItem("organigoToken");
+      const token = getToken();
 
       if (!token) {
         setError("Please login to track your order.");

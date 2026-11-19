@@ -6,7 +6,7 @@ function About() {
 
   const aboutItems = [
     {
-      title: "Terms of Service",
+      title: "Terms of Services",
       path: "/about/terms",
     },
     {

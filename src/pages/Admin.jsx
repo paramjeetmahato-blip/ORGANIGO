@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { getToken, getUser, clearSession } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import "../styles/Admin.css";
 
@@ -32,17 +33,8 @@ function getSavedDeliverySettings() {
 
 function Admin() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("organigoToken");
-
-  let currentUser = null;
-
-  try {
-    currentUser = JSON.parse(
-      localStorage.getItem("organigoUser") || "null"
-    );
-  } catch {
-    currentUser = null;
-  }
+  const token = getToken();
+const currentUser = getUser();
 
   const isAdmin =
   Boolean(token) &&
@@ -58,18 +50,16 @@ function Admin() {
   }, [isAdmin, navigate]);
 
   const logoutAdmin = useCallback(
-    (message) => {
-      localStorage.removeItem("organigoToken");
-      localStorage.removeItem("organigoUser");
+  (message) => {
+    clearSession();
 
-      navigate("/admin-login", {
-        replace: true,
-        state: { message },
-      });
-    },
-    [navigate]
-  );
-
+    navigate("/admin-login", {
+      replace: true,
+      state: { message },
+    });
+  },
+  [navigate]
+);
   // PRODUCT FORM
 
   const [product, setProduct] = useState({

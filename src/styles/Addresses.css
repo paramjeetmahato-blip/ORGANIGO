@@ -1,0 +1,215 @@
+.addresses-page {
+  min-height: 100vh;
+  background: #f7faf7;
+  padding: 35px 20px;
+}
+
+.addresses-container {
+  max-width: 900px;
+  margin: auto;
+}
+
+.addresses-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.addresses-heading h1 {
+  color: #183b24;
+  font-size: 27px;
+  margin: 0 0 7px;
+}
+
+.addresses-heading p {
+  color: #777;
+  margin: 0;
+}
+
+.addresses-heading button,
+.address-form button {
+  background: #168a43;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.addresses-heading button:hover,
+.address-form button:hover {
+  background: #116d34;
+}
+
+.addresses-message {
+  padding: 12px;
+  background: #e9f7ed;
+  color: #168a43;
+  border-radius: 7px;
+}
+
+.address-form,
+.address-card,
+.addresses-empty {
+  background: white;
+  border: 1px solid #e5eee6;
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+.address-form h2 {
+  margin-top: 0;
+  color: #183b24;
+}
+
+.address-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 17px;
+  margin-top: 15px;
+}
+
+.address-form label {
+  display: block;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 7px;
+}
+
+.address-form input:not([type="checkbox"]),
+.address-form select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #dce5dd;
+  border-radius: 7px;
+  outline: none;
+  font-size: 14px;
+}
+
+.address-form input:focus,
+.address-form select:focus {
+  border-color: #168a43;
+}
+
+.default-address-option {
+  display: flex !important;
+  align-items: center;
+  gap: 9px;
+  margin: 20px 0;
+}
+
+.address-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.address-card-top h3 {
+  color: #168a43;
+  margin-top: 0;
+}
+
+.address-card-top span {
+  background: #e8f7ec;
+  color: #168a43;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.address-card h4 {
+  margin-bottom: 7px;
+  color: #222;
+}
+
+.address-card p {
+  color: #666;
+  margin: 6px 0;
+  line-height: 1.5;
+}
+
+.addresses-empty {
+  text-align: center;
+  padding: 45px 15px;
+}
+
+.addresses-empty span {
+  font-size: 40px;
+}
+
+.addresses-empty h2 {
+  color: #183b24;
+}
+
+.addresses-empty p {
+  color: #777;
+}
+
+.addresses-back-button {
+  background: transparent;
+  border: none;
+  color: #168a43;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 12px 0;
+}
+
+.addresses-loading {
+  text-align: center;
+  padding: 60px 15px;
+}
+
+@media (max-width: 600px) {
+  .addresses-page {
+    padding: 22px 13px;
+  }
+
+  .addresses-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .addresses-heading h1 {
+    font-size: 23px;
+  }
+
+  .address-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .address-form,
+  .address-card {
+    padding: 17px;
+  }
+
+  .addresses-heading button {
+    width: 100%;
+  }
+}
+.gps-location-button {
+  width: 100%;
+  padding: 13px;
+  margin: 12px 0 20px;
+  background: #e8f7ec;
+  color: #168a43;
+  border: 1px solid #168a43;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gps-location-button:hover {
+  background: #d8f0df;
+}
+
+.gps-location-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { getUser, getToken, clearSession } from "../utils/auth";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import "../styles/Header.css";
+
+const API_URL = "http://localhost:5000/api/addresses";
 
 const defaultHub = {
   latitude: 22.5504,
@@ -48,22 +51,13 @@ function getSavedLocation() {
   }
 }
 
-// GET CUSTOMER FROM LOCAL OR SESSION STORAGE
 function getSavedUser() {
-  try {
-    const savedUser =
-      localStorage.getItem("organigoUser") ||
-      sessionStorage.getItem("organigoUser");
-
-    return savedUser ? JSON.parse(savedUser) : null;
-  } catch {
-    return null;
-  }
+  return getUser();
 }
+
 
 function Header() {
   const navigate = useNavigate();
-  const location = useLocation();
   const accountRef = useRef(null);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,19 +66,139 @@ function Header() {
   const [locationOpen, setLocationOpen] = useState(false);
   const [locationQuery, setLocationQuery] = useState("");
   const [locationResults, setLocationResults] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState(getSavedLocation);
+
+  const [selectedLocation, setSelectedLocation] =
+    useState(getSavedLocation);
+
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [addressesLoading, setAddressesLoading] = useState(false);
+  const [selectingAddressId, setSelectingAddressId] = useState(null);
 
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationMessage, setLocationMessage] = useState("");
+
   const [hubSettings, setHubSettings] = useState(getHubSettings);
 
   const [accountOpen, setAccountOpen] = useState(false);
-  const [user, setUser] = useState(getSavedUser);
+  const [user, setUser] = useState(getUser);
 
   const cartCount = cartItems.reduce(
     (total, item) => total + Number(item.quantity || 0),
     0
   );
+
+  // =====================================
+  // LOAD SAVED ADDRESSES FROM MONGODB
+  // =====================================
+
+  const loadSavedAddresses = async () => {
+    const token = getToken();
+
+    if (!token) {
+      setSavedAddresses([]);
+      setSelectedAddressId(null);
+      return;
+    }
+
+    try {
+      setAddressesLoading(true);
+
+      const response = await fetch(API_URL, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to load addresses.");
+      }
+
+      setSavedAddresses(data.addresses || []);
+      setSelectedAddressId(data.selectedAddressId || null);
+
+      // Restore selected address from MongoDB
+      if (data.selectedAddress) {
+        const address = data.selectedAddress;
+
+        const hasCoordinates =
+          address.latitude !== null &&
+          address.latitude !== undefined &&
+          address.longitude !== null &&
+          address.longitude !== undefined;
+
+        let finalLocation = {
+          name: [
+            address.area,
+            address.city,
+            address.state,
+          ]
+            .filter(Boolean)
+            .join(", "),
+
+          fullAddress: [
+            address.houseNo,
+            address.area,
+            address.landmark,
+            address.city,
+            address.state,
+            address.pincode,
+          ]
+            .filter(Boolean)
+            .join(", "),
+
+          latitude: hasCoordinates
+            ? Number(address.latitude)
+            : null,
+
+          longitude: hasCoordinates
+            ? Number(address.longitude)
+            : null,
+
+          source: "saved-address",
+          addressId: address._id,
+        };
+
+        if (hasCoordinates) {
+          const result = checkDelivery(
+            address.latitude,
+            address.longitude
+          );
+
+          finalLocation.distance = result.distance;
+          finalLocation.available = result.available;
+        } else {
+          finalLocation.available = null;
+          finalLocation.distance = null;
+        }
+
+        localStorage.setItem(
+          "organigoSelectedLocation",
+          JSON.stringify(finalLocation)
+        );
+
+        setSelectedLocation(finalLocation);
+
+        window.dispatchEvent(
+          new Event("organigoSelectedAddressUpdated")
+        );
+      } else {
+        setSelectedLocation(null);
+        localStorage.removeItem("organigoSelectedLocation");
+      }
+    } catch (error) {
+      console.error("Load Saved Addresses Error:", error);
+
+      setLocationMessage(
+        "Saved addresses load nahi ho paaye. Please try again."
+      );
+    } finally {
+      setAddressesLoading(false);
+    }
+  };
 
   // =====================================
   // LOGIN STATUS UPDATE
@@ -95,8 +209,6 @@ function Header() {
       setUser(getSavedUser());
     };
 
-    refreshUser();
-
     window.addEventListener("organigoAuthChanged", refreshUser);
     window.addEventListener("storage", refreshUser);
 
@@ -104,7 +216,20 @@ function Header() {
       window.removeEventListener("organigoAuthChanged", refreshUser);
       window.removeEventListener("storage", refreshUser);
     };
-  }, [location.pathname]);
+  }, []);
+
+  // =====================================
+  // LOAD ADDRESS AFTER LOGIN
+  // =====================================
+
+  useEffect(() => {
+    if (user && getToken()) {
+      loadSavedAddresses();
+    } else {
+      setSavedAddresses([]);
+      setSelectedAddressId(null);
+    }
+  }, [user]);
 
   // =====================================
   // CLOSE DROPDOWN
@@ -142,20 +267,21 @@ function Header() {
   // LOGOUT
   // =====================================
 
-  const handleLogout = () => {
-    localStorage.removeItem("organigoToken");
-    localStorage.removeItem("organigoUser");
+ const handleLogout = () => {
+  // Sirf current tab ka login clear hoga
+  clearSession();
 
-    sessionStorage.removeItem("organigoToken");
-    sessionStorage.removeItem("organigoUser");
+  localStorage.removeItem("organigoSelectedLocation");
 
-    setUser(null);
-    setAccountOpen(false);
+  setUser(null);
+  setSelectedLocation(null);
+  setSavedAddresses([]);
+  setSelectedAddressId(null);
 
-    window.dispatchEvent(new Event("organigoAuthChanged"));
+  setAccountOpen(false);
 
-    navigate("/");
-  };
+  navigate("/");
+};
 
   // =====================================
   // PRODUCT SEARCH
@@ -243,10 +369,123 @@ function Header() {
     );
 
     setSelectedLocation(finalLocation);
+
     setLocationOpen(false);
     setLocationQuery("");
     setLocationResults([]);
     setLocationMessage("");
+  };
+
+  // =====================================
+  // SELECT SAVED ADDRESS FROM MONGODB
+  // =====================================
+
+  const selectSavedAddress = async (address) => {
+    const token = getToken();
+
+    if (!token) {
+      setLocationMessage("Please login to select a saved address.");
+      return;
+    }
+
+    try {
+      setSelectingAddressId(address._id);
+      setLocationMessage("");
+
+      const response = await fetch(
+        `${API_URL}/${address._id}/select`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Unable to select this address."
+        );
+      }
+
+      setSelectedAddressId(data.selectedAddressId);
+
+      const selected = data.selectedAddress;
+
+      const hasCoordinates =
+        selected.latitude !== null &&
+        selected.latitude !== undefined &&
+        selected.longitude !== null &&
+        selected.longitude !== undefined;
+
+      const finalLocation = {
+        name: [
+          selected.area,
+          selected.city,
+          selected.state,
+        ]
+          .filter(Boolean)
+          .join(", "),
+
+        fullAddress: [
+          selected.houseNo,
+          selected.area,
+          selected.landmark,
+          selected.city,
+          selected.state,
+          selected.pincode,
+        ]
+          .filter(Boolean)
+          .join(", "),
+
+        latitude: hasCoordinates
+          ? Number(selected.latitude)
+          : null,
+
+        longitude: hasCoordinates
+          ? Number(selected.longitude)
+          : null,
+
+        source: "saved-address",
+        addressId: selected._id,
+      };
+
+      if (hasCoordinates) {
+        const result = checkDelivery(
+          selected.latitude,
+          selected.longitude
+        );
+
+        finalLocation.distance = result.distance;
+        finalLocation.available = result.available;
+      } else {
+        finalLocation.distance = null;
+        finalLocation.available = null;
+      }
+
+      localStorage.setItem(
+        "organigoSelectedLocation",
+        JSON.stringify(finalLocation)
+      );
+
+      setSelectedLocation(finalLocation);
+      setSavedAddresses(data.addresses || savedAddresses);
+
+      setLocationOpen(false);
+      setLocationMessage("");
+
+      window.dispatchEvent(
+        new Event("organigoSelectedAddressUpdated")
+      );
+    } catch (error) {
+      console.error("Select Address Error:", error);
+      setLocationMessage(error.message);
+    } finally {
+      setSelectingAddressId(null);
+    }
   };
 
   // =====================================
@@ -403,17 +642,24 @@ function Header() {
     );
   };
 
+  // =====================================
+  // DELIVERY TEXT
+  // =====================================
+
   const deliveryText = selectedLocation
-    ? selectedLocation.available
+    ? selectedLocation.available === true
       ? "Delivery Available"
-      : "Not Available"
+      : selectedLocation.available === false
+        ? "Not Available"
+        : "Verify Location"
     : "Select Location";
+
+  // =====================================
+  // HEADER UI
+  // =====================================
 
   return (
     <header className="Organigo-header">
-
-      {/* APP BANNER */}
-
       <div className="organigo-app-banner">
         <div className="app-banner-icon">🥬</div>
 
@@ -428,7 +674,6 @@ function Header() {
       </div>
 
       <div className="header-container">
-
         {/* LOGO */}
 
         <Link to="/" className="Organigo-logo">
@@ -444,6 +689,10 @@ function Header() {
             setLocationOpen(true);
             setLocationMessage("");
             setAccountOpen(false);
+
+            if (user) {
+              loadSavedAddresses();
+            }
           }}
         >
           <span className="location-icon">📍</span>
@@ -462,7 +711,7 @@ function Header() {
             {selectedLocation && (
               <small
                 className={
-                  selectedLocation.available
+                  selectedLocation.available === true
                     ? "location-available"
                     : "location-unavailable"
                 }
@@ -488,46 +737,40 @@ function Header() {
           />
         </div>
 
-        {/* CUSTOMER ACCOUNT */}
+        {/* ACCOUNT */}
 
         <div className="header-account" ref={accountRef}>
+          <button
+            type="button"
+            className="header-account-button"
+            aria-expanded={accountOpen}
+            onClick={() => setAccountOpen((previous) => !previous)}
+          >
+            <span className="account-icon">👤</span>
 
-          {!user ? (
-            <button
-              type="button"
-              className="header-account-button"
-              onClick={() => navigate("/login")}
-            >
-              <span className="account-icon">👤</span>
-
-              <span className="account-button-text">
-                <strong>Login</strong>
-              </span>
-            </button>
-          ) : (
-            <>
-              <button
-                type="button"
-                className="header-account-button"
-                aria-expanded={accountOpen}
-                onClick={() => setAccountOpen((previous) => !previous)}
-              >
-                <span className="account-icon">👤</span>
-
-                <span className="account-button-text">
+            <span className="account-button-text">
+              {user ? (
+                <>
                   <small>Hello,</small>
-
                   <strong>
                     {user.name?.split(" ")[0] || "My Account"}
                   </strong>
-                </span>
+                </>
+              ) : (
+                <>
+                  <small>Welcome</small>
+                  <strong>Login / Sign Up</strong>
+                </>
+              )}
+            </span>
 
-                <span className="account-arrow">⌄</span>
-              </button>
+            <span className="account-arrow">⌄</span>
+          </button>
 
-              {accountOpen && (
-                <div className="account-dropdown">
-
+          {accountOpen && (
+            <div className="account-dropdown">
+              {user ? (
+                <>
                   <div className="account-dropdown-heading">
                     <strong>{user.name}</strong>
                     <small>{user.phone}</small>
@@ -537,14 +780,7 @@ function Header() {
                     to="/account"
                     onClick={() => setAccountOpen(false)}
                   >
-                    👤 My Profile
-                  </Link>
-
-                  <Link
-                    to="/my-orders"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    📦 My Orders
+                    👤 My Account
                   </Link>
 
                   <button
@@ -554,12 +790,38 @@ function Header() {
                   >
                     ↪ Logout
                   </button>
+                </>
+              ) : (
+                <>
+                  <div className="account-dropdown-heading">
+                    <strong>Welcome to ORGANIGO!</strong>
+                    <small>Login to manage your account.</small>
+                  </div>
 
-                </div>
+                  <Link
+                    to="/login"
+                    onClick={() => setAccountOpen(false)}
+                  >
+                    🔐 Login
+                  </Link>
+
+                  <Link
+                    to="/signup"
+                    onClick={() => setAccountOpen(false)}
+                  >
+                    ✨ Create My Account
+                  </Link>
+
+                  <Link
+                    to="/forgot-password"
+                    onClick={() => setAccountOpen(false)}
+                  >
+                    🔑 Forgot Password?
+                  </Link>
+                </>
               )}
-            </>
+            </div>
           )}
-
         </div>
 
         {/* CART */}
@@ -574,7 +836,6 @@ function Header() {
             </span>
           )}
         </Link>
-
       </div>
 
       {/* LOCATION MODAL */}
@@ -591,7 +852,6 @@ function Header() {
             aria-labelledby="location-modal-title"
             onClick={(e) => e.stopPropagation()}
           >
-
             <div className="location-modal-heading">
               <div>
                 <h2 id="location-modal-title">
@@ -610,6 +870,108 @@ function Header() {
               </button>
             </div>
 
+            {/* SAVED ADDRESSES */}
+
+            {user && (
+              <div className="saved-addresses-section">
+                <div className="saved-addresses-heading">
+                  <strong>📍 Your Saved Addresses</strong>
+
+                  <Link
+                    to="/addresses"
+                    onClick={() => setLocationOpen(false)}
+                  >
+                    + Add New Address
+                  </Link>
+                </div>
+
+                {addressesLoading ? (
+                  <p className="location-loading">
+                    Loading your saved addresses...
+                  </p>
+                ) : savedAddresses.length > 0 ? (
+                  <div className="saved-addresses-list">
+                    {savedAddresses.map((address) => (
+                      <button
+                        type="button"
+                        key={address._id}
+                        className={`saved-address-item ${
+                          selectedAddressId === address._id
+                            ? "selected"
+                            : ""
+                        }`}
+                        onClick={() => selectSavedAddress(address)}
+                        disabled={selectingAddressId !== null}
+                      >
+                        <span className="saved-address-icon">
+                          {address.label === "Work"
+                            ? "🏢"
+                            : address.label === "Other"
+                              ? "📍"
+                              : "🏠"}
+                        </span>
+
+                        <div className="saved-address-details">
+                          <strong>
+                            {address.label || "Home"}
+                            {selectedAddressId === address._id &&
+                              " ✓"}
+                          </strong>
+
+                          <small>
+                            {[
+                              address.houseNo,
+                              address.area,
+                              address.landmark,
+                              address.city,
+                              address.state,
+                              address.pincode,
+                            ]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </small>
+
+                          <small>
+                            {address.fullName} · {address.phone}
+                          </small>
+                        </div>
+
+                        {selectingAddressId === address._id && (
+                          <span>Saving...</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="location-no-results">
+                    You have not saved any address yet.
+                    Click Add New Address to save one.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {!user && (
+              <div className="saved-addresses-section">
+                <p>
+                  Login to view and select your saved addresses.
+                </p>
+
+                <Link
+                  to="/login"
+                  onClick={() => setLocationOpen(false)}
+                >
+                  Login to Your Account
+                </Link>
+              </div>
+            )}
+
+            <div className="location-divider">
+              <span>OR USE ANOTHER LOCATION</span>
+            </div>
+
+            {/* GPS LOCATION */}
+
             <button
               type="button"
               className="use-current-location-btn"
@@ -618,6 +980,8 @@ function Header() {
             >
               📍 Use My Current Location
             </button>
+
+            {/* MANUAL SEARCH */}
 
             <div className="location-search-box">
               <span>🔍</span>
@@ -658,7 +1022,8 @@ function Header() {
 
                     <div>
                       <strong>
-                        {place.name || place.display_name.split(",")[0]}
+                        {place.name ||
+                          place.display_name.split(",")[0]}
                       </strong>
 
                       <small>{place.display_name}</small>
@@ -679,14 +1044,16 @@ function Header() {
 
             {selectedLocation && (
               <div className="current-selected-location">
-                <strong>Previously selected location</strong>
+                <strong>Currently selected location</strong>
 
                 <p>{selectedLocation.name}</p>
 
                 <small>
-                  {selectedLocation.available
+                  {selectedLocation.available === true
                     ? `✓ Delivery available · ${selectedLocation.distance} KM from hub`
-                    : `✕ Outside delivery area · ${selectedLocation.distance} KM from hub`}
+                    : selectedLocation.available === false
+                      ? `✕ Outside delivery area · ${selectedLocation.distance} KM from hub`
+                      : "Location coordinates need verification."}
                 </small>
               </div>
             )}
@@ -695,11 +1062,9 @@ function Header() {
               Delivery availability is calculated using your selected
               location and the current ORGANIGO delivery radius.
             </p>
-
           </div>
         </div>
       )}
-
     </header>
   );
 }

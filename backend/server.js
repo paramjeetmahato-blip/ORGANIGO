@@ -15,6 +15,12 @@ app.use("/api/auth", require("./routes/Auth"));
 // Customer Profile Routes
 app.use("/api/customer", require("./routes/Customer"));
 
+// Customer Address Routes
+app.use("/api/addresses", require("./routes/Addresses"));
+
+// Delivery Settings Routes
+app.use("/api/delivery-settings", require("./routes/DeliverySettings"));
+
 // Order Routes
 app.use("/api/orders", require("./routes/Order"));
 

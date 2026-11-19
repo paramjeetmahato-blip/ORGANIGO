@@ -1,15 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getToken, saveSession, clearSession } from "../utils/auth";
 import "../styles/Account.css";
 
 const API_URL = "http://localhost:5000/api/customer";
-
-function getToken() {
-  return (
-    localStorage.getItem("organigoToken") ||
-    sessionStorage.getItem("organigoToken")
-  );
-}
 
 function Account() {
   const navigate = useNavigate();
@@ -54,17 +49,8 @@ function Account() {
         email: data.user.email || "",
       });
 
-      // Update saved login user information
-      const storage = localStorage.getItem("organigoToken")
-        ? localStorage
-        : sessionStorage;
-
-      storage.setItem(
-        "organigoUser",
-        JSON.stringify(data.user)
-      );
-
-      window.dispatchEvent(new Event("organigoAuthChanged"));
+      // Update user only in current tab
+      saveSession(token, data.user);
 
     } catch (error) {
       setMessage(error.message);
@@ -73,12 +59,7 @@ function Account() {
         error.message.includes("expired") ||
         error.message.includes("Invalid")
       ) {
-        localStorage.removeItem("organigoToken");
-        localStorage.removeItem("organigoUser");
-
-        sessionStorage.removeItem("organigoToken");
-        sessionStorage.removeItem("organigoUser");
-
+        clearSession();
         navigate("/login");
       }
     } finally {
@@ -99,6 +80,11 @@ function Account() {
 
     try {
       const token = getToken();
+
+      if (!token) {
+        navigate("/login");
+        return;
+      }
 
       const response = await fetch(`${API_URL}/profile`, {
         method: "PUT",
@@ -121,21 +107,14 @@ function Account() {
       }
 
       setUser(data.user);
+
       setForm({
         name: data.user.name,
         email: data.user.email || "",
       });
 
-      const storage = localStorage.getItem("organigoToken")
-        ? localStorage
-        : sessionStorage;
-
-      storage.setItem(
-        "organigoUser",
-        JSON.stringify(data.user)
-      );
-
-      window.dispatchEvent(new Event("organigoAuthChanged"));
+      // Update current tab session
+      saveSession(token, data.user);
 
       setEditing(false);
       setMessage("Profile updated successfully!");
@@ -147,15 +126,9 @@ function Account() {
     }
   };
 
+  // LOGOUT
   const handleLogout = () => {
-    localStorage.removeItem("organigoToken");
-    localStorage.removeItem("organigoUser");
-
-    sessionStorage.removeItem("organigoToken");
-    sessionStorage.removeItem("organigoUser");
-
-    window.dispatchEvent(new Event("organigoAuthChanged"));
-
+    clearSession();
     navigate("/");
   };
 

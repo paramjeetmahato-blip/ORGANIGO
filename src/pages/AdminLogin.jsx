@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { saveSession } from "../utils/auth";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles/Auth.css";
 
@@ -137,19 +138,8 @@ function AdminLogin() {
         return;
       }
 
-      localStorage.removeItem("organigoToken");
-      localStorage.removeItem("organigoUser");
-
-      sessionStorage.removeItem("organigoToken");
-      sessionStorage.removeItem("organigoUser");
-
-      localStorage.setItem("organigoToken", data.token);
-      localStorage.setItem(
-        "organigoUser",
-        JSON.stringify(data.user)
-      );
-
-      window.dispatchEvent(new Event("organigoAuthChanged"));
+      // SAVE ADMIN SESSION IN CURRENT TAB ONLY
+      saveSession(data.token, data.user);
 
       setMessage("Admin Login Successful!");
 

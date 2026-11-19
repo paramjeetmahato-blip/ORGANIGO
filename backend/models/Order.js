@@ -121,6 +121,12 @@ const orderSchema = new mongoose.Schema(
       index: true,
     },
 
+    // CUSTOMER SELECTED SAVED ADDRESS ID
+    selectedAddressId: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+    },
+
     orderId: {
       type: String,
       required: true,

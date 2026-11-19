@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getToken } from "../utils/auth";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "../styles/Cart.css";
@@ -151,7 +152,7 @@ function Cart() {
 
     setCheckoutMessage("");
 
-    const token = localStorage.getItem("organigoToken");
+    const token = getToken();
 
     if (token) {
       navigate("/checkout");
