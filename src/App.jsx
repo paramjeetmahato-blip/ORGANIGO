@@ -20,12 +20,18 @@ import MyOrders from "./pages/MyOrders";
 import OrderTracking from "./pages/OrderTracking";
 import RiderDashboard from "./pages/RiderDashboard";
 import Account from "./pages/Account";
+import About from "./pages/About";
+
+// CUSTOMER LAYOUT
+import { useLocation } from "react-router-dom";
 
 // CUSTOMER LAYOUT
 function CustomerLayout() {
+  const location = useLocation();
+
   return (
     <>
-      <Header />
+      {location.pathname !== "/account" && <Header />}
       <Outlet />
     </>
   );
@@ -59,6 +65,9 @@ function App() {
 
             {/* CUSTOMER ACCOUNT */}
             <Route path="/account" element={<Account />} />
+
+            {/* CUSTOMER ABOUT */}
+            <Route path="/about" element={<About />} />
 
             {/* CUSTOMER ORDERS */}
             <Route path="/my-orders" element={<MyOrders />} />
