@@ -34,11 +34,11 @@ function getSavedDeliverySettings() {
 function Admin() {
   const navigate = useNavigate();
   const token = getToken();
-const currentUser = getUser();
+  const currentUser = getUser();
 
   const isAdmin =
-  Boolean(token) &&
-  ["admin", "superadmin"].includes(currentUser?.role);
+    Boolean(token) &&
+    ["admin", "superadmin"].includes(currentUser?.role);
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -50,17 +50,20 @@ const currentUser = getUser();
   }, [isAdmin, navigate]);
 
   const logoutAdmin = useCallback(
-  (message) => {
-    clearSession();
+    (message) => {
+      clearSession();
 
-    navigate("/admin-login", {
-      replace: true,
-      state: { message },
-    });
-  },
-  [navigate]
-);
-  // PRODUCT FORM
+      navigate("/admin-login", {
+        replace: true,
+        state: { message },
+      });
+    },
+    [navigate]
+  );
+
+  // =========================================
+  // ADD PRODUCT FORM
+  // =========================================
 
   const [product, setProduct] = useState({
     name: "",
@@ -71,17 +74,14 @@ const currentUser = getUser();
     stock: "",
     description: "",
     image: null,
+    isSpecial: false,
+    isDemanding: false,
+    isOnOffer: false,
   });
 
-  const [preview, setPreview] = useState("");
-
-  // PRODUCT MANAGEMENT
-
-  const [products, setProducts] = useState([]);
-  const [productsLoading, setProductsLoading] = useState(false);
-  const [productsError, setProductsError] = useState("");
-
-  const [editingProductId, setEditingProductId] = useState(null);
+  // =========================================
+  // EDIT PRODUCT FORM
+  // =========================================
 
   const [editProduct, setEditProduct] = useState({
     name: "",
@@ -92,9 +92,25 @@ const currentUser = getUser();
     stock: "",
     description: "",
     image: "",
+    isSpecial: false,
+    isDemanding: false,
+    isOnOffer: false,
   });
 
+  const [preview, setPreview] = useState("");
+  const [editingProductId, setEditingProductId] = useState(null);
+
+  // =========================================
+  // PRODUCT MANAGEMENT
+  // =========================================
+
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [productsError, setProductsError] = useState("");
+
+  // =========================================
   // INVENTORY FILTERS
+  // =========================================
 
   const [searchProduct, setSearchProduct] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
@@ -103,9 +119,7 @@ const currentUser = getUser();
   const productCategories = useMemo(() => {
     return [
       ...new Set(
-        products
-          .map((item) => item.category)
-          .filter(Boolean)
+        products.map((item) => item.category).filter(Boolean)
       ),
     ].sort();
   }, [products]);
@@ -114,8 +128,9 @@ const currentUser = getUser();
     return products.filter((item) => {
       const searchText = searchProduct.trim().toLowerCase();
 
-      const matchesSearch =
-        (item.name || "").toLowerCase().includes(searchText);
+      const matchesSearch = (item.name || "")
+        .toLowerCase()
+        .includes(searchText);
 
       const matchesCategory =
         categoryFilter === "All" ||
@@ -143,10 +158,14 @@ const currentUser = getUser();
     setStockFilter("All");
   };
 
+  // =========================================
   // FETCH PRODUCTS
+  // =========================================
 
   const fetchProducts = useCallback(async () => {
-    if (!token || !["admin", "superadmin"].includes(currentUser?.role)) return;
+    if (!token || !["admin", "superadmin"].includes(currentUser?.role)) {
+      return;
+    }
 
     try {
       setProductsLoading(true);
@@ -188,7 +207,35 @@ const currentUser = getUser();
     }
   }, [isAdmin, activeTab, fetchProducts]);
 
-  // EDIT PRODUCT
+  // =========================================
+  // ADD PRODUCT INPUT
+  // =========================================
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setProduct((previous) => ({
+      ...previous,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  // =========================================
+  // EDIT PRODUCT INPUT
+  // =========================================
+
+  const handleEditChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setEditProduct((previous) => ({
+      ...previous,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  // =========================================
+  // START EDIT PRODUCT
+  // =========================================
 
   const startEditProduct = (item) => {
     setEditingProductId(item._id);
@@ -202,22 +249,42 @@ const currentUser = getUser();
       stock: item.stock ?? "",
       description: item.description || "",
       image: item.image || "",
+      isSpecial: item.isSpecial || false,
+      isDemanding: item.isDemanding || false,
+      isOnOffer: item.isOnOffer || false,
     });
 
     setActiveTab("addProduct");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
+  // =========================================
+  // CANCEL EDIT PRODUCT
+  // =========================================
 
-    setEditProduct((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
+  const cancelEditProduct = () => {
+    setEditingProductId(null);
+
+    setEditProduct({
+      name: "",
+      category: "Fruits",
+      price: "",
+      originalPrice: "",
+      unit: "",
+      stock: "",
+      description: "",
+      image: "",
+      isSpecial: false,
+      isDemanding: false,
+      isOnOffer: false,
+    });
+
+    setActiveTab("inventory");
   };
 
+  // =========================================
   // UPDATE PRODUCT
+  // =========================================
 
   const updateProduct = async (e) => {
     e.preventDefault();
@@ -235,9 +302,13 @@ const currentUser = getUser();
           },
           body: JSON.stringify({
             ...editProduct,
+            name: editProduct.name.trim(),
             price: Number(editProduct.price),
             originalPrice: Number(editProduct.originalPrice),
             stock: Number(editProduct.stock),
+            isSpecial: Boolean(editProduct.isSpecial),
+            isDemanding: Boolean(editProduct.isDemanding),
+            isOnOffer: Boolean(editProduct.isOnOffer),
           }),
         }
       );
@@ -255,7 +326,7 @@ const currentUser = getUser();
         throw new Error(data.message || "Unable to update product.");
       }
 
-      alert("Your product has been updated successfully!");
+      alert("Product updated successfully!");
 
       setEditingProductId(null);
 
@@ -270,7 +341,9 @@ const currentUser = getUser();
     }
   };
 
+  // =========================================
   // DELETE PRODUCT
+  // =========================================
 
   const deleteProduct = async (productId) => {
     const confirmDelete = window.confirm(
@@ -303,7 +376,7 @@ const currentUser = getUser();
         throw new Error(data.message || "Unable to delete product.");
       }
 
-      alert("Your product has been deleted successfully!");
+      alert("Product deleted successfully!");
 
       await fetchProducts();
 
@@ -314,24 +387,126 @@ const currentUser = getUser();
     }
   };
 
-  const cancelEditProduct = () => {
-    setEditingProductId(null);
+  // =========================================
+  // PRODUCT IMAGE UPLOAD
+  // =========================================
 
-    setEditProduct({
-      name: "",
-      category: "Fruits",
-      price: "",
-      originalPrice: "",
-      unit: "",
-      stock: "",
-      description: "",
-      image: "",
-    });
+  const handleImage = (e) => {
+    const file = e.target.files[0];
 
-    setActiveTab("inventory");
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image.");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image size must be less than 2 MB.");
+      e.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setProduct((previous) => ({
+        ...previous,
+        image: reader.result,
+      }));
+
+      setPreview(reader.result);
+    };
+
+    reader.readAsDataURL(file);
   };
 
+  // =========================================
+  // ADD PRODUCT
+  // =========================================
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!product.image) {
+      alert("Please upload a product image.");
+      return;
+    }
+
+    if (!token || !["admin", "superadmin"].includes(currentUser?.role)) {
+      logoutAdmin("Please log in with an Admin account.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/products`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: product.name.trim(),
+          category: product.category,
+          price: Number(product.price),
+          originalPrice: Number(product.oldPrice),
+          unit: product.weight.trim(),
+          stock: Number(product.stock),
+          description: product.description,
+          image: product.image,
+          isSpecial: Boolean(product.isSpecial),
+          isDemanding: Boolean(product.isDemanding),
+          isOnOffer: Boolean(product.isOnOffer),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.status === 401 || response.status === 403) {
+        logoutAdmin(
+          data.message || "Your session has expired. Please log in again."
+        );
+        return;
+      }
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Unable to add product.");
+      }
+
+      alert("Product added successfully!");
+
+      setProduct({
+        name: "",
+        category: "Fruits",
+        weight: "",
+        price: "",
+        oldPrice: "",
+        stock: "",
+        description: "",
+        image: null,
+        isSpecial: false,
+        isDemanding: false,
+        isOnOffer: false,
+      });
+
+      setPreview("");
+      e.target.reset();
+
+      window.dispatchEvent(new Event("organigoProductsUpdated"));
+
+      await fetchProducts();
+
+      setActiveTab("inventory");
+    } catch (error) {
+      console.error("Add Product Error:", error);
+      alert(error.message || "Unable to save product.");
+    }
+  };
+
+  // =========================================
   // DELIVERY SETTINGS
+  // =========================================
 
   const [deliverySettings, setDeliverySettings] = useState(
     getSavedDeliverySettings
@@ -339,19 +514,25 @@ const currentUser = getUser();
 
   const [settingsMessage, setSettingsMessage] = useState("");
 
+  // =========================================
   // ORDERS
+  // =========================================
 
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState("");
 
+  // =========================================
   // RIDER MANAGEMENT
+  // =========================================
 
   const [riders, setRiders] = useState([]);
   const [ridersLoading, setRidersLoading] = useState(false);
   const [assigningOrder, setAssigningOrder] = useState("");
 
+  // =========================================
   // FETCH ORDERS
+  // =========================================
 
   const fetchOrders = useCallback(async () => {
     if (!token || !["admin", "superadmin"].includes(currentUser?.role)) {
@@ -392,10 +573,14 @@ const currentUser = getUser();
     }
   }, [token, currentUser?.role, logoutAdmin]);
 
+  // =========================================
   // FETCH ACTIVE RIDERS
+  // =========================================
 
   const fetchRiders = useCallback(async () => {
-    if (!token || !["admin", "superadmin"].includes(currentUser?.role)) return;
+    if (!token || !["admin", "superadmin"].includes(currentUser?.role)) {
+      return;
+    }
 
     try {
       setRidersLoading(true);
@@ -428,7 +613,9 @@ const currentUser = getUser();
     }
   }, [token, currentUser?.role, logoutAdmin]);
 
-  // ASSIGN RIDER TO ORDER
+  // =========================================
+  // ASSIGN RIDER
+  // =========================================
 
   const assignRider = async (orderId, riderId) => {
     if (!riderId) return;
@@ -487,138 +674,24 @@ const currentUser = getUser();
     }
   }, [fetchOrders, fetchRiders, isAdmin]);
 
-  // ADD PRODUCT INPUT
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setProduct((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // PRODUCT IMAGE UPLOAD
-
-  const handleImage = (e) => {
-    const file = e.target.files[0];
-
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      alert("Please select a valid image.");
-      e.target.value = "";
-      return;
-    }
-
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Image size must be less than 2 MB.");
-      e.target.value = "";
-      return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      setProduct((prev) => ({
-        ...prev,
-        image: reader.result,
-      }));
-
-      setPreview(reader.result);
-    };
-
-    reader.readAsDataURL(file);
-  };
-
-  // ADD PRODUCT
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!product.image) {
-      alert("Please upload a product image.");
-      return;
-    }
-
-    if (!token || !["admin", "superadmin"].includes(currentUser?.role)) {
-      logoutAdmin("Please log in with an Admin account.");
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/products`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: product.name.trim(),
-          category: product.category,
-          price: Number(product.price),
-          originalPrice: Number(product.oldPrice),
-          unit: product.weight.trim(),
-          stock: Number(product.stock),
-          description: product.description,
-          image: product.image,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.status === 401 || response.status === 403) {
-        logoutAdmin(
-          data.message || "Your session has expired. Please log in again."
-        );
-        return;
-      }
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Unable to add product.");
-      }
-
-      alert("Your product has been added successfully!");
-
-      setProduct({
-        name: "",
-        category: "Fruits",
-        weight: "",
-        price: "",
-        oldPrice: "",
-        stock: "",
-        description: "",
-        image: null,
-      });
-
-      setPreview("");
-      e.target.reset();
-
-      window.dispatchEvent(new Event("organigoProductsUpdated"));
-
-      await fetchProducts();
-
-      setActiveTab("inventory");
-    } catch (error) {
-      console.error("Add Product Error:", error);
-      alert(error.message || "Unable to save product. Please try again.");
-    }
-  };
-
+  // =========================================
   // DELIVERY SETTINGS INPUT
+  // =========================================
 
   const handleDeliveryChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    setDeliverySettings((prev) => ({
-      ...prev,
+    setDeliverySettings((previous) => ({
+      ...previous,
       [name]: type === "checkbox" ? checked : value,
     }));
 
     setSettingsMessage("");
   };
 
+  // =========================================
   // SAVE DELIVERY SETTINGS
+  // =========================================
 
   const saveDeliverySettings = (e) => {
     e.preventDefault();
@@ -674,7 +747,9 @@ const currentUser = getUser();
     alert("Your delivery settings have been updated successfully!");
   };
 
+  // =========================================
   // OPEN HUB MAP
+  // =========================================
 
   const openHubMap = () => {
     window.open(
@@ -684,7 +759,9 @@ const currentUser = getUser();
     );
   };
 
+  // =========================================
   // UPDATE ORDER STATUS
+  // =========================================
 
   const updateOrderStatus = async (orderId, newStatus) => {
     if (!token || !["admin", "superadmin"].includes(currentUser?.role)) {
@@ -734,7 +811,9 @@ const currentUser = getUser();
 
   if (!isAdmin) return null;
 
+  // =========================================
   // DASHBOARD CALCULATIONS
+  // =========================================
 
   const pendingOrders = orders.filter(
     (order) => !["Delivered", "Cancelled"].includes(order.status)
@@ -748,7 +827,9 @@ const currentUser = getUser();
     .filter((order) => order.status === "Delivered")
     .reduce((total, order) => total + Number(order.total || 0), 0);
 
+  // =========================================
   // SIDEBAR MENU
+  // =========================================
 
   const menuItems = [
     { id: "dashboard", icon: "▦", label: "Dashboard" },
@@ -763,15 +844,18 @@ const currentUser = getUser();
     setSidebarOpen(false);
   };
 
+  // =========================================
   // MAIN UI
-return (
-  <div className="admin-layout">
-    {sidebarOpen && (
-      <div
-        className="admin-sidebar-overlay"
-        onClick={() => setSidebarOpen(false)}
-      />
-    )}
+  // =========================================
+
+  return (
+    <div className="admin-layout">
+      {sidebarOpen && (
+        <div
+          className="admin-sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* SIDEBAR */}
       <aside className={`admin-sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
@@ -964,7 +1048,7 @@ return (
                     <span>＋</span>
                     <div>
                       <strong>Add New Product</strong>
-                      <small>Add grocery items to your store</small>
+                      <small>Add products to your store</small>
                     </div>
                     <b>→</b>
                   </button>
@@ -1023,7 +1107,7 @@ return (
             </section>
           )}
 
-          {/* ADD PRODUCT */}
+          {/* ADD / EDIT PRODUCT */}
           {activeTab === "addProduct" && (
             <section className="admin-product-management">
               <div className="admin-container">
@@ -1035,7 +1119,7 @@ return (
                     <p>
                       {editingProductId
                         ? "Update product details and stock."
-                        : "Add grocery products to your ORGANIGO store."}
+                        : "Add products to your ORGANIGO store."}
                     </p>
                   </div>
                 </div>
@@ -1044,6 +1128,7 @@ return (
                   <form onSubmit={updateProduct}>
                     <div className="image-upload">
                       <label>Product Image</label>
+
                       <div className="image-preview">
                         {editProduct.image ? (
                           <img
@@ -1075,12 +1160,14 @@ return (
                           }
 
                           const reader = new FileReader();
+
                           reader.onloadend = () => {
                             setEditProduct((previous) => ({
                               ...previous,
                               image: reader.result,
                             }));
                           };
+
                           reader.readAsDataURL(file);
                         }}
                       />
@@ -1170,10 +1257,43 @@ return (
                       />
                     </div>
 
+                    <div className="admin-product-flags">
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="isSpecial"
+                          checked={editProduct.isSpecial}
+                          onChange={handleEditChange}
+                        />
+                        ⭐ Special Product
+                      </label>
+
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="isDemanding"
+                          checked={editProduct.isDemanding}
+                          onChange={handleEditChange}
+                        />
+                        🔥 Demanding Product
+                      </label>
+
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="isOnOffer"
+                          checked={editProduct.isOnOffer}
+                          onChange={handleEditChange}
+                        />
+                        🏷️ Show in Offers
+                      </label>
+                    </div>
+
                     <div className="admin-product-form-actions">
                       <button type="submit" className="save-product-btn">
                         💾 Update Product
                       </button>
+
                       <button
                         type="button"
                         className="cancel-edit-btn"
@@ -1187,6 +1307,7 @@ return (
                   <form onSubmit={handleSubmit}>
                     <div className="image-upload">
                       <label>Product Image</label>
+
                       <div className="image-preview">
                         {preview ? (
                           <img src={preview} alt="Product Preview" />
@@ -1201,6 +1322,7 @@ return (
                         onChange={handleImage}
                         required
                       />
+
                       <small className="field-help">
                         Maximum image size: 2 MB.
                       </small>
@@ -1295,6 +1417,38 @@ return (
                       />
                     </div>
 
+                    <div className="admin-product-flags">
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="isSpecial"
+                          checked={product.isSpecial}
+                          onChange={handleChange}
+                        />
+                        ⭐ Special Product
+                      </label>
+
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="isDemanding"
+                          checked={product.isDemanding}
+                          onChange={handleChange}
+                        />
+                        🔥 Demanding Product
+                      </label>
+
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="isOnOffer"
+                          checked={product.isOnOffer}
+                          onChange={handleChange}
+                        />
+                        🏷️ Show in Offers
+                      </label>
+                    </div>
+
                     <button type="submit" className="save-product-btn">
                       ＋ Add Product
                     </button>
@@ -1303,8 +1457,8 @@ return (
               </div>
             </section>
           )}
-                    {/* PRODUCT INVENTORY */}
 
+          {/* PRODUCT INVENTORY */}
           {activeTab === "inventory" && (
             <section className="admin-product-management">
               <div className="admin-container admin-product-list-container">
@@ -1340,6 +1494,7 @@ return (
                     aria-label="Filter by category"
                   >
                     <option value="All">All Categories</option>
+
                     {productCategories.map((category) => (
                       <option key={category} value={category}>
                         {category}
@@ -1358,20 +1513,19 @@ return (
                     <option value="Out of Stock">Out of Stock</option>
                   </select>
 
-                  <button
-                    type="button"
-                    onClick={resetInventoryFilters}
-                  >
+                  <button type="button" onClick={resetInventoryFilters}>
                     Reset Filters
                   </button>
                 </div>
 
-                {!productsLoading && !productsError && products.length > 0 && (
-                  <div className="inventory-result-count">
-                    Showing <strong>{filteredProducts.length}</strong> of{" "}
-                    <strong>{products.length}</strong> products
-                  </div>
-                )}
+                {!productsLoading &&
+                  !productsError &&
+                  products.length > 0 && (
+                    <div className="inventory-result-count">
+                      Showing <strong>{filteredProducts.length}</strong> of{" "}
+                      <strong>{products.length}</strong> products
+                    </div>
+                  )}
 
                 <div className="admin-inventory-summary">
                   <div>
@@ -1435,7 +1589,7 @@ return (
                   <div className="admin-empty-state">
                     <span>🥬</span>
                     <h4>No Products Found</h4>
-                    <p>Add your first grocery product.</p>
+                    <p>Add your first product.</p>
 
                     <button
                       className="admin-refresh-btn"
@@ -1515,6 +1669,12 @@ return (
                               : "In Stock"}
                           </div>
 
+                          <div className="admin-product-flags-preview">
+                            {item.isSpecial && <span>⭐ Special</span>}
+                            {item.isDemanding && <span>🔥 Demanding</span>}
+                            {item.isOnOffer && <span>🏷️ Offer</span>}
+                          </div>
+
                           <div className="admin-product-actions">
                             <button
                               type="button"
@@ -1541,7 +1701,6 @@ return (
           )}
 
           {/* DELIVERY SETTINGS */}
-
           {activeTab === "delivery" && (
             <section className="delivery-settings-container">
               <div className="delivery-settings-heading">
@@ -1719,7 +1878,6 @@ return (
           )}
 
           {/* CUSTOMER ORDERS */}
-
           {activeTab === "orders" && (
             <section className="admin-orders-container">
               <div className="admin-orders-heading">
@@ -1879,7 +2037,6 @@ return (
                       </div>
 
                       {/* RIDER ASSIGNMENT */}
-
                       <div
                         className="admin-rider-assignment"
                         style={{
@@ -1999,4 +2156,5 @@ return (
     </div>
   );
 }
+
 export default Admin;

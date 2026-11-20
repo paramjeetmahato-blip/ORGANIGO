@@ -695,7 +695,21 @@ function Header() {
             }
           }}
         >
-          <span className="location-icon">📍</span>
+          <span className="location-icon">
+  <svg
+    viewBox="0 0 24 24"
+    width="21"
+    height="21"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+    <circle cx="12" cy="10" r="2.5" />
+  </svg>
+</span>
 
           <div>
             <small>
@@ -875,7 +889,22 @@ function Header() {
             {user && (
               <div className="saved-addresses-section">
                 <div className="saved-addresses-heading">
-                  <strong>📍 Your Saved Addresses</strong>
+                  <strong className="address-section-heading">
+  <svg
+    viewBox="0 0 24 24"
+    width="19"
+    height="19"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+    <circle cx="12" cy="10" r="2.5" />
+  </svg>
+  Your Saved Addresses
+</strong>
 
                   <Link
                     to="/addresses"
@@ -903,14 +932,30 @@ function Header() {
                         onClick={() => selectSavedAddress(address)}
                         disabled={selectingAddressId !== null}
                       >
-                        <span className="saved-address-icon">
-                          {address.label === "Work"
-                            ? "🏢"
-                            : address.label === "Other"
-                              ? "📍"
-                              : "🏠"}
-                        </span>
-
+                       <span className="saved-address-icon">
+  {address.label === "Work" ? (
+    <svg viewBox="0 0 24 24" width="21" height="21"
+      fill="none" stroke="currentColor" strokeWidth="1.8"
+      strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="7" width="18" height="14" rx="2" />
+      <path d="M8 7V4h8v3M3 12h18M10 12v2h4v-2" />
+    </svg>
+  ) : address.label === "Other" ? (
+    <svg viewBox="0 0 24 24" width="21" height="21"
+      fill="none" stroke="currentColor" strokeWidth="1.8"
+      strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" width="21" height="21"
+      fill="none" stroke="currentColor" strokeWidth="1.8"
+      strokeLinecap="round" strokeLinejoin="round">
+      <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />
+      <path d="M9 21v-8h6v8" />
+    </svg>
+  )}
+</span>
                         <div className="saved-address-details">
                           <strong>
                             {address.label || "Home"}
@@ -973,13 +1018,27 @@ function Header() {
             {/* GPS LOCATION */}
 
             <button
-              type="button"
-              className="use-current-location-btn"
-              onClick={useCurrentLocation}
-              disabled={locationLoading}
-            >
-              📍 Use My Current Location
-            </button>
+  type="button"
+  className="use-current-location-btn"
+  onClick={useCurrentLocation}
+  disabled={locationLoading}
+>
+  <svg
+    viewBox="0 0 24 24"
+    width="21"
+    height="21"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+    <circle cx="12" cy="10" r="2.5" />
+  </svg>
+
+  {locationLoading ? "Detecting Location..." : "Use My Current Location"}
+</button>
 
             {/* MANUAL SEARCH */}
 
@@ -1018,7 +1077,21 @@ function Header() {
                     className="location-result-item"
                     onClick={() => selectAddress(place)}
                   >
-                    <span>📍</span>
+                   <span className="modern-location-icon">
+  <svg
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+    <circle cx="12" cy="10" r="2.5" />
+  </svg>
+</span>
 
                     <div>
                       <strong>

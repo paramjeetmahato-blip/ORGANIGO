@@ -47,6 +47,24 @@ const productSchema = new mongoose.Schema(
       min: 0,
     },
 
+    // Special Product
+    isSpecial: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Demanding Product
+    isDemanding: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Offer Product
+    isOnOffer: {
+      type: Boolean,
+      default: false,
+    },
+
     isActive: {
       type: Boolean,
       default: true,

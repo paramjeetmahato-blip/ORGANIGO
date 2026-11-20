@@ -1,5 +1,6 @@
 /* =========================================
-   ORGANIGO - PREMIUM MODERN HEADER
+   ORGANIGO - CLEAN PREMIUM HEADER
+   Natural Fresh Green Theme
 ========================================= */
 
 .Organigo-header,
@@ -9,13 +10,13 @@
 
 .Organigo-header {
   width: 100%;
-  background: #ffffff;
   position: sticky;
   top: 0;
   z-index: 1000;
-  font-family: 'DM Sans', Arial, sans-serif;
-  border-bottom: 1px solid #e8eee9;
-  box-shadow: 0 3px 15px rgba(20, 80, 40, 0.035);
+  background: linear-gradient(135deg, #e9f8e9, #d9f2dc, #c9ebce);
+  border-bottom: 1px solid #c8e7cd;
+  box-shadow: 0 3px 14px rgba(20, 100, 45, 0.07);
+  font-family: "DM Sans", Arial, sans-serif;
 }
 
 .organigo-app-banner {
@@ -28,14 +29,15 @@
 
 .header-container {
   width: 100%;
-  max-width: 1500px;
-  min-height: 76px;
+  max-width: 1700px;
+  min-height: 84px;
   margin: auto;
-  padding: 8px 24px;
+  padding: 10px 30px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 18px;
 }
 
 /* =========================================
@@ -43,19 +45,22 @@
 ========================================= */
 
 .Organigo-logo {
-  flex: 0 0 118px;
-  height: 58px;
+  flex: 0 0 130px;
+  width: 130px;
+  height: 65px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   text-decoration: none;
   border-radius: 12px;
   transition: 0.25s ease;
 }
 
 .Organigo-logo img {
-  width: 118px;
-  height: 56px;
+  width: 130px;
+  height: 62px;
   object-fit: contain;
   transition: transform 0.25s ease;
 }
@@ -65,12 +70,13 @@
 }
 
 /* =========================================
-   DELIVERY LOCATION BUTTON
+   DELIVERY LOCATION
 ========================================= */
 
 .delivery-location {
-  flex: 0 0 auto;
-  min-width: 205px;
+  flex: 0 0 230px;
+  width: 230px;
+  min-width: 0;
   min-height: 49px;
   padding: 7px 12px;
 
@@ -78,54 +84,64 @@
   align-items: center;
   gap: 10px;
 
-  background: #f7fbf7;
-  border: 1px solid #dceade;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid transparent;
   border-radius: 11px;
 
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-
   transition: 0.25s ease;
 }
 
 .delivery-location:hover {
-  border-color: #159447;
-  background: #f0faf2;
+  background: rgba(255, 255, 255, 0.65);
+  border-color: #b9dfc2;
 }
 
 .location-icon {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: #e5f6e9;
-  border-radius: 9px;
-  font-size: 18px;
+  background: #ffffff;
+  color: #159447;
+  border-radius: 50%;
+}
+
+.location-icon svg {
+  display: block;
 }
 
 .delivery-location div {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 3px;
-  min-width: 0;
 }
 
 .delivery-location small {
-  color: #718075;
+  color: #58745e;
   font-size: 10px;
   font-weight: 500;
 }
 
 .delivery-location strong {
   color: #173d26;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.location-edit-icon {
+  flex-shrink: 0;
+  color: #159447;
 }
 
 /* =========================================
@@ -134,9 +150,10 @@
 
 .header-search {
   flex: 1;
-  max-width: 520px;
+  width: 100%;
+  max-width: none;
   min-width: 150px;
-  height: 45px;
+  height: 50px;
 
   display: flex;
   align-items: center;
@@ -144,8 +161,8 @@
 
   padding: 0 15px;
 
-  background: #f5f8f5;
-  border: 1px solid #e0e9e1;
+  background: #ffffff;
+  border: 1px solid #dceade;
   border-radius: 12px;
 
   transition: all 0.25s ease;
@@ -158,6 +175,8 @@
 }
 
 .header-search > span {
+  display: flex;
+  align-items: center;
   font-size: 18px;
   flex-shrink: 0;
 }
@@ -211,12 +230,174 @@
 }
 
 /* =========================================
-   CART BUTTON
+   ACCOUNT
+========================================= */
+
+.header-account {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.header-account-button {
+  min-height: 49px;
+  padding: 6px 13px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  background: #ffffff;
+  border: 1px solid #d8ebdc;
+  border-radius: 10px;
+
+  color: #173d26;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.header-account-button:hover {
+  background: #e8f7ec;
+  border-color: #159447;
+}
+
+.account-icon {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #dff3e4;
+  color: #159447;
+  border-radius: 50%;
+  font-size: 17px;
+}
+
+.account-button-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.account-button-text small {
+  color: #718075;
+  font-size: 9px;
+}
+
+.account-button-text strong {
+  color: #173d26;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.account-arrow {
+  font-size: 14px;
+  color: #159447;
+}
+
+/* ACCOUNT DROPDOWN */
+
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 245px;
+  padding: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  background: #ffffff;
+  border: 1px solid #e2eee4;
+  border-radius: 14px;
+  box-shadow: 0 12px 35px rgba(20, 80, 40, 0.15);
+
+  z-index: 9999;
+  animation: accountDropdown 0.2s ease;
+}
+
+@keyframes accountDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.account-dropdown-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px;
+  margin-bottom: 5px;
+  background: #f0faf2;
+  border-radius: 10px;
+}
+
+.account-dropdown-heading strong {
+  color: #173d26;
+  font-size: 13px;
+}
+
+.account-dropdown-heading small {
+  color: #718075;
+  font-size: 11px;
+  word-break: break-word;
+}
+
+.account-dropdown > a,
+.account-logout-button {
+  width: 100%;
+  padding: 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+
+  color: #344b3b;
+  text-decoration: none;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.account-dropdown > a:hover {
+  background: #eff9f1;
+  color: #087a36;
+}
+
+.account-logout-button {
+  color: #d33434;
+}
+
+.account-logout-button:hover {
+  background: #fff0f0;
+}
+
+/* =========================================
+   CART
 ========================================= */
 
 .header-cart {
-  min-width: 120px;
-  min-height: 44px;
+  min-width: 125px;
+  min-height: 49px;
   padding: 0 15px;
 
   display: flex;
@@ -227,10 +408,10 @@
   position: relative;
   flex-shrink: 0;
 
-  color: white;
+  color: #ffffff;
   background: #159447;
   border: 1px solid #159447;
-  border-radius: 10px;
+  border-radius: 11px;
 
   text-decoration: none;
   font-size: 13px;
@@ -263,9 +444,9 @@
   align-items: center;
   justify-content: center;
 
-  color: white;
+  color: #ffffff;
   background: #ff3535;
-  border: 2px solid white;
+  border: 2px solid #ffffff;
   border-radius: 50px;
 
   font-size: 10px;
@@ -273,10 +454,8 @@
 }
 
 /* =========================================
-   LOCATION POPUP / MODAL
+   LOCATION MODAL
 ========================================= */
-
-/* Overlay */
 
 .location-modal-overlay,
 .location-modal-backdrop {
@@ -294,8 +473,6 @@
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
 }
-
-/* Main popup */
 
 .location-modal,
 .location-modal-content {
@@ -325,8 +502,6 @@
   }
 }
 
-/* Popup heading */
-
 .location-modal-header {
   display: flex;
   align-items: center;
@@ -350,7 +525,7 @@
   font-size: 12px;
 }
 
-/* Close button */
+/* CLOSE BUTTON */
 
 .location-close-btn,
 .location-modal-close {
@@ -364,7 +539,6 @@
 
   border: none;
   border-radius: 50%;
-
   background: #f1f5f1;
   color: #304b37;
 
@@ -384,17 +558,15 @@
 ========================================= */
 
 .gps-location-btn,
-.use-current-location-btn,
 .current-location-btn {
   width: 100%;
   min-height: 53px;
+  padding: 12px 15px;
 
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-
-  padding: 12px 15px;
 
   color: #ffffff;
   background: #159447;
@@ -410,28 +582,61 @@
 }
 
 .gps-location-btn:hover,
-.use-current-location-btn:hover,
 .current-location-btn:hover {
   background: #087a36;
   box-shadow: 0 5px 15px rgba(21, 148, 71, 0.18);
 }
 
 .gps-location-btn:disabled,
-.use-current-location-btn:disabled,
-.current-location-btn:disabled {
+.current-location-btn:disabled,
+.use-current-location-btn:disabled {
   opacity: 0.65;
   cursor: not-allowed;
 }
 
+/* CURRENT LOCATION - OUTLINED STYLE */
+
+.use-current-location-btn {
+  width: 100%;
+  min-height: 53px;
+  padding: 12px 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  color: #218838;
+  background: #f0f9f1;
+  border: 1px solid #218838;
+  border-radius: 12px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.use-current-location-btn svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.use-current-location-btn:hover:not(:disabled) {
+  color: #ffffff;
+  background: #218838;
+}
+
 /* =========================================
-   DIVIDER
+   LOCATION DIVIDER
 ========================================= */
 
 .location-divider {
   display: flex;
   align-items: center;
   gap: 12px;
-
   margin: 20px 0;
 
   color: #9aa59c;
@@ -455,12 +660,11 @@
 .manual-location-search {
   width: 100%;
   min-height: 48px;
+  padding: 0 14px;
 
   display: flex;
   align-items: center;
   gap: 10px;
-
-  padding: 0 14px;
 
   background: #f7faf7;
   border: 1px solid #dce8de;
@@ -481,7 +685,6 @@
 .location-modal input {
   width: 100%;
   min-width: 0;
-
   padding: 13px 0;
 
   border: none;
@@ -517,12 +720,11 @@
 .location-result-item,
 .location-suggestion {
   width: 100%;
+  padding: 12px;
 
   display: flex;
   align-items: flex-start;
   gap: 11px;
-
-  padding: 12px;
 
   background: #ffffff;
   border: 1px solid #edf1ed;
@@ -530,7 +732,6 @@
 
   text-align: left;
   cursor: pointer;
-
   transition: 0.2s ease;
 }
 
@@ -568,7 +769,56 @@
 }
 
 /* =========================================
-   LOCATION STATUS / MESSAGES
+   SAVED ADDRESSES
+========================================= */
+
+.address-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  color: #202820;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.address-section-heading svg {
+  color: #218838;
+  flex-shrink: 0;
+}
+
+.saved-address-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #edf8ef;
+  color: #218838;
+  border-radius: 12px;
+}
+
+.saved-address-icon svg {
+  display: block;
+}
+
+.modern-location-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #218838;
+  flex-shrink: 0;
+}
+
+.modern-location-icon svg {
+  display: block;
+}
+
+/* =========================================
+   LOCATION MESSAGES
 ========================================= */
 
 .location-message,
@@ -645,36 +895,111 @@
 }
 
 /* =========================================
-   TABLET
+   APP BANNER
 ========================================= */
 
-@media (max-width: 1100px) {
+.app-banner-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ffffff;
+  border-radius: 10px;
+  font-size: 21px;
+}
+
+.app-banner-text {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.app-banner-text strong {
+  color: #086b32;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.app-banner-text small {
+  color: #526c59;
+  font-size: 9px;
+}
+
+.app-download-button {
+  flex-shrink: 0;
+  padding: 8px 10px;
+
+  border: none;
+  border-radius: 7px;
+
+  color: #ffffff;
+  background: #159447;
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* =========================================
+   TABLET / SMALL LAPTOP
+========================================= */
+
+@media (min-width: 651px) and (max-width: 1100px) {
 
   .header-container {
+    min-height: auto;
+    padding: 12px 18px;
+
+    display: grid;
+    grid-template-columns: 105px minmax(150px, 1fr) auto auto;
+    grid-template-areas:
+      "logo location account cart"
+      "search search search search";
+
     gap: 10px;
-    padding: 8px 15px;
   }
 
   .Organigo-logo {
-    flex-basis: 100px;
+    grid-area: logo;
+    width: 105px;
+    height: 55px;
   }
 
   .Organigo-logo img {
-    width: 100px;
+    width: 105px;
+    height: 55px;
   }
 
   .delivery-location {
-    min-width: 180px;
-    padding: 7px 9px;
+    grid-area: location;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+  }
+
+  .header-search {
+    grid-area: search;
+    width: 100%;
+    height: 44px;
+  }
+
+  .header-account {
+    grid-area: account;
+  }
+
+  .header-cart {
+    grid-area: cart;
+    min-width: 105px;
   }
 
   .hygiene-badge {
     display: none;
-  }
-
-  .header-cart {
-    min-width: 105px;
-    padding: 0 11px;
   }
 }
 
@@ -685,7 +1010,8 @@
 @media (max-width: 650px) {
 
   .Organigo-header {
-    background: #ffffff;
+    background: linear-gradient(160deg, #eaf8e9, #d9f2dc);
+    border-bottom: 1px solid #c8e7cd;
   }
 
   /* APP BANNER */
@@ -699,74 +1025,27 @@
     align-items: center;
     gap: 9px;
 
-    background: #eaf8ee;
-    border-bottom: 1px solid #d8efdf;
-  }
-
-  .app-banner-icon {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: white;
-    border-radius: 10px;
-    font-size: 21px;
-  }
-
-  .app-banner-text {
-    flex: 1;
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .app-banner-text strong {
-    color: #086b32;
-    font-size: 12px;
-    font-weight: 900;
-  }
-
-  .app-banner-text small {
-    color: #526c59;
-    font-size: 9px;
-  }
-
-  .app-download-button {
-    flex-shrink: 0;
-    padding: 8px 10px;
-
-    border: none;
-    border-radius: 7px;
-
-    color: white;
-    background: #159447;
-
-    font-size: 9px;
-    font-weight: 800;
+    background: #f2fbf1;
+    border-bottom: 1px solid #d9ead9;
   }
 
   /* MAIN HEADER */
 
   .header-container {
+    width: 100%;
     min-height: auto;
-    padding: 10px 12px;
+    padding: 11px 12px 13px;
 
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
 
     grid-template-areas:
-      "location cart"
-      "search search";
+      "location account cart"
+      "search search search";
 
     align-items: center;
-    column-gap: 9px;
-    row-gap: 10px;
+    column-gap: 7px;
+    row-gap: 11px;
   }
 
   .Organigo-logo {
@@ -777,72 +1056,120 @@
 
   .delivery-location {
     grid-area: location;
-
-    width: fit-content;
-    max-width: 100%;
+    width: 100%;
     min-width: 0;
-    min-height: 43px;
+    min-height: 44px;
+    padding: 4px 5px;
 
-    padding: 5px 9px;
+    background: transparent;
+    border: none;
     gap: 7px;
   }
 
-  .location-icon {
-    width: 29px;
-    height: 29px;
-    font-size: 16px;
+  .delivery-location:hover {
+    background: rgba(255, 255, 255, 0.35);
+    border: none;
   }
 
-  .delivery-location div {
-    gap: 2px;
+  .location-icon {
+    width: 32px;
+    height: 32px;
+    background: #ffffff;
   }
 
   .delivery-location small {
+    color: #617b65;
     font-size: 9px;
   }
 
   .delivery-location strong {
     max-width: 190px;
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  /* ACCOUNT */
+
+  .header-account {
+    grid-area: account;
+  }
+
+  .header-account-button {
+    min-height: 42px;
+    padding: 4px 7px;
+    gap: 5px;
+  }
+
+  .account-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+  }
+
+  .account-button-text {
+    gap: 2px;
+  }
+
+  .account-button-text small {
+    font-size: 8px;
+  }
+
+  .account-button-text strong {
+    max-width: 75px;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 9px;
+  }
+
+  .account-arrow {
     font-size: 11px;
+  }
+
+  .account-dropdown {
+    width: 230px;
+    right: 0;
+    top: calc(100% + 9px);
   }
 
   /* CART */
 
   .header-cart {
     grid-area: cart;
-
-    min-width: 100px;
-    min-height: 40px;
-    padding: 0 11px;
-
-    font-size: 12px;
+    min-width: 88px;
+    min-height: 42px;
+    padding: 0 9px;
+    font-size: 11px;
   }
 
   /* SEARCH */
 
   .header-search {
     grid-area: search;
-
     width: 100%;
-    max-width: none;
+    max-width: 100%;
     min-width: 0;
-    height: 42px;
+    height: 46px;
 
-    padding: 0 12px;
-    border-radius: 10px;
+    padding: 0 13px;
+
+    background: #ffffff;
+    border: 1px solid #d9e9db;
+    border-radius: 11px;
+
+    box-shadow: 0 2px 7px rgba(30, 90, 40, 0.05);
   }
 
   .header-search input {
-    font-size: 12px;
+    font-size: 13px;
   }
+
+  /* HIDE DESKTOP BADGE */
 
   .hygiene-badge {
     display: none;
   }
 
-  /* MOBILE LOCATION POPUP */
+  /* LOCATION MODAL */
 
   .location-modal-overlay,
   .location-modal-backdrop {
@@ -883,6 +1210,16 @@
   .location-suggestion {
     padding: 11px;
   }
+
+  .address-section-heading {
+    font-size: 15px;
+  }
+
+  .saved-address-icon {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+  }
 }
 
 /* =========================================
@@ -892,265 +1229,18 @@
 @media (max-width: 360px) {
 
   .header-container {
-    padding: 9px;
-    column-gap: 5px;
+    padding: 9px 7px 11px;
+    column-gap: 4px;
+    row-gap: 9px;
   }
 
   .delivery-location {
-    padding: 5px 7px;
+    padding: 4px;
   }
 
   .delivery-location strong {
-    max-width: 155px;
+    max-width: 135px;
     font-size: 10px;
-  }
-
-  .header-cart {
-    min-width: 90px;
-    padding: 0 8px;
-    font-size: 11px;
-  }
-
-  .app-banner-text small {
-    font-size: 8px;
-  }
-
-  .location-modal,
-  .location-modal-content {
-    padding: 19px 14px 24px;
-  }
-}
-/* =========================================
-   ORGANIGO LOGIN / MY ACCOUNT
-========================================= */
-
-.header-account {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.header-account-button {
-  min-height: 44px;
-  padding: 5px 10px;
-
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  background: #f2faf4;
-  border: 1px solid #d8ebdc;
-  border-radius: 10px;
-
-  color: #173d26;
-  font-family: inherit;
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
-.header-account-button:hover {
-  background: #e8f7ec;
-  border-color: #159447;
-}
-
-.account-icon {
-  width: 32px;
-  height: 32px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: #dff3e4;
-  border-radius: 50%;
-  font-size: 17px;
-}
-
-.account-button-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
-}
-
-.account-button-text small {
-  color: #718075;
-  font-size: 9px;
-}
-
-.account-button-text strong {
-  color: #173d26;
-  font-size: 11px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.account-arrow {
-  font-size: 14px;
-  color: #159447;
-}
-
-/* DROPDOWN */
-
-.account-dropdown {
-  position: absolute;
-  top: calc(100% + 12px);
-  right: 0;
-
-  width: 245px;
-  padding: 10px;
-
-  background: #ffffff;
-  border: 1px solid #e2eee4;
-  border-radius: 14px;
-
-  box-shadow: 0 12px 35px rgba(20, 80, 40, 0.15);
-
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-
-  z-index: 9999;
-  animation: accountDropdown 0.2s ease;
-}
-
-@keyframes accountDropdown {
-  from {
-    opacity: 0;
-    transform: translateY(-7px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.account-dropdown-heading {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-
-  padding: 12px;
-  margin-bottom: 5px;
-
-  background: #f0faf2;
-  border-radius: 10px;
-}
-
-.account-dropdown-heading strong {
-  color: #173d26;
-  font-size: 13px;
-}
-
-.account-dropdown-heading small {
-  color: #718075;
-  font-size: 11px;
-  word-break: break-word;
-}
-
-.account-dropdown > a,
-.account-logout-button {
-  width: 100%;
-  padding: 12px;
-
-  display: flex;
-  align-items: center;
-  gap: 9px;
-
-  background: transparent;
-  border: none;
-  border-radius: 9px;
-
-  color: #344b3b;
-  text-decoration: none;
-  text-align: left;
-
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.account-dropdown > a:hover {
-  background: #eff9f1;
-  color: #087a36;
-  text-decoration: none;
-}
-
-.account-logout-button {
-  color: #d33434;
-}
-
-.account-logout-button:hover {
-  background: #fff0f0;
-}
-
-/* =========================================
-   MOBILE ACCOUNT
-========================================= */
-
-@media (max-width: 650px) {
-
-  .header-container {
-    grid-template-columns: minmax(0, 1fr) auto auto;
-
-    grid-template-areas:
-      "location account cart"
-      "search search search";
-
-    column-gap: 6px;
-  }
-
-  .header-account {
-    grid-area: account;
-  }
-
-  .header-account-button {
-    min-height: 40px;
-    padding: 4px 7px;
-    gap: 5px;
-  }
-
-  .account-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 15px;
-  }
-
-  .account-button-text {
-    gap: 2px;
-  }
-
-  .account-button-text small {
-    font-size: 8px;
-  }
-
-  .account-button-text strong {
-    max-width: 75px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 9px;
-  }
-
-  .account-arrow {
-    font-size: 11px;
-  }
-
-  .account-dropdown {
-    width: 230px;
-    right: 0;
-    top: calc(100% + 9px);
-  }
-}
-
-/* SMALL MOBILE */
-
-@media (max-width: 360px) {
-
-  .header-container {
-    column-gap: 4px;
   }
 
   .header-account-button {
@@ -1176,152 +1266,26 @@
   .account-dropdown {
     width: 215px;
   }
+
+  .header-cart {
+    min-width: 80px;
+    padding: 0 7px;
+    font-size: 10px;
+  }
+
+  .app-banner-text small {
+    font-size: 8px;
+  }
+
+  .location-modal,
+  .location-modal-content {
+    padding: 19px 14px 24px;
+  }
 }
+
 /* =========================================
-   ORGANIGO - FULL WIDTH PREMIUM HEADER
+   ACCOUNT PAGE - SEARCH ONLY HEADER
 ========================================= */
-
-/* DESKTOP */
-@media (min-width: 1101px) {
-  .header-container {
-    width: 100%;
-    max-width: 1700px;
-    min-height: 84px;
-    padding: 10px 35px;
-
-    display: grid;
-    grid-template-columns: 130px 230px minmax(280px, 1fr) auto auto;
-    align-items: center;
-    justify-content: stretch;
-    gap: 20px;
-  }
-
-  .Organigo-logo {
-    width: 130px;
-    height: 65px;
-  }
-
-  .Organigo-logo img {
-    width: 130px;
-    height: 62px;
-  }
-
-  .delivery-location {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .header-search {
-    width: 100%;
-    max-width: none;
-    min-width: 0;
-    height: 49px;
-  }
-
-  .header-account-button {
-    min-height: 49px;
-    padding: 6px 13px;
-  }
-
-  .header-cart {
-    min-width: 125px;
-    min-height: 49px;
-  }
-}
-
-/* TABLET / SMALL LAPTOP */
-@media (min-width: 651px) and (max-width: 1100px) {
-  .header-container {
-    display: grid;
-    grid-template-columns: 105px minmax(150px, 1fr) auto auto;
-    grid-template-areas:
-      "logo location account cart"
-      "search search search search";
-
-    gap: 10px;
-    padding: 12px 18px;
-  }
-
-  .Organigo-logo {
-    grid-area: logo;
-    flex-basis: auto;
-    width: 105px;
-  }
-
-  .Organigo-logo img {
-    width: 105px;
-  }
-
-  .delivery-location {
-    grid-area: location;
-    width: 100%;
-    min-width: 0;
-  }
-
-  .header-search {
-    grid-area: search;
-    width: 100%;
-    max-width: none;
-    height: 44px;
-  }
-
-  .header-account {
-    grid-area: account;
-  }
-
-  .header-cart {
-    grid-area: cart;
-  }
-}
-
-/* MOBILE */
-@media (max-width: 650px) {
-  .header-container {
-    width: 100%;
-    padding: 11px 12px;
-    column-gap: 7px;
-    row-gap: 11px;
-  }
-
-  .delivery-location {
-    width: 100%;
-  }
-
-  .header-search {
-    width: 100%;
-    height: 45px;
-  }
-
-  .header-account-button {
-    min-height: 42px;
-  }
-
-  .header-cart {
-    min-height: 42px;
-  }
-}
-
-/* SMALL MOBILE */
-@media (max-width: 360px) {
-  .header-container {
-    padding: 9px 7px;
-    column-gap: 4px;
-  }
-
-  .header-account-button {
-    padding: 4px;
-  }
-
-  .header-cart {
-    min-width: 85px;
-  }
-}
-/* =========================================
-   ORGANIGO PROFILE SECTION HEADER
-   ONLY SEARCH BAR VISIBLE
-========================================= */
-
-/* Hide unnecessary header elements */
 
 .Organigo-header.profile-search-only .organigo-app-banner,
 .Organigo-header.profile-search-only .Organigo-logo,
@@ -1330,8 +1294,6 @@
 .Organigo-header.profile-search-only .header-cart {
   display: none !important;
 }
-
-/* Header container */
 
 .Organigo-header.profile-search-only .header-container {
   width: 100%;
@@ -1346,8 +1308,6 @@
   gap: 0;
 }
 
-/* Search bar */
-
 .Organigo-header.profile-search-only .header-search {
   display: flex !important;
 
@@ -1357,28 +1317,20 @@
   height: 46px;
 
   flex: 1;
-
   margin: 0;
   border-radius: 10px;
 }
-
-/* Search input */
 
 .Organigo-header.profile-search-only .header-search input {
   width: 100%;
   font-size: 14px;
 }
 
-/* Mobile */
-
 @media (max-width: 650px) {
 
   .Organigo-header.profile-search-only .header-container {
     width: 100%;
     min-height: 60px;
-
-    display: flex !important;
-
     padding: 9px 12px;
   }
 
@@ -1391,15 +1343,11 @@
   .Organigo-header.profile-search-only .header-search input {
     font-size: 13px;
   }
-
 }
-
-/* Small Mobile */
 
 @media (max-width: 360px) {
 
   .Organigo-header.profile-search-only .header-container {
     padding: 8px;
   }
-
 }
