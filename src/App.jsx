@@ -3,11 +3,13 @@ import {
   Routes,
   Route,
   Outlet,
+  useLocation,
 } from "react-router-dom";
 
 import { CartProvider } from "./context/CartContext";
 
 import Header from "./components/Header";
+import BottomNavigation from "./components/BottomNavigation";
 
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
@@ -24,16 +26,25 @@ import About from "./pages/About";
 import Addresses from "./pages/Addresses";
 
 // CUSTOMER LAYOUT
-import { useLocation } from "react-router-dom";
-
-// CUSTOMER LAYOUT
 function CustomerLayout() {
   const location = useLocation();
 
+  const hideHeader =
+    location.pathname === "/account";
+
+  const hideBottomNavigation = [
+    "/login",
+    "/signup",
+    "/checkout",
+  ].includes(location.pathname);
+
   return (
     <>
-      {location.pathname !== "/account" && <Header />}
+      {!hideHeader && <Header />}
+
       <Outlet />
+
+      {!hideBottomNavigation && <BottomNavigation />}
     </>
   );
 }
@@ -64,18 +75,14 @@ function App() {
 
             <Route path="/signup" element={<Signup />} />
 
-            {/* CUSTOMER ACCOUNT */}
             <Route path="/account" element={<Account />} />
-            {/* CUSTOMER SAVED ADDRESSES */}
-            <Route path="/addresses" element={<Addresses />} />     
 
-            {/* CUSTOMER ABOUT */}
+            <Route path="/addresses" element={<Addresses />} />
+
             <Route path="/about" element={<About />} />
 
-            {/* CUSTOMER ORDERS */}
             <Route path="/my-orders" element={<MyOrders />} />
 
-            {/* ORDER TRACKING */}
             <Route
               path="/track-order/:orderId"
               element={<OrderTracking />}

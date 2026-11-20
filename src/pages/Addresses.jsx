@@ -1,11 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { getToken } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import "../styles/Addresses.css";
 
 const API_URL = "http://localhost:5000/api/addresses";
-
-
 
 function Addresses() {
   const navigate = useNavigate();
@@ -17,6 +16,7 @@ function Addresses() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
   const [message, setMessage] = useState("");
 
   const emptyForm = {
@@ -36,7 +36,10 @@ function Addresses() {
 
   const [form, setForm] = useState(emptyForm);
 
+  // =====================================
   // LOAD ADDRESSES FROM MONGODB
+  // =====================================
+
   const loadAddresses = async () => {
     try {
       const token = getToken();
@@ -70,7 +73,10 @@ function Addresses() {
     loadAddresses();
   }, []);
 
+  // =====================================
   // GET CURRENT GPS LOCATION
+  // =====================================
+
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
       setMessage("Your browser does not support GPS location.");
@@ -133,7 +139,10 @@ function Addresses() {
     );
   };
 
+  // =====================================
   // FORM INPUT CHANGE
+  // =====================================
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -143,7 +152,10 @@ function Addresses() {
     }));
   };
 
+  // =====================================
   // EDIT ADDRESS
+  // =====================================
+
   const handleEdit = (address) => {
     setForm({
       label: address.label || "Home",
@@ -162,6 +174,7 @@ function Addresses() {
 
     setEditingId(address._id);
     setShowForm(true);
+    setOpenMenuId(null);
     setMessage("");
 
     window.scrollTo({
@@ -170,7 +183,10 @@ function Addresses() {
     });
   };
 
+  // =====================================
   // DELETE ADDRESS
+  // =====================================
+
   const handleDelete = async (addressId) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this address?"
@@ -203,7 +219,10 @@ function Addresses() {
     }
   };
 
+  // =====================================
   // SET DEFAULT ADDRESS
+  // =====================================
+
   const handleSetDefault = async (addressId) => {
     try {
       const response = await fetch(`${API_URL}/${addressId}/default`, {
@@ -226,7 +245,67 @@ function Addresses() {
     }
   };
 
+  // =====================================
+  // SHARE ADDRESS
+  // =====================================
+
+  const handleShareAddress = async (address) => {
+    const fullAddress = [
+      address.fullName,
+      address.houseNo,
+      address.area,
+      address.landmark,
+      address.city,
+      address.state,
+      address.pincode,
+      `Phone: ${address.phone}`,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    const shareData = {
+      title: "ORGANIGO Delivery Address",
+      text: `My delivery address:\n${fullAddress}`,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareData.text);
+        setMessage("Address copied! You can share it now.");
+      } else {
+        throw new Error("Sharing is not supported by this browser.");
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        setMessage(error.message || "Unable to share address.");
+      }
+    }
+
+    setOpenMenuId(null);
+  };
+
+  // =====================================
+  // REQUEST ADDRESS ON WHATSAPP
+  // =====================================
+
+  const requestAddressOnWhatsApp = () => {
+    const message = encodeURIComponent(
+      "Hi! I want to place an order on ORGANIGO. Please share your delivery address or live location with me."
+    );
+
+    window.open(
+      `https://wa.me/?text=${message}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
+  // =====================================
   // ADD OR UPDATE ADDRESS
+  // =====================================
+
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -276,13 +355,20 @@ function Addresses() {
     }
   };
 
+  // =====================================
   // CANCEL FORM
+  // =====================================
+
   const handleCancel = () => {
     setShowForm(false);
     setEditingId(null);
     setForm(emptyForm);
     setMessage("");
   };
+
+  // =====================================
+  // LOADING
+  // =====================================
 
   if (loading) {
     return (
@@ -292,19 +378,35 @@ function Addresses() {
     );
   }
 
+  // =====================================
+  // MAIN PAGE
+  // =====================================
+
   return (
     <div className="addresses-page">
       <div className="addresses-container">
 
-        {/* PAGE HEADING */}
-        <div className="addresses-heading">
-          <div>
-            <h1>My Saved Addresses</h1>
-            <p>Manage your ORGANIGO delivery locations</p>
-          </div>
+        {/* PAGE HEADER */}
+
+        <div className="my-addresses-header">
+          <button
+            type="button"
+            className="my-addresses-back"
+            onClick={() => navigate("/account")}
+          >
+            ←
+          </button>
+
+          <h1>My Addresses</h1>
+        </div>
+
+        {/* ADDRESS ACTIONS */}
+
+        <div className="my-addresses-actions">
 
           <button
             type="button"
+            className="my-address-action"
             onClick={() => {
               if (showForm) {
                 handleCancel();
@@ -316,11 +418,31 @@ function Addresses() {
               }
             }}
           >
-            {showForm ? "Cancel" : "+ Add New Address"}
+            <span className="my-address-action-icon">＋</span>
+            <span>Add new address</span>
+            <span className="my-address-arrow">›</span>
           </button>
+
+          <button
+            type="button"
+            className="my-address-action"
+            onClick={requestAddressOnWhatsApp}
+          >
+            <span className="my-address-whatsapp">☏</span>
+            <span>Request address from someone else</span>
+            <span className="my-address-arrow">›</span>
+          </button>
+
+        </div>
+
+        {/* SAVED ADDRESSES HEADING */}
+
+        <div className="my-addresses-section-heading">
+          Your saved addresses
         </div>
 
         {/* MESSAGE */}
+
         {message && (
           <p className="addresses-message">
             {message}
@@ -328,6 +450,7 @@ function Addresses() {
         )}
 
         {/* ADD / EDIT FORM */}
+
         {showForm && (
           <form className="address-form" onSubmit={handleSave}>
 
@@ -467,10 +590,19 @@ function Addresses() {
                 : "Save Address"}
             </button>
 
+            <button
+              type="button"
+              onClick={handleCancel}
+              disabled={saving}
+            >
+              Cancel
+            </button>
+
           </form>
         )}
 
         {/* SAVED ADDRESS LIST */}
+
         <div className="addresses-list">
 
           {addresses.length === 0 ? (
@@ -480,72 +612,129 @@ function Addresses() {
               <p>Add your delivery address to get started.</p>
             </div>
           ) : (
-
             addresses.map((address) => (
-              <div className="address-card" key={address._id}>
 
-                <div className="address-card-top">
-                  <h3>📍 {address.label}</h3>
+              <div
+                className="organigo-address-card"
+                key={address._id}
+              >
 
-                  {address.isDefault && (
-                    <span>DEFAULT</span>
-                  )}
+                {/* ADDRESS ICON */}
+
+                <div className="organigo-address-icon">
+                  {address.label === "Work" ? "🏢" : "⌂"}
                 </div>
 
-                <h4>{address.fullName}</h4>
+                <div className="organigo-address-info">
 
-                <p>{address.phone}</p>
+                  {/* ADDRESS TITLE */}
 
-                <p>
-                  {address.houseNo}, {address.area}
-                  {address.landmark
-                    ? `, ${address.landmark}`
-                    : ""}
-                </p>
+                  <div className="organigo-address-title">
 
-                <p>
-                  {address.city}, {address.state} - {address.pincode}
-                </p>
+                    <h3>{address.label}</h3>
 
-                {/* ADDRESS ACTION BUTTONS */}
-                <div className="address-card-actions">
+                    {address.isDefault && (
+                      <span className="organigo-default-badge">
+                        DEFAULT
+                      </span>
+                    )}
 
-                  <button
-                    type="button"
-                    onClick={() => handleEdit(address)}
-                  >
-                    ✏️ Edit
-                  </button>
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(address._id)}
-                    disabled={deletingId === address._id}
-                  >
-                    {deletingId === address._id
-                      ? "Deleting..."
-                      : "🗑️ Delete"}
-                  </button>
+                  <p className="organigo-address-fullname">
+                    {address.fullName}
+                  </p>
 
-                  {!address.isDefault && (
+                  <p className="organigo-address-details">
+                    {address.houseNo}, {address.area}
+                    {address.landmark ? `, ${address.landmark}` : ""}
+                    , {address.city}, {address.state} - {address.pincode}
+                  </p>
+
+                  <p className="organigo-address-phone">
+                    Phone number: <strong>{address.phone}</strong>
+                  </p>
+
+                  {/* THREE DOT MENU */}
+
+                  <div className="organigo-address-menu-wrapper">
+
                     <button
                       type="button"
-                      onClick={() => handleSetDefault(address._id)}
+                      className="organigo-address-menu-trigger"
+                      aria-label="Address options"
+                      aria-expanded={openMenuId === address._id}
+                      onClick={() =>
+                        setOpenMenuId(
+                          openMenuId === address._id
+                            ? null
+                            : address._id
+                        )
+                      }
                     >
-                      ⭐ Set as Default
+                      ⋮
                     </button>
-                  )}
+
+                    {openMenuId === address._id && (
+
+                      <div className="organigo-address-dropdown">
+
+                        <button
+                          type="button"
+                          onClick={() => handleShareAddress(address)}
+                        >
+                          ↗ Share Address
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleEdit(address)}
+                        >
+                          ✏️ Edit Address
+                        </button>
+
+                        {!address.isDefault && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              handleSetDefault(address._id);
+                            }}
+                          >
+                            ★ Set as Default
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          className="organigo-delete-option"
+                          disabled={deletingId === address._id}
+                          onClick={() => {
+                            setOpenMenuId(null);
+                            handleDelete(address._id);
+                          }}
+                        >
+                          {deletingId === address._id
+                            ? "Deleting..."
+                            : "🗑 Delete Address"}
+                        </button>
+
+                      </div>
+                    )}
+
+                  </div>
 
                 </div>
 
               </div>
-            ))
 
+            ))
           )}
 
         </div>
 
         {/* BACK BUTTON */}
+
         <button
           className="addresses-back-button"
           onClick={() => navigate("/account")}

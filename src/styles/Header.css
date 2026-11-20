@@ -1351,3 +1351,525 @@
     padding: 8px;
   }
 }
+/* =====================================
+   ORGANIGO - BLINKIT STYLE MOBILE LOCATION
+===================================== */
+
+@media (max-width: 650px) {
+
+  .Organigo-header {
+    background: #f7f9e9;
+  }
+
+  .header-container {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "location cart"
+      "search search" !important;
+    column-gap: 10px;
+    row-gap: 10px;
+    padding: 10px 12px 12px;
+  }
+
+  .delivery-location {
+    grid-area: location;
+    width: 100%;
+    min-height: 55px;
+    padding: 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+  }
+
+  .delivery-location:hover {
+    background: transparent;
+  }
+
+  .location-icon {
+    width: 25px;
+    height: 25px;
+    background: transparent;
+    color: #278b39;
+  }
+
+  .location-icon svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .delivery-location div {
+    flex: 1;
+    min-width: 0;
+    gap: 3px;
+  }
+
+  .delivery-location small {
+    font-size: 10px;
+    color: #737b69;
+    font-weight: 600;
+  }
+
+  .delivery-location strong {
+    max-width: 100%;
+    font-size: 14px;
+    color: #222b1f;
+    font-weight: 800;
+  }
+
+  .delivery-location .location-edit-icon {
+    font-size: 17px;
+    color: #278b39;
+  }
+
+  .header-cart {
+    grid-area: cart;
+  }
+
+  .header-search {
+    grid-area: search;
+    height: 45px;
+    border-radius: 10px;
+    background: #ffffff;
+  }
+}
+/* ORGANIGO GREEN DELIVERY LOCATION BAR */
+
+@media (max-width: 650px) {
+
+  .organigo-location-bar {
+    background: #eaf7e9 !important;
+    border: 1px solid #d6ecd4 !important;
+    border-radius: 12px !important;
+    padding: 10px 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 7px !important;
+    width: 100%;
+    text-align: left;
+  }
+
+  .organigo-location-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .organigo-location-top > strong {
+    color: #176b32;
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  .organigo-distance-badge {
+    background: #d2f0d5;
+    color: #18783a;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .organigo-location-bottom {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .organigo-address-label {
+    font-size: 9px;
+    color: #66816a;
+    font-weight: 700;
+  }
+
+  .organigo-address-name {
+    font-size: 12px;
+    color: #263d2b;
+    font-weight: 700;
+  }
+
+  .organigo-location-bottom .location-edit-icon {
+    color: #16833b;
+    font-size: 18px;
+  }
+}
+/* ORGANIGO - COMPACT MOBILE LOCATION BAR */
+
+@media (max-width: 650px) {
+
+  .organigo-location-bar {
+    padding: 6px 9px !important;
+    gap: 3px !important;
+    border-radius: 9px !important;
+  }
+
+  .organigo-location-top > strong {
+    font-size: 14px !important;
+  }
+
+  .organigo-distance-badge {
+    font-size: 9px !important;
+    padding: 3px 7px !important;
+  }
+
+  .organigo-location-bottom {
+    gap: 4px !important;
+  }
+
+  .organigo-address-label {
+    font-size: 8px !important;
+  }
+
+  .organigo-address-name {
+    font-size: 10px !important;
+  }
+
+  .organigo-location-bottom .location-edit-icon {
+    font-size: 15px !important;
+  }
+}
+/* ORGANIGO - PERFECT COMPACT LOCATION BAR */
+
+@media (max-width: 650px) {
+
+  .organigo-home ~ .Organigo-header .organigo-location-bar,
+  .Organigo-header .organigo-location-bar {
+    height: 50px !important;
+    min-height: 50px !important;
+    padding: 4px 9px !important;
+    gap: 2px !important;
+    border-radius: 9px !important;
+    background: #eaf7e9 !important;
+    border: 1px solid #d6ecd4 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  .organigo-location-bar .organigo-location-top {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+  }
+
+  .organigo-location-bar .organigo-location-top strong {
+    font-size: 12px !important;
+  }
+
+  .organigo-location-bar .organigo-distance-badge {
+    font-size: 8px !important;
+    padding: 2px 5px !important;
+  }
+
+  .organigo-location-bar .organigo-location-bottom {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .organigo-location-bar .organigo-address-label {
+    font-size: 8px !important;
+  }
+
+  .organigo-location-bar .organigo-address-name {
+    font-size: 10px !important;
+  }
+}
+/* ORGANIGO - GREEN ORANGE LOCATION BADGE */
+
+@media (max-width: 650px) {
+
+  .organigo-location-bar {
+    background: linear-gradient(
+      120deg,
+      #e5f7e9,
+      #f0fae9
+    ) !important;
+
+    border: 1px solid #c8e8ce !important;
+    box-shadow: 0 2px 7px rgba(30, 120, 55, 0.08);
+  }
+
+  /* Delivery Time */
+  .organigo-location-top > strong {
+    color: #167b38 !important;
+    font-weight: 800 !important;
+  }
+
+  /* Distance Badge */
+  .organigo-distance-badge {
+    background: linear-gradient(
+      135deg,
+      #ff9638,
+      #ff6b27
+    ) !important;
+
+    color: #ffffff !important;
+    padding: 4px 8px !important;
+    border-radius: 20px !important;
+    font-size: 9px !important;
+    font-weight: 800 !important;
+
+    box-shadow: 0 2px 5px rgba(255, 107, 39, 0.25);
+  }
+
+  /* Address */
+  .organigo-address-name {
+    color: #176b32 !important;
+  }
+
+  .organigo-location-bottom .location-edit-icon {
+    color: #f07828 !important;
+    font-weight: 800;
+  }
+}
+/* ORGANIGO delivery text - Blinkit style (All Screens) */
+
+.organigo-location-top > strong {
+  font-size: 16px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.5px;
+  color: #176b32 !important;
+}
+
+.organigo-distance-badge {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+}
+
+.organigo-address-label {
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px;
+}
+
+.organigo-address-name {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+/* LOCATION PERMISSION WARNING */
+
+.location-permission-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  margin-bottom: 18px;
+  background: #fff0f1;
+  border: 1px solid #ffd9dc;
+  border-radius: 12px;
+}
+
+.location-permission-icon {
+  font-size: 25px;
+}
+
+.location-permission-text {
+  flex: 1;
+}
+
+.location-permission-text strong {
+  display: block;
+  color: #d83b50;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.location-permission-text p {
+  margin: 4px 0 0;
+  color: #777;
+  font-size: 11px;
+}
+
+.location-permission-banner button {
+  border: none;
+  border-radius: 7px;
+  background: #e84459;
+  color: white;
+  padding: 8px 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+/* REQUEST ADDRESS BUTTON */
+
+.request-address-btn {
+  width: 100%;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  background: #ffffff;
+  border: 1px solid #e8eee9;
+  border-radius: 12px;
+  color: #26382b;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+
+.request-address-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  background: #e5f8e9;
+  color: #16843b;
+  border-radius: 9px;
+  font-size: 23px;
+}
+
+.request-address-btn span:nth-child(2) {
+  flex: 1;
+}
+
+.request-address-arrow {
+  font-size: 25px;
+  color: #89928c;
+}
+/* =====================================
+   ORGANIGO - PREMIUM LOCATION MODAL
+===================================== */
+
+.location-modal {
+  font-family: "DM Sans", Arial, sans-serif;
+}
+
+.location-modal-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.location-modal-heading h2 {
+  font-size: 20px;
+  font-weight: 900;
+  color: #173d26;
+}
+
+.location-modal-heading p {
+  margin-top: 5px;
+  font-size: 13px;
+  color: #718075;
+}
+
+.saved-addresses-section {
+  margin-bottom: 18px;
+}
+
+.saved-addresses-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 13px;
+}
+
+.saved-addresses-heading > a {
+  color: #16843b;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.saved-addresses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.saved-address-item {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #e4eee6;
+  border-radius: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.saved-address-item:hover,
+.saved-address-item.selected {
+  background: #f0faf2;
+  border-color: #159447;
+  box-shadow: 0 3px 10px rgba(21,148,71,0.08);
+}
+
+.saved-address-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.saved-address-details strong {
+  color: #263b2c;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.saved-address-details small {
+  color: #77847a;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.location-modal-footer {
+  margin-top: 13px;
+  color: #718075;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+  .location-modal {
+    padding: 22px 17px 28px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .location-modal-heading h2 {
+    font-size: 19px;
+  }
+
+  .saved-address-item {
+    padding: 12px;
+  }
+
+  .saved-address-details small {
+    font-size: 11px;
+  }
+}
+/* Hide Bottom Navigation While Location Modal Is Open */
+
+body:has(.location-modal) .organigo-bottom-nav {
+  display: none !important;
+}
+
+/* Location Modal Scroll */
+
+.location-modal {
+  max-height: 92vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

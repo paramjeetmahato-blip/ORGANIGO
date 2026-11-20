@@ -667,19 +667,7 @@ function Home() {
 
         {categories.length > 0 && (
           <section className="organigo-categories">
-            <div className="section-heading">
-              <div>
-                <span className="section-label">
-                  EXPLORE ORGANIGO
-                </span>
-
-                <h2>Shop by Category</h2>
-              </div>
-
-              <p>
-                Explore the products available in our store.
-              </p>
-            </div>
+           
 
             <div className="category-list">
 

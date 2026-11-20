@@ -183,12 +183,12 @@ function Account() {
       description: "Discover offers and save money",
       link: "/offers",
     },
-    {
-      icon: "📍",
-      title: "Saved Addresses",
-      description: "Manage your delivery addresses",
-      link: "/addresses",
-    },
+   {
+  icon: "🏠",
+  title: "My Addresses",
+  description: "Manage your delivery addresses",
+  link: "/addresses",
+},
     {
       icon: "🎧",
       title: "Help & Support",
@@ -338,10 +338,27 @@ function Account() {
               className="account-menu-card"
               key={index}
             >
-              <div className="account-menu-icon">
-                {item.icon}
-              </div>
-
+             <div className="account-menu-icon">
+  {item.title === "My Addresses" ? (
+    <svg
+      viewBox="0 0 24 24"
+      width="25"
+      height="25"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 10.5L12 3l9 7.5" />
+      <path d="M5 9.5V21h14V9.5" />
+      <path d="M9 21v-7h6v7" />
+      <path d="M19 3v4" />
+    </svg>
+  ) : (
+    item.icon
+  )}
+</div>
               <div className="account-menu-content">
                 <h3>{item.title}</h3>
                 <p>{item.description}</p>

@@ -77,6 +77,7 @@ function Header() {
 
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationMessage, setLocationMessage] = useState("");
+  const [locationPermission, setLocationPermission] = useState("prompt");
 
   const [hubSettings, setHubSettings] = useState(getHubSettings);
 
@@ -217,7 +218,43 @@ function Header() {
       window.removeEventListener("storage", refreshUser);
     };
   }, []);
+// =====================================
+// DEVICE LOCATION PERMISSION CHECK
+// =====================================
 
+useEffect(() => {
+  let permissionStatus = null;
+
+  const checkPermission = async () => {
+    try {
+      if (!navigator.permissions) {
+        setLocationPermission("prompt");
+        return;
+      }
+
+      permissionStatus = await navigator.permissions.query({
+        name: "geolocation",
+      });
+
+      setLocationPermission(permissionStatus.state);
+
+      permissionStatus.onchange = () => {
+        setLocationPermission(permissionStatus.state);
+      };
+    } catch (error) {
+      console.log("Location permission check:", error);
+      setLocationPermission("prompt");
+    }
+  };
+
+  checkPermission();
+
+  return () => {
+    if (permissionStatus) {
+      permissionStatus.onchange = null;
+    }
+  };
+}, []);
   // =====================================
   // LOAD ADDRESS AFTER LOGIN
   // =====================================
@@ -643,6 +680,22 @@ function Header() {
   };
 
   // =====================================
+// REQUEST ADDRESS ON WHATSAPP
+// =====================================
+
+const requestAddressOnWhatsApp = () => {
+  const message = encodeURIComponent(
+    "Hi! I want to place an order on ORGANIGO. Please share your delivery address or live location with me so I can use it for delivery."
+  );
+
+  window.open(
+    `https://wa.me/?text=${message}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
+};
+
+  // =====================================
   // DELIVERY TEXT
   // =====================================
 
@@ -653,7 +706,20 @@ function Header() {
         ? "Not Available"
         : "Verify Location"
     : "Select Location";
+const estimatedMinutes =
+  selectedLocation?.distance != null
+    ? Math.max(
+        10,
+        Math.ceil(5 + (Number(selectedLocation.distance) / 15) * 60)
+      )
+    : null;
 
+const displayDistance =
+  selectedLocation?.distance != null
+    ? Number(selectedLocation.distance) < 1
+      ? `${Math.round(Number(selectedLocation.distance) * 1000)} m away`
+      : `${Number(selectedLocation.distance).toFixed(1)} km away`
+    : "Set delivery location";
   // =====================================
   // HEADER UI
   // =====================================
@@ -680,64 +746,49 @@ function Header() {
           <img src="/organigo-logo.png" alt="ORGANIGO" />
         </Link>
 
-        {/* LOCATION */}
+       {/* ORGANIGO DELIVERY LOCATION */}
 
-        <button
-          type="button"
-          className="delivery-location"
-          onClick={() => {
-            setLocationOpen(true);
-            setLocationMessage("");
-            setAccountOpen(false);
+<button
+  type="button"
+  className="delivery-location organigo-location-bar"
+  onClick={() => {
+    setLocationOpen(true);
+    setLocationMessage("");
+    setAccountOpen(false);
 
-            if (user) {
-              loadSavedAddresses();
-            }
-          }}
-        >
-          <span className="location-icon">
-  <svg
-    viewBox="0 0 24 24"
-    width="21"
-    height="21"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-    <circle cx="12" cy="10" r="2.5" />
-  </svg>
-</span>
+    if (user) {
+      loadSavedAddresses();
+    }
+  }}
+>
+  <div className="organigo-location-top">
+    <strong>
+      ORGANIGO in {estimatedMinutes !== null
+        ? `${estimatedMinutes} minutes`
+        : "15 minutes"}
+    </strong>
 
-          <div>
-            <small>
-              {selectedLocation ? "Delivering to" : "Delivery Location"}
-            </small>
+    {selectedLocation?.distance != null && (
+      <span className="organigo-distance-badge">
+        🚚 {displayDistance}
+      </span>
+    )}
+  </div>
 
-            <strong>
-              {selectedLocation
-                ? selectedLocation.name.split(",").slice(0, 2).join(",")
-                : "Select your location"}
-            </strong>
+  <div className="organigo-location-bottom">
+    <span className="organigo-address-label">
+      {selectedLocation ? "DELIVERING TO" : "SELECT LOCATION"}
+    </span>
 
-            {selectedLocation && (
-              <small
-                className={
-                  selectedLocation.available === true
-                    ? "location-available"
-                    : "location-unavailable"
-                }
-              >
-                {deliveryText}
-              </small>
-            )}
-          </div>
+    <strong className="organigo-address-name">
+      {selectedLocation
+        ? selectedLocation.name.split(",").slice(0, 2).join(", ")
+        : "Choose your delivery address"}
+    </strong>
 
-          <span className="location-edit-icon">⌄</span>
-        </button>
-
+    <span className="location-edit-icon">⌄</span>
+  </div>
+</button>
         {/* SEARCH */}
 
         <div className="header-search">
@@ -749,93 +800,6 @@ function Header() {
             value={searchQuery}
             onChange={handleSearch}
           />
-        </div>
-
-        {/* ACCOUNT */}
-
-        <div className="header-account" ref={accountRef}>
-          <button
-            type="button"
-            className="header-account-button"
-            aria-expanded={accountOpen}
-            onClick={() => setAccountOpen((previous) => !previous)}
-          >
-            <span className="account-icon">👤</span>
-
-            <span className="account-button-text">
-              {user ? (
-                <>
-                  <small>Hello,</small>
-                  <strong>
-                    {user.name?.split(" ")[0] || "My Account"}
-                  </strong>
-                </>
-              ) : (
-                <>
-                  <small>Welcome</small>
-                  <strong>Login / Sign Up</strong>
-                </>
-              )}
-            </span>
-
-            <span className="account-arrow">⌄</span>
-          </button>
-
-          {accountOpen && (
-            <div className="account-dropdown">
-              {user ? (
-                <>
-                  <div className="account-dropdown-heading">
-                    <strong>{user.name}</strong>
-                    <small>{user.phone}</small>
-                  </div>
-
-                  <Link
-                    to="/account"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    👤 My Account
-                  </Link>
-
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="account-logout-button"
-                  >
-                    ↪ Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div className="account-dropdown-heading">
-                    <strong>Welcome to ORGANIGO!</strong>
-                    <small>Login to manage your account.</small>
-                  </div>
-
-                  <Link
-                    to="/login"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    🔐 Login
-                  </Link>
-
-                  <Link
-                    to="/signup"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    ✨ Create My Account
-                  </Link>
-
-                  <Link
-                    to="/forgot-password"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    🔑 Forgot Password?
-                  </Link>
-                </>
-              )}
-            </div>
-          )}
         </div>
 
         {/* CART */}
@@ -883,6 +847,28 @@ function Header() {
                 ✕
               </button>
             </div>
+
+{/* DEVICE LOCATION WARNING */}
+{locationPermission !== "granted" && (
+  <div className="location-permission-banner">
+    <div className="location-permission-icon">📍</div>
+
+    <div className="location-permission-text">
+      <strong>Device Location Not Enabled</strong>
+      <p>
+        Enable your location to find the nearest delivery address.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      onClick={useCurrentLocation}
+      disabled={locationLoading}
+    >
+      {locationLoading ? "Please wait..." : "Enable"}
+    </button>
+  </div>
+)}
 
             {/* SAVED ADDRESSES */}
 
@@ -1038,6 +1024,20 @@ function Header() {
   </svg>
 
   {locationLoading ? "Detecting Location..." : "Use My Current Location"}
+</button>
+
+{/* REQUEST ADDRESS FROM SOMEONE ELSE */}
+
+<button
+  type="button"
+  className="request-address-btn"
+  onClick={requestAddressOnWhatsApp}
+>
+  <span className="request-address-icon">☏</span>
+
+  <span>Request Address from Someone Else</span>
+
+  <span className="request-address-arrow">›</span>
 </button>
 
             {/* MANUAL SEARCH */}
