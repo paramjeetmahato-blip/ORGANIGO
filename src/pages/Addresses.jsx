@@ -18,6 +18,7 @@ function Addresses() {
   const [deletingId, setDeletingId] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [message, setMessage] = useState("");
+  const [recipientType, setRecipientType] = useState("Myself");
 
   const emptyForm = {
     label: "Home",
@@ -381,7 +382,248 @@ function Addresses() {
   // =====================================
   // MAIN PAGE
   // =====================================
+// =====================================
+// ORGANIGO FULL SCREEN ADD ADDRESS
+// =====================================
 
+if (showForm) {
+  return (
+    <div className="organigo-add-address-page">
+
+      {/* HEADER */}
+      <div className="organigo-add-address-header">
+        <button
+          type="button"
+          className="organigo-add-address-back"
+          onClick={handleCancel}
+        >
+          ←
+        </button>
+
+        <h2>
+          {editingId ? "Edit Address" : "Add Address Details"}
+        </h2>
+      </div>
+
+      <form
+        onSubmit={handleSave}
+        className="organigo-add-address-content"
+      >
+
+        {/* GPS LOCATION */}
+        <div className="organigo-current-location">
+
+          <span className="organigo-current-location-icon">
+            📍
+          </span>
+
+          <div className="organigo-current-location-info">
+            <strong>Adding address at your current location?</strong>
+            <p>Use GPS to automatically detect your address.</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={getCurrentLocation}
+            disabled={gpsLoading}
+          >
+            {gpsLoading ? "Wait..." : "Enable"}
+          </button>
+
+        </div>
+
+        {/* LOCATION DETAILS */}
+        <div className="organigo-address-section">
+
+          <h3>Address Details</h3>
+
+          <div className="organigo-address-field">
+            <label>House / Flat / Building Number *</label>
+            <input
+              name="houseNo"
+              value={form.houseNo}
+              onChange={handleChange}
+              placeholder="Enter house or flat number"
+              required
+            />
+          </div>
+
+          <div className="organigo-address-field">
+            <label>Area / Street *</label>
+            <input
+              name="area"
+              value={form.area}
+              onChange={handleChange}
+              placeholder="Enter area or street"
+              required
+            />
+          </div>
+
+          <div className="organigo-address-field">
+            <label>Landmark</label>
+            <input
+              name="landmark"
+              value={form.landmark}
+              onChange={handleChange}
+              placeholder="Nearby famous place"
+            />
+          </div>
+
+          <div className="organigo-address-field">
+            <label>City *</label>
+            <input
+              name="city"
+              value={form.city}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="organigo-address-field">
+            <label>State *</label>
+            <input
+              name="state"
+              value={form.state}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="organigo-address-field">
+            <label>PIN Code *</label>
+            <input
+              name="pincode"
+              value={form.pincode}
+              onChange={handleChange}
+              maxLength="6"
+              required
+            />
+          </div>
+
+        </div>
+
+        {/* CONTACT DETAILS */}
+        <div className="organigo-address-section">
+
+          <h3>Contact Details</h3>
+
+          <div className="organigo-address-choice">
+
+            <button
+              type="button"
+              className={recipientType === "Myself" ? "active" : ""}
+              onClick={() => setRecipientType("Myself")}
+            >
+              Myself
+            </button>
+
+            <button
+              type="button"
+              className={recipientType === "Someone else" ? "active" : ""}
+              onClick={() => setRecipientType("Someone else")}
+            >
+              Someone else
+            </button>
+
+          </div>
+
+          <div className="organigo-address-field">
+            <label>
+              {recipientType === "Myself"
+                ? "Your Name *"
+                : "Receiver's Name *"}
+            </label>
+
+            <input
+              name="fullName"
+              value={form.fullName}
+              onChange={handleChange}
+              placeholder="Enter full name"
+              required
+            />
+          </div>
+
+          <div className="organigo-address-field">
+            <label>
+              {recipientType === "Myself"
+                ? "Your Mobile Number *"
+                : "Receiver's Mobile Number *"}
+            </label>
+
+            <input
+              name="phone"
+              type="tel"
+              maxLength="10"
+              value={form.phone}
+              onChange={handleChange}
+              placeholder="Enter 10 digit mobile number"
+              required
+            />
+          </div>
+
+        </div>
+
+        {/* SAVE ADDRESS AS */}
+        <div className="organigo-address-section">
+
+          <h3>Save Address As</h3>
+
+          <div className="organigo-address-choice">
+
+            {["Home", "Work", "Hotel", "Other"].map((type) => (
+              <button
+                key={type}
+                type="button"
+                className={form.label === type ? "active" : ""}
+                onClick={() =>
+                  setForm((prev) => ({
+                    ...prev,
+                    label: type,
+                  }))
+                }
+              >
+                {type === "Home" && "🏠 "}
+                {type === "Work" && "🏢 "}
+                {type === "Hotel" && "🏨 "}
+                {type === "Other" && "📍 "}
+                {type}
+              </button>
+            ))}
+
+          </div>
+
+        </div>
+
+        {/* DEFAULT ADDRESS */}
+        <label className="default-address-option">
+          <input
+            type="checkbox"
+            name="isDefault"
+            checked={form.isDefault}
+            onChange={handleChange}
+          />
+          Make this my default address
+        </label>
+
+        {message && (
+          <p className="addresses-message">{message}</p>
+        )}
+
+        {/* FIXED NEXT BUTTON */}
+        <div className="organigo-address-next">
+          <button type="submit" disabled={saving}>
+            {saving
+              ? "Saving Address..."
+              : editingId
+              ? "Update Address"
+              : "Next"}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  );
+}
   return (
     <div className="addresses-page">
       <div className="addresses-container">
@@ -459,6 +701,30 @@ function Addresses() {
                 ? "Edit Delivery Address"
                 : "Add Delivery Address"}
             </h2>
+
+            {/* RECIPIENT TYPE */}
+
+<div className="organigo-address-section">
+  <h3>Who are you receiving this order for?</h3>
+
+  <div className="organigo-address-choice">
+    <button
+      type="button"
+      className={recipientType === "Myself" ? "active" : ""}
+      onClick={() => setRecipientType("Myself")}
+    >
+      Myself
+    </button>
+
+    <button
+      type="button"
+      className={recipientType === "Someone else" ? "active" : ""}
+      onClick={() => setRecipientType("Someone else")}
+    >
+      Someone else
+    </button>
+  </div>
+</div>
 
             <button
               type="button"

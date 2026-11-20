@@ -466,3 +466,197 @@
 .organigo-address-dropdown .organigo-delete-option {
   color: #df4545;
 }
+/* =====================================
+   ORGANIGO - FULL SCREEN ADD ADDRESS
+===================================== */
+
+.organigo-add-address-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #fff;
+  padding-bottom: 95px;
+}
+
+.organigo-add-address-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 18px 16px;
+  border-bottom: 1px solid #edf1ed;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
+}
+
+.organigo-add-address-back {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #f0f8f1;
+  color: #168a43;
+  border-radius: 50%;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.organigo-add-address-header h2 {
+  margin: 0;
+  color: #183b24;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.organigo-add-address-content {
+  max-width: 650px;
+  margin: auto;
+  padding: 20px 16px;
+}
+
+.organigo-current-location {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: #edf8ef;
+  border: 1px solid #d6edda;
+  border-radius: 13px;
+  margin-bottom: 25px;
+}
+
+.organigo-current-location-icon {
+  font-size: 27px;
+}
+
+.organigo-current-location-info {
+  flex: 1;
+}
+
+.organigo-current-location-info strong {
+  display: block;
+  color: #176b32;
+  font-size: 13px;
+}
+
+.organigo-current-location-info p {
+  margin: 5px 0 0;
+  color: #66766a;
+  font-size: 11px;
+}
+
+.organigo-current-location button {
+  border: none;
+  background: #168a43;
+  color: white;
+  padding: 9px 13px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.organigo-address-section {
+  margin-bottom: 25px;
+}
+
+.organigo-address-section h3 {
+  margin: 0 0 15px;
+  color: #26382b;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.organigo-address-field {
+  margin-bottom: 16px;
+}
+
+.organigo-address-field label {
+  display: block;
+  margin-bottom: 7px;
+  color: #4b594e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.organigo-address-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  border: 1px solid #dce6de;
+  border-radius: 9px;
+  outline: none;
+  font-size: 14px;
+  background: #fff;
+}
+
+.organigo-address-field input:focus {
+  border-color: #168a43;
+  box-shadow: 0 0 0 2px #168a4315;
+}
+
+.organigo-address-choice {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.organigo-address-choice button {
+  padding: 11px 17px;
+  border: 1px solid #dce6de;
+  border-radius: 9px;
+  background: white;
+  color: #455448;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.organigo-address-choice button.active {
+  background: #eaf7ed;
+  border-color: #168a43;
+  color: #168a43;
+}
+
+.organigo-address-next {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 14px 16px;
+  background: white;
+  border-top: 1px solid #edf1ed;
+  z-index: 20;
+}
+
+.organigo-address-next button {
+  display: block;
+  width: 100%;
+  max-width: 650px;
+  margin: auto;
+  padding: 15px;
+  border: none;
+  border-radius: 11px;
+  background: #168a43;
+  color: white;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.organigo-address-next button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (min-width: 700px) {
+  .organigo-add-address-page {
+    background: #f7faf7;
+  }
+
+  .organigo-add-address-content {
+    margin-top: 20px;
+    padding: 28px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 3px 15px rgba(0,0,0,.05);
+  }
+}
