@@ -1,10 +1,11 @@
+import API_BASE_URL from "../services/api";
 
 import { useEffect, useState } from "react";
 import { getToken } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import "../styles/Addresses.css";
 
-const API_URL = "http://localhost:5000/api/addresses";
+const API_URL = `${API_BASE_URL}/api/addresses`;
 
 function Addresses() {
   const navigate = useNavigate();

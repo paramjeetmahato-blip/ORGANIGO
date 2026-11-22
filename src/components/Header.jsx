@@ -1,10 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import { getUser, getToken, clearSession } from "../utils/auth";
 import { Link, useNavigate } from "react-router-dom";
+
+import {
+  getUser,
+  getToken,
+  clearSession,
+} from "../utils/auth";
+
 import { useCart } from "../context/CartContext";
+import API_BASE_URL from "../services/api";
+
 import "../styles/Header.css";
 
-const API_URL = "http://localhost:5000/api/addresses";
+const API_URL = `${API_BASE_URL}/api/addresses`;
 
 const defaultHub = {
   latitude: 22.5504,
@@ -13,8 +21,13 @@ const defaultHub = {
   active: true,
 };
 
+// =====================================
+// DISTANCE CALCULATION
+// =====================================
+
 function getDistanceKm(lat1, lon1, lat2, lon2) {
   const toRad = (value) => (value * Math.PI) / 180;
+
   const earthRadius = 6371;
 
   const dLat = toRad(lat2 - lat1);
@@ -26,8 +39,16 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
       Math.cos(toRad(lat2)) *
       Math.sin(dLon / 2) ** 2;
 
-  return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return (
+    earthRadius *
+    2 *
+    Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  );
 }
+
+// =====================================
+// DELIVERY SETTINGS
+// =====================================
 
 function getHubSettings() {
   try {
@@ -35,11 +56,17 @@ function getHubSettings() {
       localStorage.getItem("organigoDeliverySettings") || "null"
     );
 
-    return saved ? { ...defaultHub, ...saved } : defaultHub;
+    return saved
+      ? { ...defaultHub, ...saved }
+      : defaultHub;
   } catch {
     return defaultHub;
   }
 }
+
+// =====================================
+// SAVED LOCATION
+// =====================================
 
 function getSavedLocation() {
   try {
@@ -51,43 +78,164 @@ function getSavedLocation() {
   }
 }
 
-function getSavedUser() {
-  return getUser();
-}
-
+// =====================================
+// HEADER COMPONENT
+// =====================================
 
 function Header() {
   const navigate = useNavigate();
+
   const accountRef = useRef(null);
 
-  const [searchQuery, setSearchQuery] = useState("");
   const { cartItems } = useCart();
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [user, setUser] = useState(getUser);
+
+  const [accountOpen, setAccountOpen] = useState(false);
+
   const [locationOpen, setLocationOpen] = useState(false);
+
   const [locationQuery, setLocationQuery] = useState("");
+
   const [locationResults, setLocationResults] = useState([]);
 
   const [selectedLocation, setSelectedLocation] =
     useState(getSavedLocation);
 
   const [savedAddresses, setSavedAddresses] = useState([]);
-  const [selectedAddressId, setSelectedAddressId] = useState(null);
-  const [addressesLoading, setAddressesLoading] = useState(false);
-  const [selectingAddressId, setSelectingAddressId] = useState(null);
 
-  const [locationLoading, setLocationLoading] = useState(false);
-  const [locationMessage, setLocationMessage] = useState("");
-  const [locationPermission, setLocationPermission] = useState("prompt");
+  const [selectedAddressId, setSelectedAddressId] =
+    useState(null);
 
-  const [hubSettings, setHubSettings] = useState(getHubSettings);
+  const [addressesLoading, setAddressesLoading] =
+    useState(false);
 
-  const [accountOpen, setAccountOpen] = useState(false);
-  const [user, setUser] = useState(getUser);
+  const [selectingAddressId, setSelectingAddressId] =
+    useState(null);
+
+  const [locationLoading, setLocationLoading] =
+    useState(false);
+
+  const [locationMessage, setLocationMessage] =
+    useState("");
+
+  const [locationPermission, setLocationPermission] =
+    useState("prompt");
+
+  const [hubSettings, setHubSettings] =
+    useState(getHubSettings);
+
+  // =====================================
+  // CART COUNT
+  // =====================================
 
   const cartCount = cartItems.reduce(
-    (total, item) => total + Number(item.quantity || 0),
+    (total, item) =>
+      total + Number(item.quantity || 0),
     0
   );
+
+  // =====================================
+  // CHECK DELIVERY DISTANCE
+  // =====================================
+
+  const checkDelivery = (latitude, longitude) => {
+    const hub = getHubSettings();
+
+    const distance = getDistanceKm(
+      Number(hub.latitude),
+      Number(hub.longitude),
+      Number(latitude),
+      Number(longitude)
+    );
+
+    return {
+      distance: Number(distance.toFixed(2)),
+
+      available:
+        hub.active !== false &&
+        distance <= Number(hub.radius || 10),
+    };
+  };
+
+  // =====================================
+  // LOGIN STATUS UPDATE
+  // =====================================
+
+  useEffect(() => {
+    const refreshUser = () => {
+      setUser(getUser());
+    };
+
+    window.addEventListener(
+      "organigoAuthChanged",
+      refreshUser
+    );
+
+    window.addEventListener(
+      "storage",
+      refreshUser
+    );
+
+    return () => {
+      window.removeEventListener(
+        "organigoAuthChanged",
+        refreshUser
+      );
+
+      window.removeEventListener(
+        "storage",
+        refreshUser
+      );
+    };
+  }, []);
+
+  // =====================================
+  // DEVICE LOCATION PERMISSION
+  // =====================================
+
+  useEffect(() => {
+    let permissionStatus = null;
+
+    const checkPermission = async () => {
+      try {
+        if (!navigator.permissions) {
+          setLocationPermission("prompt");
+          return;
+        }
+
+        permissionStatus =
+          await navigator.permissions.query({
+            name: "geolocation",
+          });
+
+        setLocationPermission(permissionStatus.state);
+
+        permissionStatus.onchange = () => {
+          setLocationPermission(
+            permissionStatus.state
+          );
+        };
+      } catch (error) {
+        console.log(
+          "Location permission check:",
+          error
+        );
+
+        setLocationPermission("prompt");
+      }
+    };
+
+    checkPermission();
+
+    return () => {
+      if (permissionStatus) {
+        permissionStatus.onchange = null;
+      }
+    };
+  }, []);
 
   // =====================================
   // LOAD SAVED ADDRESSES FROM MONGODB
@@ -107,6 +255,7 @@ function Header() {
 
       const response = await fetch(API_URL, {
         method: "GET",
+
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -115,13 +264,17 @@ function Header() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Unable to load addresses.");
+        throw new Error(
+          data.message || "Unable to load addresses."
+        );
       }
 
       setSavedAddresses(data.addresses || []);
-      setSelectedAddressId(data.selectedAddressId || null);
 
-      // Restore selected address from MongoDB
+      setSelectedAddressId(
+        data.selectedAddressId || null
+      );
+
       if (data.selectedAddress) {
         const address = data.selectedAddress;
 
@@ -131,7 +284,7 @@ function Header() {
           address.longitude !== null &&
           address.longitude !== undefined;
 
-        let finalLocation = {
+        const finalLocation = {
           name: [
             address.area,
             address.city,
@@ -160,6 +313,7 @@ function Header() {
             : null,
 
           source: "saved-address",
+
           addressId: address._id,
         };
 
@@ -170,6 +324,7 @@ function Header() {
           );
 
           finalLocation.distance = result.distance;
+
           finalLocation.available = result.available;
         } else {
           finalLocation.available = null;
@@ -188,10 +343,16 @@ function Header() {
         );
       } else {
         setSelectedLocation(null);
-        localStorage.removeItem("organigoSelectedLocation");
+
+        localStorage.removeItem(
+          "organigoSelectedLocation"
+        );
       }
     } catch (error) {
-      console.error("Load Saved Addresses Error:", error);
+      console.error(
+        "Load Saved Addresses Error:",
+        error
+      );
 
       setLocationMessage(
         "Saved addresses load nahi ho paaye. Please try again."
@@ -201,60 +362,6 @@ function Header() {
     }
   };
 
-  // =====================================
-  // LOGIN STATUS UPDATE
-  // =====================================
-
-  useEffect(() => {
-    const refreshUser = () => {
-      setUser(getSavedUser());
-    };
-
-    window.addEventListener("organigoAuthChanged", refreshUser);
-    window.addEventListener("storage", refreshUser);
-
-    return () => {
-      window.removeEventListener("organigoAuthChanged", refreshUser);
-      window.removeEventListener("storage", refreshUser);
-    };
-  }, []);
-// =====================================
-// DEVICE LOCATION PERMISSION CHECK
-// =====================================
-
-useEffect(() => {
-  let permissionStatus = null;
-
-  const checkPermission = async () => {
-    try {
-      if (!navigator.permissions) {
-        setLocationPermission("prompt");
-        return;
-      }
-
-      permissionStatus = await navigator.permissions.query({
-        name: "geolocation",
-      });
-
-      setLocationPermission(permissionStatus.state);
-
-      permissionStatus.onchange = () => {
-        setLocationPermission(permissionStatus.state);
-      };
-    } catch (error) {
-      console.log("Location permission check:", error);
-      setLocationPermission("prompt");
-    }
-  };
-
-  checkPermission();
-
-  return () => {
-    if (permissionStatus) {
-      permissionStatus.onchange = null;
-    }
-  };
-}, []);
   // =====================================
   // LOAD ADDRESS AFTER LOGIN
   // =====================================
@@ -269,7 +376,7 @@ useEffect(() => {
   }, [user]);
 
   // =====================================
-  // CLOSE DROPDOWN
+  // CLOSE ACCOUNT DROPDOWN
   // =====================================
 
   useEffect(() => {
@@ -289,14 +396,36 @@ useEffect(() => {
       }
     };
 
-    document.addEventListener("mousedown", handleOutsideClick);
-    document.addEventListener("touchstart", handleOutsideClick);
-    document.addEventListener("keydown", handleEscape);
+    document.addEventListener(
+      "mousedown",
+      handleOutsideClick
+    );
+
+    document.addEventListener(
+      "touchstart",
+      handleOutsideClick
+    );
+
+    document.addEventListener(
+      "keydown",
+      handleEscape
+    );
 
     return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-      document.removeEventListener("touchstart", handleOutsideClick);
-      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener(
+        "mousedown",
+        handleOutsideClick
+      );
+
+      document.removeEventListener(
+        "touchstart",
+        handleOutsideClick
+      );
+
+      document.removeEventListener(
+        "keydown",
+        handleEscape
+      );
     };
   }, []);
 
@@ -304,28 +433,33 @@ useEffect(() => {
   // LOGOUT
   // =====================================
 
- const handleLogout = () => {
-  // Sirf current tab ka login clear hoga
-  clearSession();
+  const handleLogout = () => {
+    clearSession();
 
-  localStorage.removeItem("organigoSelectedLocation");
+    localStorage.removeItem(
+      "organigoSelectedLocation"
+    );
 
-  setUser(null);
-  setSelectedLocation(null);
-  setSavedAddresses([]);
-  setSelectedAddressId(null);
+    setUser(null);
 
-  setAccountOpen(false);
+    setSelectedLocation(null);
 
-  navigate("/");
-};
+    setSavedAddresses([]);
+
+    setSelectedAddressId(null);
+
+    setAccountOpen(false);
+
+    navigate("/");
+  };
 
   // =====================================
   // PRODUCT SEARCH
   // =====================================
 
-  const handleSearch = (e) => {
-    const value = e.target.value;
+  const handleSearch = (event) => {
+    const value = event.target.value;
+
     setSearchQuery(value);
 
     window.dispatchEvent(
@@ -349,7 +483,10 @@ useEffect(() => {
       refreshSettings
     );
 
-    window.addEventListener("storage", refreshSettings);
+    window.addEventListener(
+      "storage",
+      refreshSettings
+    );
 
     return () => {
       window.removeEventListener(
@@ -357,31 +494,12 @@ useEffect(() => {
         refreshSettings
       );
 
-      window.removeEventListener("storage", refreshSettings);
+      window.removeEventListener(
+        "storage",
+        refreshSettings
+      );
     };
   }, []);
-
-  // =====================================
-  // CHECK DELIVERY DISTANCE
-  // =====================================
-
-  const checkDelivery = (latitude, longitude) => {
-    const hub = getHubSettings();
-
-    const distance = getDistanceKm(
-      Number(hub.latitude),
-      Number(hub.longitude),
-      Number(latitude),
-      Number(longitude)
-    );
-
-    return {
-      distance: Number(distance.toFixed(2)),
-      available:
-        hub.active !== false &&
-        distance <= Number(hub.radius || 10),
-    };
-  };
 
   // =====================================
   // SAVE CUSTOMER LOCATION
@@ -395,8 +513,11 @@ useEffect(() => {
 
     const finalLocation = {
       ...location,
+
       distance: result.distance,
+
       available: result.available,
+
       updatedAt: new Date().toISOString(),
     };
 
@@ -408,33 +529,42 @@ useEffect(() => {
     setSelectedLocation(finalLocation);
 
     setLocationOpen(false);
+
     setLocationQuery("");
+
     setLocationResults([]);
+
     setLocationMessage("");
   };
 
   // =====================================
-  // SELECT SAVED ADDRESS FROM MONGODB
+  // SELECT SAVED ADDRESS
   // =====================================
 
   const selectSavedAddress = async (address) => {
     const token = getToken();
 
     if (!token) {
-      setLocationMessage("Please login to select a saved address.");
+      setLocationMessage(
+        "Please login to select a saved address."
+      );
+
       return;
     }
 
     try {
       setSelectingAddressId(address._id);
+
       setLocationMessage("");
 
       const response = await fetch(
         `${API_URL}/${address._id}/select`,
         {
           method: "PATCH",
+
           headers: {
             Authorization: `Bearer ${token}`,
+
             "Content-Type": "application/json",
           },
         }
@@ -444,11 +574,14 @@ useEffect(() => {
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Unable to select this address."
+          data.message ||
+            "Unable to select this address."
         );
       }
 
-      setSelectedAddressId(data.selectedAddressId);
+      setSelectedAddressId(
+        data.selectedAddressId
+      );
 
       const selected = data.selectedAddress;
 
@@ -487,6 +620,7 @@ useEffect(() => {
           : null,
 
         source: "saved-address",
+
         addressId: selected._id,
       };
 
@@ -497,9 +631,11 @@ useEffect(() => {
         );
 
         finalLocation.distance = result.distance;
+
         finalLocation.available = result.available;
       } else {
         finalLocation.distance = null;
+
         finalLocation.available = null;
       }
 
@@ -509,16 +645,24 @@ useEffect(() => {
       );
 
       setSelectedLocation(finalLocation);
-      setSavedAddresses(data.addresses || savedAddresses);
+
+      setSavedAddresses(
+        data.addresses || savedAddresses
+      );
 
       setLocationOpen(false);
+
       setLocationMessage("");
 
       window.dispatchEvent(
         new Event("organigoSelectedAddressUpdated")
       );
     } catch (error) {
-      console.error("Select Address Error:", error);
+      console.error(
+        "Select Address Error:",
+        error
+      );
+
       setLocationMessage(error.message);
     } finally {
       setSelectingAddressId(null);
@@ -530,7 +674,10 @@ useEffect(() => {
   // =====================================
 
   useEffect(() => {
-    if (!locationOpen || locationQuery.trim().length < 3) {
+    if (
+      !locationOpen ||
+      locationQuery.trim().length < 3
+    ) {
       setLocationResults([]);
       return;
     }
@@ -541,9 +688,13 @@ useEffect(() => {
 
         const params = new URLSearchParams({
           format: "jsonv2",
+
           addressdetails: "1",
+
           limit: "5",
+
           countrycodes: "in",
+
           q: locationQuery,
         });
 
@@ -556,6 +707,7 @@ useEffect(() => {
         }
 
         const data = await response.json();
+
         setLocationResults(data);
       } catch {
         setLocationMessage(
@@ -576,22 +728,32 @@ useEffect(() => {
   const selectAddress = (place) => {
     const address = place.address || {};
 
-    const name =
-      [
-        address.road,
-        address.suburb || address.neighbourhood,
-        address.city || address.town || address.village,
-        address.state,
-        address.postcode,
-      ]
-        .filter(Boolean)
-        .join(", ") || place.display_name;
+    const name = [
+      address.road,
+
+      address.suburb ||
+        address.neighbourhood,
+
+      address.city ||
+        address.town ||
+        address.village,
+
+      address.state,
+
+      address.postcode,
+    ]
+      .filter(Boolean)
+      .join(", ") || place.display_name;
 
     saveLocation({
       name,
+
       fullAddress: place.display_name,
+
       latitude: Number(place.lat),
+
       longitude: Number(place.lon),
+
       source: "manual",
     });
   };
@@ -605,21 +767,30 @@ useEffect(() => {
       setLocationMessage(
         "Your browser does not support GPS location."
       );
+
       return;
     }
 
     setLocationLoading(true);
-    setLocationMessage("Detecting your current location...");
+
+    setLocationMessage(
+      "Detecting your current location..."
+    );
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
+        const latitude =
+          position.coords.latitude;
+
+        const longitude =
+          position.coords.longitude;
 
         try {
           const params = new URLSearchParams({
             format: "jsonv2",
+
             lat: String(latitude),
+
             lon: String(longitude),
           });
 
@@ -634,26 +805,42 @@ useEffect(() => {
           const data = await response.json();
 
           saveLocation({
-            name: data.display_name || "Current Location",
-            fullAddress: data.display_name || "Current Location",
+            name:
+              data.display_name ||
+              "Current Location",
+
+            fullAddress:
+              data.display_name ||
+              "Current Location",
+
             latitude,
+
             longitude,
+
             accuracy: position.coords.accuracy,
+
             source: "gps",
           });
         } catch {
           saveLocation({
             name: "Current GPS Location",
-            fullAddress: "Address could not be identified",
+
+            fullAddress:
+              "Address could not be identified",
+
             latitude,
+
             longitude,
+
             accuracy: position.coords.accuracy,
+
             source: "gps",
           });
         } finally {
           setLocationLoading(false);
         }
       },
+
       (error) => {
         setLocationLoading(false);
 
@@ -671,32 +858,35 @@ useEffect(() => {
           );
         }
       },
+
       {
         enableHighAccuracy: true,
+
         timeout: 20000,
+
         maximumAge: 0,
       }
     );
   };
 
   // =====================================
-// REQUEST ADDRESS ON WHATSAPP
-// =====================================
+  // REQUEST ADDRESS ON WHATSAPP
+  // =====================================
 
-const requestAddressOnWhatsApp = () => {
-  const message = encodeURIComponent(
-    "Hi! I want to place an order on ORGANIGO. Please share your delivery address or live location with me so I can use it for delivery."
-  );
+  const requestAddressOnWhatsApp = () => {
+    const message = encodeURIComponent(
+      "Hi! I want to place an order on ORGANIGO. Please share your delivery address or live location with me so I can use it for delivery."
+    );
 
-  window.open(
-    `https://wa.me/?text=${message}`,
-    "_blank",
-    "noopener,noreferrer"
-  );
-};
+    window.open(
+      `https://wa.me/?text=${message}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
 
   // =====================================
-  // DELIVERY TEXT
+  // DELIVERY INFORMATION
   // =====================================
 
   const deliveryText = selectedLocation
@@ -706,438 +896,790 @@ const requestAddressOnWhatsApp = () => {
         ? "Not Available"
         : "Verify Location"
     : "Select Location";
-const estimatedMinutes =
-  selectedLocation?.distance != null
-    ? Math.max(
-        10,
-        Math.ceil(5 + (Number(selectedLocation.distance) / 15) * 60)
-      )
-    : null;
 
-const displayDistance =
-  selectedLocation?.distance != null
-    ? Number(selectedLocation.distance) < 1
-      ? `${Math.round(Number(selectedLocation.distance) * 1000)} m away`
-      : `${Number(selectedLocation.distance).toFixed(1)} km away`
-    : "Set delivery location";
+  const estimatedMinutes =
+    selectedLocation?.distance != null
+      ? Math.max(
+          10,
+          Math.ceil(
+            5 +
+              (Number(selectedLocation.distance) /
+                15) *
+                60
+          )
+        )
+      : null;
+
+  const displayDistance =
+    selectedLocation?.distance != null
+      ? Number(selectedLocation.distance) < 1
+        ? `${Math.round(
+            Number(selectedLocation.distance) *
+              1000
+          )} m away`
+        : `${Number(
+            selectedLocation.distance
+          ).toFixed(1)} km away`
+      : "Set delivery location";
+
   // =====================================
   // HEADER UI
   // =====================================
 
   return (
     <header className="Organigo-header">
+
+      {/* APP BANNER */}
+
       <div className="organigo-app-banner">
-        <div className="app-banner-icon">🥬</div>
+        <div className="app-banner-icon">
+          🥬
+        </div>
 
         <div className="app-banner-text">
           <strong>ORGANIGO APP</strong>
-          <small>Get a fresher shopping experience!</small>
+
+          <small>
+            Get a fresher shopping experience!
+          </small>
         </div>
 
-        <button className="app-download-button" type="button" disabled>
+        <button
+          className="app-download-button"
+          type="button"
+          disabled
+        >
           Coming Soon
         </button>
       </div>
 
       <div className="header-container">
+
         {/* LOGO */}
 
-        <Link to="/" className="Organigo-logo">
-          <img src="/organigo-logo.png" alt="ORGANIGO" />
+        <Link
+          to="/"
+          className="Organigo-logo"
+        >
+          <img
+            src="/organigo-logo.png"
+            alt="ORGANIGO"
+          />
         </Link>
 
-       {/* ORGANIGO DELIVERY LOCATION */}
+        {/* DELIVERY LOCATION */}
 
-<button
-  type="button"
-  className="delivery-location organigo-location-bar"
-  onClick={() => {
-    setLocationOpen(true);
-    setLocationMessage("");
-    setAccountOpen(false);
+        <button
+          type="button"
+          className="delivery-location organigo-location-bar"
+          onClick={() => {
+            setLocationOpen(true);
 
-    if (user) {
-      loadSavedAddresses();
-    }
-  }}
->
-  <div className="organigo-location-top">
-    <strong>
-      ORGANIGO in {estimatedMinutes !== null
-        ? `${estimatedMinutes} minutes`
-        : "15 minutes"}
-    </strong>
+            setLocationMessage("");
 
-    {selectedLocation?.distance != null && (
-      <span className="organigo-distance-badge">
-        🚚 {displayDistance}
-      </span>
-    )}
-  </div>
+            setAccountOpen(false);
 
-  <div className="organigo-location-bottom">
-    <span className="organigo-address-label">
-      {selectedLocation ? "DELIVERING TO" : "SELECT LOCATION"}
-    </span>
+            if (user) {
+              loadSavedAddresses();
+            }
+          }}
+        >
+          <div className="organigo-location-top">
 
-    <strong className="organigo-address-name">
-      {selectedLocation
-        ? selectedLocation.name.split(",").slice(0, 2).join(", ")
-        : "Choose your delivery address"}
-    </strong>
+            <strong>
+              ORGANIGO in{" "}
+              {estimatedMinutes !== null
+                ? `${estimatedMinutes} minutes`
+                : "15 minutes"}
+            </strong>
 
-    <span className="location-edit-icon">⌄</span>
-  </div>
-</button>
+            {selectedLocation?.distance != null && (
+              <span className="organigo-distance-badge">
+                🚚 {displayDistance}
+              </span>
+            )}
+
+          </div>
+
+          <div className="organigo-location-bottom">
+
+            <span className="organigo-address-label">
+              {selectedLocation
+                ? "DELIVERING TO"
+                : "SELECT LOCATION"}
+            </span>
+
+            <strong className="organigo-address-name">
+              {selectedLocation
+                ? selectedLocation.name
+                    .split(",")
+                    .slice(0, 2)
+                    .join(", ")
+                : "Choose your delivery address"}
+            </strong>
+
+            <span className="location-edit-icon">
+              ⌄
+            </span>
+
+          </div>
+        </button>
+
         {/* SEARCH */}
 
         <div className="header-search">
+
           <span>🔍</span>
 
           <input
+            id="organigo-search"
+            name="search"
             type="text"
             placeholder="Search fruits, vegetables, juice..."
             value={searchQuery}
             onChange={handleSearch}
           />
+
         </div>
 
-        {/* CART */}
+        {/* DESKTOP CART */}
 
-        <Link to="/cart" className="header-cart">
-          <span className="cart-icon">🛒</span>
+        <Link
+          to="/cart"
+          className="header-cart"
+        >
+          <span className="cart-icon">
+            🛒
+          </span>
+
           <span>My Cart</span>
 
           {cartCount > 0 && (
             <span className="cart-count">
-              {cartCount > 99 ? "99+" : cartCount}
+              {cartCount > 99
+                ? "99+"
+                : cartCount}
             </span>
           )}
         </Link>
-      </div>
 
-      {/* LOCATION MODAL */}
+        {/* MOBILE ACCOUNT MENU */}
 
-      {locationOpen && (
         <div
-          className="location-modal-backdrop"
-          onClick={() => setLocationOpen(false)}
+          className="header-account"
+          ref={accountRef}
         >
-          <div
-            className="location-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="location-modal-title"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="location-modal-heading">
-              <div>
-                <h2 id="location-modal-title">
-                  Select Delivery Location
-                </h2>
 
-                <p>Choose where you want your order delivered.</p>
+          <button
+            type="button"
+            className="header-account-button"
+            aria-label="My Account"
+            aria-expanded={accountOpen}
+            onClick={() => {
+              if (!user) {
+                navigate("/login");
+                return;
+              }
+
+              setAccountOpen((prev) => !prev);
+            }}
+          >
+            <span className="account-icon">
+
+              <svg
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle
+                  cx="12"
+                  cy="8"
+                  r="4"
+                />
+
+                <path d="M4 21a8 8 0 0 1 16 0" />
+
+              </svg>
+
+            </span>
+          </button>
+
+          {user && accountOpen && (
+            <div className="account-dropdown">
+
+              <div className="account-dropdown-heading">
+
+                <strong>
+                  {user.name || "ORGANIGO Customer"}
+                </strong>
+
+                <small>
+                  {user.phone || ""}
+                </small>
+
               </div>
+
+              <Link
+                to="/my-orders"
+                onClick={() => setAccountOpen(false)}
+              >
+                My Orders
+              </Link>
+
+              <Link
+                to="/my-orders"
+                onClick={() => setAccountOpen(false)}
+              >
+                Order History
+              </Link>
+
+              <Link
+                to="/addresses"
+                onClick={() => setAccountOpen(false)}
+              >
+                Address Book
+              </Link>
+
+              <Link
+                to="/account"
+                onClick={() => setAccountOpen(false)}
+              >
+                Account & Privacy
+              </Link>
 
               <button
                 type="button"
-                className="location-modal-close"
-                onClick={() => setLocationOpen(false)}
+                className="account-logout-button"
+                onClick={handleLogout}
               >
-                ✕
+                Logout
               </button>
+
             </div>
+          )}
 
-{/* DEVICE LOCATION WARNING */}
-{locationPermission !== "granted" && (
-  <div className="location-permission-banner">
-    <div className="location-permission-icon">📍</div>
+        </div>
 
-    <div className="location-permission-text">
-      <strong>Device Location Not Enabled</strong>
-      <p>
-        Enable your location to find the nearest delivery address.
-      </p>
-    </div>
+        {/* DESKTOP LOGIN */}
 
-    <button
-      type="button"
-      onClick={useCurrentLocation}
-      disabled={locationLoading}
-    >
-      {locationLoading ? "Please wait..." : "Enable"}
-    </button>
-  </div>
-)}
+        <Link
+          to={user ? "/account" : "/login"}
+          className="header-login"
+        >
+          {user ? "My Account" : "Login"}
+        </Link>
 
-            {/* SAVED ADDRESSES */}
+        {/* =====================================
+            LOCATION MODAL
+        ===================================== */}
 
-            {user && (
-              <div className="saved-addresses-section">
-                <div className="saved-addresses-heading">
-                  <strong className="address-section-heading">
-  <svg
-    viewBox="0 0 24 24"
-    width="19"
-    height="19"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-    <circle cx="12" cy="10" r="2.5" />
-  </svg>
-  Your Saved Addresses
-</strong>
+        {locationOpen && (
 
-                  <Link
-                    to="/addresses"
-                    onClick={() => setLocationOpen(false)}
-                  >
-                    + Add New Address
-                  </Link>
+          <div
+            className="location-modal-backdrop"
+            onClick={() => setLocationOpen(false)}
+          >
+
+            <div
+              className="location-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="location-modal-title"
+              onClick={(event) =>
+                event.stopPropagation()
+              }
+            >
+
+              {/* MODAL HEADING */}
+
+              <div className="location-modal-heading">
+
+                <div>
+
+                  <h2 id="location-modal-title">
+                    Select Delivery Location
+                  </h2>
+
+                  <p>
+                    Choose where you want your order delivered.
+                  </p>
+
                 </div>
 
-                {addressesLoading ? (
-                  <p className="location-loading">
-                    Loading your saved addresses...
-                  </p>
-                ) : savedAddresses.length > 0 ? (
-                  <div className="saved-addresses-list">
-                    {savedAddresses.map((address) => (
-                      <button
-                        type="button"
-                        key={address._id}
-                        className={`saved-address-item ${
-                          selectedAddressId === address._id
-                            ? "selected"
-                            : ""
-                        }`}
-                        onClick={() => selectSavedAddress(address)}
-                        disabled={selectingAddressId !== null}
-                      >
-                       <span className="saved-address-icon">
-  {address.label === "Work" ? (
-    <svg viewBox="0 0 24 24" width="21" height="21"
-      fill="none" stroke="currentColor" strokeWidth="1.8"
-      strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="7" width="18" height="14" rx="2" />
-      <path d="M8 7V4h8v3M3 12h18M10 12v2h4v-2" />
-    </svg>
-  ) : address.label === "Other" ? (
-    <svg viewBox="0 0 24 24" width="21" height="21"
-      fill="none" stroke="currentColor" strokeWidth="1.8"
-      strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-      <circle cx="12" cy="10" r="2.5" />
-    </svg>
-  ) : (
-    <svg viewBox="0 0 24 24" width="21" height="21"
-      fill="none" stroke="currentColor" strokeWidth="1.8"
-      strokeLinecap="round" strokeLinejoin="round">
-      <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />
-      <path d="M9 21v-8h6v8" />
-    </svg>
-  )}
-</span>
-                        <div className="saved-address-details">
-                          <strong>
-                            {address.label || "Home"}
-                            {selectedAddressId === address._id &&
-                              " ✓"}
-                          </strong>
-
-                          <small>
-                            {[
-                              address.houseNo,
-                              address.area,
-                              address.landmark,
-                              address.city,
-                              address.state,
-                              address.pincode,
-                            ]
-                              .filter(Boolean)
-                              .join(", ")}
-                          </small>
-
-                          <small>
-                            {address.fullName} · {address.phone}
-                          </small>
-                        </div>
-
-                        {selectingAddressId === address._id && (
-                          <span>Saving...</span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="location-no-results">
-                    You have not saved any address yet.
-                    Click Add New Address to save one.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {!user && (
-              <div className="saved-addresses-section">
-                <p>
-                  Login to view and select your saved addresses.
-                </p>
-
-                <Link
-                  to="/login"
+                <button
+                  type="button"
+                  className="location-modal-close"
+                  aria-label="Close location dialog"
                   onClick={() => setLocationOpen(false)}
                 >
-                  Login to Your Account
-                </Link>
+                  ✕
+                </button>
+
               </div>
-            )}
 
-            <div className="location-divider">
-              <span>OR USE ANOTHER LOCATION</span>
-            </div>
+              {/* LOCATION PERMISSION */}
 
-            {/* GPS LOCATION */}
+              {locationPermission !== "granted" && (
 
-            <button
-  type="button"
-  className="use-current-location-btn"
-  onClick={useCurrentLocation}
-  disabled={locationLoading}
->
-  <svg
-    viewBox="0 0 24 24"
-    width="21"
-    height="21"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-    <circle cx="12" cy="10" r="2.5" />
-  </svg>
+                <div className="location-permission-banner">
 
-  {locationLoading ? "Detecting Location..." : "Use My Current Location"}
-</button>
+                  <div className="location-permission-icon">
+                    📍
+                  </div>
 
-{/* REQUEST ADDRESS FROM SOMEONE ELSE */}
+                  <div className="location-permission-text">
 
-<button
-  type="button"
-  className="request-address-btn"
-  onClick={requestAddressOnWhatsApp}
->
-  <span className="request-address-icon">☏</span>
+                    <strong>
+                      Device Location Not Enabled
+                    </strong>
 
-  <span>Request Address from Someone Else</span>
+                    <p>
+                      Enable your location to find the nearest delivery address.
+                    </p>
 
-  <span className="request-address-arrow">›</span>
-</button>
+                  </div>
 
-            {/* MANUAL SEARCH */}
-
-            <div className="location-search-box">
-              <span>🔍</span>
-
-              <input
-                type="text"
-                placeholder="Enter area, street, city or PIN code..."
-                value={locationQuery}
-                onChange={(e) => {
-                  setLocationQuery(e.target.value);
-                  setLocationMessage("");
-                }}
-              />
-            </div>
-
-            {locationLoading && (
-              <p className="location-loading">
-                Finding your location...
-              </p>
-            )}
-
-            {locationMessage && (
-              <p className="location-error">
-                {locationMessage}
-              </p>
-            )}
-
-            {locationResults.length > 0 && (
-              <div className="location-results">
-                {locationResults.map((place) => (
                   <button
                     type="button"
-                    key={place.place_id}
-                    className="location-result-item"
-                    onClick={() => selectAddress(place)}
+                    onClick={useCurrentLocation}
+                    disabled={locationLoading}
                   >
-                   <span className="modern-location-icon">
-  <svg
-    viewBox="0 0 24 24"
-    width="20"
-    height="20"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-    <circle cx="12" cy="10" r="2.5" />
-  </svg>
-</span>
-
-                    <div>
-                      <strong>
-                        {place.name ||
-                          place.display_name.split(",")[0]}
-                      </strong>
-
-                      <small>{place.display_name}</small>
-                    </div>
+                    {locationLoading
+                      ? "Please wait..."
+                      : "Enable"}
                   </button>
-                ))}
-              </div>
-            )}
 
-            {locationQuery.trim().length >= 3 &&
-              !locationLoading &&
-              locationResults.length === 0 &&
-              !locationMessage && (
-                <p className="location-no-results">
-                  No matching address found. Try another area or PIN code.
+                </div>
+              )}
+
+              {/* SAVED ADDRESSES */}
+
+              {user && (
+
+                <div className="saved-addresses-section">
+
+                  <div className="saved-addresses-heading">
+
+                    <strong className="address-section-heading">
+
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="19"
+                        height="19"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+
+                        <circle
+                          cx="12"
+                          cy="10"
+                          r="2.5"
+                        />
+                      </svg>
+
+                      Your Saved Addresses
+
+                    </strong>
+
+                    <Link
+                      to="/addresses"
+                      onClick={() => setLocationOpen(false)}
+                    >
+                      + Add New Address
+                    </Link>
+
+                  </div>
+
+                  {addressesLoading ? (
+
+                    <p className="location-loading">
+                      Loading your saved addresses...
+                    </p>
+
+                  ) : savedAddresses.length > 0 ? (
+
+                    <div className="saved-addresses-list">
+
+                      {savedAddresses.map((address) => (
+
+                        <button
+                          type="button"
+                          key={address._id}
+                          className={`saved-address-item ${
+                            selectedAddressId === address._id
+                              ? "selected"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            selectSavedAddress(address)
+                          }
+                          disabled={
+                            selectingAddressId !== null
+                          }
+                        >
+
+                          <span className="saved-address-icon">
+
+                            {address.label === "Work" ? (
+
+                              <svg
+                                viewBox="0 0 24 24"
+                                width="21"
+                                height="21"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <rect
+                                  x="3"
+                                  y="7"
+                                  width="18"
+                                  height="14"
+                                  rx="2"
+                                />
+
+                                <path d="M8 7V4h8v3M3 12h18M10 12v2h4v-2" />
+
+                              </svg>
+
+                            ) : address.label === "Other" ? (
+
+                              <svg
+                                viewBox="0 0 24 24"
+                                width="21"
+                                height="21"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+
+                                <circle
+                                  cx="12"
+                                  cy="10"
+                                  r="2.5"
+                                />
+
+                              </svg>
+
+                            ) : (
+
+                              <svg
+                                viewBox="0 0 24 24"
+                                width="21"
+                                height="21"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />
+
+                                <path d="M9 21v-8h6v8" />
+
+                              </svg>
+
+                            )}
+
+                          </span>
+
+                          <div className="saved-address-details">
+
+                            <strong>
+                              {address.label || "Home"}
+
+                              {selectedAddressId === address._id &&
+                                " ✓"}
+                            </strong>
+
+                            <small>
+                              {[
+                                address.houseNo,
+                                address.area,
+                                address.landmark,
+                                address.city,
+                                address.state,
+                                address.pincode,
+                              ]
+                                .filter(Boolean)
+                                .join(", ")}
+                            </small>
+
+                            <small>
+                              {address.fullName} · {address.phone}
+                            </small>
+
+                          </div>
+
+                          {selectingAddressId === address._id && (
+                            <span>Saving...</span>
+                          )}
+
+                        </button>
+
+                      ))}
+
+                    </div>
+
+                  ) : (
+
+                    <p className="location-no-results">
+                      You have not saved any address yet.
+                      Click Add New Address to save one.
+                    </p>
+
+                  )}
+
+                </div>
+              )}
+
+              {/* LOGIN MESSAGE */}
+
+              {!user && (
+
+                <div className="saved-addresses-section">
+
+                  <p>
+                    Login to view and select your saved addresses.
+                  </p>
+
+                  <Link
+                    to="/login"
+                    onClick={() => setLocationOpen(false)}
+                  >
+                    Login to Your Account
+                  </Link>
+
+                </div>
+              )}
+
+              {/* DIVIDER */}
+
+              <div className="location-divider">
+                <span>
+                  OR USE ANOTHER LOCATION
+                </span>
+              </div>
+
+              {/* GPS LOCATION */}
+
+              <button
+                type="button"
+                className="use-current-location-btn"
+                onClick={useCurrentLocation}
+                disabled={locationLoading}
+              >
+
+                <svg
+                  viewBox="0 0 24 24"
+                  width="21"
+                  height="21"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+
+                  <circle
+                    cx="12"
+                    cy="10"
+                    r="2.5"
+                  />
+                </svg>
+
+                {locationLoading
+                  ? "Detecting Location..."
+                  : "Use My Current Location"}
+
+              </button>
+
+              {/* REQUEST ADDRESS */}
+
+              <button
+                type="button"
+                className="request-address-btn"
+                onClick={requestAddressOnWhatsApp}
+              >
+
+                <span className="request-address-icon">
+                  ☏
+                </span>
+
+                <span>
+                  Request Address from Someone Else
+                </span>
+
+                <span className="request-address-arrow">
+                  ›
+                </span>
+
+              </button>
+
+              {/* MANUAL LOCATION SEARCH */}
+
+              <div className="location-search-box">
+
+                <span>🔍</span>
+
+                <input
+                  type="text"
+                  id="organigo-location-search"
+                  name="deliveryLocation"
+                  placeholder="Enter area, street, city or PIN code..."
+                  value={locationQuery}
+                  onChange={(event) => {
+                    setLocationQuery(event.target.value);
+
+                    setLocationMessage("");
+                  }}
+                />
+
+              </div>
+
+              {/* LOADING */}
+
+              {locationLoading && (
+                <p className="location-loading">
+                  Finding your location...
                 </p>
               )}
 
-            {selectedLocation && (
-              <div className="current-selected-location">
-                <strong>Currently selected location</strong>
+              {/* ERROR */}
 
-                <p>{selectedLocation.name}</p>
+              {locationMessage && (
+                <p className="location-error">
+                  {locationMessage}
+                </p>
+              )}
 
-                <small>
-                  {selectedLocation.available === true
-                    ? `✓ Delivery available · ${selectedLocation.distance} KM from hub`
-                    : selectedLocation.available === false
-                      ? `✕ Outside delivery area · ${selectedLocation.distance} KM from hub`
-                      : "Location coordinates need verification."}
-                </small>
-              </div>
-            )}
+              {/* SEARCH RESULTS */}
 
-            <p className="location-modal-footer">
-              Delivery availability is calculated using your selected
-              location and the current ORGANIGO delivery radius.
-            </p>
+              {locationResults.length > 0 && (
+
+                <div className="location-results">
+
+                  {locationResults.map((place) => (
+
+                    <button
+                      type="button"
+                      key={place.place_id}
+                      className="location-result-item"
+                      onClick={() => selectAddress(place)}
+                    >
+
+                      <span className="modern-location-icon">
+
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="20"
+                          height="20"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+
+                          <circle
+                            cx="12"
+                            cy="10"
+                            r="2.5"
+                          />
+                        </svg>
+
+                      </span>
+
+                      <div>
+
+                        <strong>
+                          {place.name ||
+                            place.display_name.split(",")[0]}
+                        </strong>
+
+                        <small>
+                          {place.display_name}
+                        </small>
+
+                      </div>
+
+                    </button>
+
+                  ))}
+
+                </div>
+              )}
+
+              {/* NO RESULTS */}
+
+              {locationQuery.trim().length >= 3 &&
+                !locationLoading &&
+                locationResults.length === 0 &&
+                !locationMessage && (
+
+                  <p className="location-no-results">
+                    No matching address found.
+                    Try another area or PIN code.
+                  </p>
+
+                )}
+
+              {/* CURRENT LOCATION */}
+
+              {selectedLocation && (
+
+                <div className="current-selected-location">
+
+                  <strong>
+                    Currently selected location
+                  </strong>
+
+                  <p>
+                    {selectedLocation.name}
+                  </p>
+
+                  <small>
+
+                    {selectedLocation.available === true
+                      ? `✓ Delivery available · ${selectedLocation.distance} KM from hub`
+                      : selectedLocation.available === false
+                        ? `✕ Outside delivery area · ${selectedLocation.distance} KM from hub`
+                        : "Location coordinates need verification."}
+
+                  </small>
+
+                </div>
+              )}
+
+              {/* FOOTER */}
+
+              <p className="location-modal-footer">
+                Delivery availability is calculated using your selected
+                location and the current ORGANIGO delivery radius.
+              </p>
+
+            </div>
+
           </div>
-        </div>
-      )}
+        )}
+
+      </div>
     </header>
   );
 }

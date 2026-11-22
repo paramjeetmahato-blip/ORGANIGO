@@ -1,9 +1,10 @@
+import API_BASE_URL from "../services/api";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { getToken, getUser, clearSession } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import "../styles/Admin.css";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = `${API_BASE_URL}/api`;
 
 const defaultDeliverySettings = {
   businessName: "ORGANIGO",

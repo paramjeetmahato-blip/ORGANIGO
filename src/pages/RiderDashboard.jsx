@@ -1,6 +1,7 @@
+import API_BASE_URL from "../services/api";
 import React, { useCallback, useEffect, useState } from "react";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = `${API_BASE_URL}/api`;
 
 function RiderDashboard() {
   const [orders, setOrders] = useState([]);

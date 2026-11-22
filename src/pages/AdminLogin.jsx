@@ -1,9 +1,10 @@
+import API_BASE_URL from "../services/api";
 import { useState } from "react";
 import { saveSession } from "../utils/auth";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles/Auth.css";
 
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = `${API_BASE_URL}/api/auth`;
 
 function AdminLogin() {
   const navigate = useNavigate();

@@ -1,8 +1,9 @@
+import API_BASE_URL from "../services/api";
 import { useState, useEffect, useCallback } from "react";
 import { getToken, getUser } from "../utils/auth";
 import { Link, useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = `${API_BASE_URL}/api`;
 
 function MyOrders() {
   const navigate = useNavigate();

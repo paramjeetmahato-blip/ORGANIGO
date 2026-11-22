@@ -1,7 +1,7 @@
-/* =========================================
-   ORGANIGO - CLEAN PREMIUM HEADER
-   Natural Fresh Green Theme
-========================================= */
+/* =====================================================
+   ORGANIGO - PREMIUM RESPONSIVE HEADER
+   Natural Green Theme
+===================================================== */
 
 .Organigo-header,
 .Organigo-header * {
@@ -23,9 +23,9 @@
   display: none;
 }
 
-/* =========================================
+/* =====================================================
    MAIN HEADER
-========================================= */
+===================================================== */
 
 .header-container {
   width: 100%;
@@ -40,9 +40,9 @@
   gap: 18px;
 }
 
-/* =========================================
+/* =====================================================
    LOGO
-========================================= */
+===================================================== */
 
 .Organigo-logo {
   flex: 0 0 130px;
@@ -55,7 +55,6 @@
 
   text-decoration: none;
   border-radius: 12px;
-  transition: 0.25s ease;
 }
 
 .Organigo-logo img {
@@ -69,9 +68,9 @@
   transform: scale(1.04);
 }
 
-/* =========================================
+/* =====================================================
    DELIVERY LOCATION
-========================================= */
+===================================================== */
 
 .delivery-location {
   flex: 0 0 230px;
@@ -144,9 +143,9 @@
   color: #159447;
 }
 
-/* =========================================
+/* =====================================================
    SEARCH BAR
-========================================= */
+===================================================== */
 
 .header-search {
   flex: 1;
@@ -169,7 +168,6 @@
 }
 
 .header-search:focus-within {
-  background: #ffffff;
   border-color: #159447;
   box-shadow: 0 0 0 3px rgba(21, 148, 71, 0.09);
 }
@@ -196,9 +194,9 @@
   color: #8b978d;
 }
 
-/* =========================================
+/* =====================================================
    HYGIENE BADGE
-========================================= */
+===================================================== */
 
 .hygiene-badge {
   flex: 0 0 auto;
@@ -229,11 +227,12 @@
   font-size: 8px;
 }
 
-/* =========================================
-   ACCOUNT
-========================================= */
+/* =====================================================
+   ACCOUNT BUTTON
+===================================================== */
 
 .header-account {
+  display: none;
   position: relative;
   flex-shrink: 0;
 }
@@ -244,6 +243,7 @@
 
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 
   background: #ffffff;
@@ -275,6 +275,10 @@
   font-size: 17px;
 }
 
+.account-icon svg {
+  display: block;
+}
+
 .account-button-text {
   display: flex;
   flex-direction: column;
@@ -299,13 +303,16 @@
   color: #159447;
 }
 
-/* ACCOUNT DROPDOWN */
+/* =====================================================
+   ACCOUNT DROPDOWN
+===================================================== */
 
 .account-dropdown {
   position: absolute;
   top: calc(100% + 12px);
   right: 0;
   width: 245px;
+  max-width: calc(100vw - 20px);
   padding: 10px;
 
   display: flex;
@@ -391,9 +398,9 @@
   background: #fff0f0;
 }
 
-/* =========================================
-   CART
-========================================= */
+/* =====================================================
+   CART BUTTON
+===================================================== */
 
 .header-cart {
   min-width: 125px;
@@ -453,9 +460,88 @@
   font-weight: 800;
 }
 
-/* =========================================
+/* =====================================================
+   DESKTOP LOGIN
+===================================================== */
+
+.header-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+
+  background: #198754;
+  color: #ffffff;
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+
+  transition: 0.3s ease;
+}
+
+.header-login:hover {
+  background: #146c43;
+  transform: translateY(-2px);
+}
+
+/* =====================================================
+   APP BANNER
+===================================================== */
+
+.app-banner-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ffffff;
+  border-radius: 10px;
+  font-size: 21px;
+}
+
+.app-banner-text {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.app-banner-text strong {
+  color: #086b32;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.app-banner-text small {
+  color: #526c59;
+  font-size: 9px;
+}
+
+.app-download-button {
+  flex-shrink: 0;
+  padding: 8px 10px;
+
+  border: none;
+  border-radius: 7px;
+
+  color: #ffffff;
+  background: #159447;
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* =====================================================
    LOCATION MODAL
-========================================= */
+===================================================== */
 
 .location-modal-overlay,
 .location-modal-backdrop {
@@ -478,8 +564,9 @@
 .location-modal-content {
   width: 100%;
   max-width: 480px;
-  max-height: 85vh;
+  max-height: 92vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
 
   padding: 25px;
 
@@ -488,6 +575,7 @@
   box-shadow: 0 20px 70px rgba(0, 0, 0, 0.2);
 
   animation: locationPopup 0.25s ease;
+  font-family: "DM Sans", Arial, sans-serif;
 }
 
 @keyframes locationPopup {
@@ -502,9 +590,10 @@
   }
 }
 
-.location-modal-header {
+.location-modal-header,
+.location-modal-heading {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 20px;
@@ -512,14 +601,16 @@
 
 .location-modal-header h2,
 .location-modal h2,
-.location-modal-title {
+.location-modal-title,
+.location-modal-heading h2 {
   margin: 0;
   color: #173d26;
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 900;
 }
 
-.location-modal-header p {
+.location-modal-header p,
+.location-modal-heading p {
   margin: 6px 0 0;
   color: #7b897e;
   font-size: 12px;
@@ -553,49 +644,12 @@
   color: #e33434;
 }
 
-/* =========================================
-   GPS LOCATION BUTTON
-========================================= */
+/* =====================================================
+   GPS BUTTONS
+===================================================== */
 
 .gps-location-btn,
-.current-location-btn {
-  width: 100%;
-  min-height: 53px;
-  padding: 12px 15px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  color: #ffffff;
-  background: #159447;
-  border: none;
-  border-radius: 12px;
-
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 800;
-
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
-.gps-location-btn:hover,
-.current-location-btn:hover {
-  background: #087a36;
-  box-shadow: 0 5px 15px rgba(21, 148, 71, 0.18);
-}
-
-.gps-location-btn:disabled,
-.current-location-btn:disabled,
-.use-current-location-btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-/* CURRENT LOCATION - OUTLINED STYLE */
-
+.current-location-btn,
 .use-current-location-btn {
   width: 100%;
   min-height: 53px;
@@ -606,9 +660,6 @@
   justify-content: center;
   gap: 10px;
 
-  color: #218838;
-  background: #f0f9f1;
-  border: 1px solid #218838;
   border-radius: 12px;
 
   font-family: inherit;
@@ -619,9 +670,23 @@
   transition: 0.25s ease;
 }
 
-.use-current-location-btn svg {
-  display: block;
-  flex-shrink: 0;
+.gps-location-btn,
+.current-location-btn {
+  color: #ffffff;
+  background: #159447;
+  border: none;
+}
+
+.gps-location-btn:hover,
+.current-location-btn:hover {
+  background: #087a36;
+  box-shadow: 0 5px 15px rgba(21, 148, 71, 0.18);
+}
+
+.use-current-location-btn {
+  color: #218838;
+  background: #f0f9f1;
+  border: 1px solid #218838;
 }
 
 .use-current-location-btn:hover:not(:disabled) {
@@ -629,9 +694,21 @@
   background: #218838;
 }
 
-/* =========================================
+.use-current-location-btn svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.gps-location-btn:disabled,
+.current-location-btn:disabled,
+.use-current-location-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* =====================================================
    LOCATION DIVIDER
-========================================= */
+===================================================== */
 
 .location-divider {
   display: flex;
@@ -652,9 +729,9 @@
   background: #e8eee9;
 }
 
-/* =========================================
-   MANUAL ADDRESS SEARCH
-========================================= */
+/* =====================================================
+   MANUAL LOCATION SEARCH
+===================================================== */
 
 .location-search-box,
 .manual-location-search {
@@ -703,9 +780,9 @@
   color: #98a39a;
 }
 
-/* =========================================
+/* =====================================================
    LOCATION SEARCH RESULTS
-========================================= */
+===================================================== */
 
 .location-results,
 .location-suggestions {
@@ -768,9 +845,9 @@
   line-height: 1.5;
 }
 
-/* =========================================
+/* =====================================================
    SAVED ADDRESSES
-========================================= */
+===================================================== */
 
 .address-section-heading {
   display: flex;
@@ -785,6 +862,75 @@
 .address-section-heading svg {
   color: #218838;
   flex-shrink: 0;
+}
+
+.saved-addresses-section {
+  margin-bottom: 18px;
+}
+
+.saved-addresses-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 13px;
+}
+
+.saved-addresses-heading > a {
+  color: #16843b;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.saved-addresses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.saved-address-item {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+
+  background: #ffffff;
+  border: 1px solid #e4eee6;
+  border-radius: 13px;
+
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.saved-address-item:hover,
+.saved-address-item.selected {
+  background: #f0faf2;
+  border-color: #159447;
+  box-shadow: 0 3px 10px rgba(21, 148, 71, 0.08);
+}
+
+.saved-address-details {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.saved-address-details strong {
+  color: #263b2c;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.saved-address-details small {
+  color: #77847a;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .saved-address-icon {
@@ -817,9 +963,9 @@
   display: block;
 }
 
-/* =========================================
+/* =====================================================
    LOCATION MESSAGES
-========================================= */
+===================================================== */
 
 .location-message,
 .location-status,
@@ -848,9 +994,9 @@
   border: 1px solid #c9ebd2;
 }
 
-/* =========================================
+/* =====================================================
    SELECTED LOCATION
-========================================= */
+===================================================== */
 
 .selected-location,
 .saved-location {
@@ -880,10 +1026,6 @@
   line-height: 1.6;
 }
 
-/* =========================================
-   DELIVERY AVAILABILITY
-========================================= */
-
 .delivery-available {
   color: #087a36;
   background: #eaf8ee;
@@ -894,61 +1036,173 @@
   background: #fff0f0;
 }
 
-/* =========================================
-   APP BANNER
-========================================= */
+.location-modal-footer {
+  margin-top: 13px;
+  color: #718075;
+  font-size: 11px;
+  line-height: 1.5;
+}
 
-.app-banner-icon {
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
+/* =====================================================
+   LOCATION PERMISSION WARNING
+===================================================== */
 
+.location-permission-banner {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 12px;
+  padding: 14px;
+  margin-bottom: 18px;
 
-  background: #ffffff;
-  border-radius: 10px;
-  font-size: 21px;
+  background: #fff0f1;
+  border: 1px solid #ffd9dc;
+  border-radius: 12px;
 }
 
-.app-banner-text {
+.location-permission-icon {
+  font-size: 25px;
+}
+
+.location-permission-text {
   flex: 1;
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
 }
 
-.app-banner-text strong {
-  color: #086b32;
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.app-banner-text small {
-  color: #526c59;
-  font-size: 9px;
-}
-
-.app-download-button {
-  flex-shrink: 0;
-  padding: 8px 10px;
-
-  border: none;
-  border-radius: 7px;
-
-  color: #ffffff;
-  background: #159447;
-
-  font-size: 9px;
+.location-permission-text strong {
+  display: block;
+  color: #d83b50;
+  font-size: 13px;
   font-weight: 800;
 }
 
-/* =========================================
-   TABLET / SMALL LAPTOP
-========================================= */
+.location-permission-text p {
+  margin: 4px 0 0;
+  color: #777;
+  font-size: 11px;
+}
+
+.location-permission-banner button {
+  border: none;
+  border-radius: 7px;
+  background: #e84459;
+  color: #ffffff;
+  padding: 8px 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* =====================================================
+   REQUEST ADDRESS BUTTON
+===================================================== */
+
+.request-address-btn {
+  width: 100%;
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 16px;
+  margin: 12px 0;
+
+  background: #ffffff;
+  border: 1px solid #e8eee9;
+  border-radius: 12px;
+
+  color: #26382b;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+  text-align: left;
+}
+
+.request-address-icon {
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  background: #e5f8e9;
+  color: #16843b;
+  border-radius: 9px;
+  font-size: 23px;
+}
+
+.request-address-btn span:nth-child(2) {
+  flex: 1;
+}
+
+.request-address-arrow {
+  font-size: 25px;
+  color: #89928c;
+}
+
+/* =====================================================
+   ORGANIGO MOBILE LOCATION BAR
+===================================================== */
+
+.organigo-location-bar {
+  width: 100%;
+}
+
+.organigo-location-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.organigo-location-top > strong {
+  color: #176b32;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+.organigo-distance-badge {
+  background: linear-gradient(135deg, #ff9638, #ff6b27);
+  color: #ffffff;
+
+  padding: 4px 8px;
+  border-radius: 20px;
+
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+
+  box-shadow: 0 2px 5px rgba(255, 107, 39, 0.25);
+}
+
+.organigo-location-bottom {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.organigo-address-label {
+  color: #66816a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.organigo-address-name {
+  color: #176b32;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.organigo-location-bottom .location-edit-icon {
+  color: #f07828;
+  font-size: 15px;
+}
+
+/* =====================================================
+   TABLET
+===================================================== */
 
 @media (min-width: 651px) and (max-width: 1100px) {
 
@@ -957,9 +1211,9 @@
     padding: 12px 18px;
 
     display: grid;
-    grid-template-columns: 105px minmax(150px, 1fr) auto auto;
+    grid-template-columns: 105px minmax(130px, 1fr) auto auto;
     grid-template-areas:
-      "logo location account cart"
+      "logo location login cart"
       "search search search search";
 
     gap: 10px;
@@ -989,29 +1243,49 @@
     height: 44px;
   }
 
-  .header-account {
-    grid-area: account;
+  .header-login {
+    grid-area: login;
+    display: inline-flex;
+    padding: 11px 13px;
+    font-size: 12px;
   }
 
   .header-cart {
     grid-area: cart;
-    min-width: 105px;
+    min-width: 95px;
+    padding: 0 10px;
   }
 
+  .header-account,
   .hygiene-badge {
     display: none;
   }
 }
 
-/* =========================================
+/* =====================================================
+   DESKTOP
+===================================================== */
+
+@media (min-width: 1101px) {
+
+  .header-account {
+    display: none;
+  }
+
+  .header-login {
+    display: inline-flex;
+  }
+}
+
+/* =====================================================
    MOBILE HEADER
-========================================= */
+===================================================== */
 
 @media (max-width: 650px) {
 
   .Organigo-header {
-    background: linear-gradient(160deg, #eaf8e9, #d9f2dc);
-    border-bottom: 1px solid #c8e7cd;
+    background: #f7f9e9;
+    border-bottom: 1px solid #d6ecd4;
   }
 
   /* APP BANNER */
@@ -1034,18 +1308,17 @@
   .header-container {
     width: 100%;
     min-height: auto;
-    padding: 11px 12px 13px;
+    padding: 10px 12px 12px;
 
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
-
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-      "location account cart"
-      "search search search";
+      "location account"
+      "search search";
 
     align-items: center;
-    column-gap: 7px;
-    row-gap: 11px;
+    column-gap: 10px;
+    row-gap: 10px;
   }
 
   .Organigo-logo {
@@ -1058,87 +1331,112 @@
     grid-area: location;
     width: 100%;
     min-width: 0;
-    min-height: 44px;
-    padding: 4px 5px;
+    min-height: 55px;
+    padding: 5px 0;
+
+    display: flex;
+    align-items: center;
+    gap: 9px;
 
     background: transparent;
     border: none;
-    gap: 7px;
+    border-radius: 0;
   }
 
   .delivery-location:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: transparent;
     border: none;
   }
 
   .location-icon {
-    width: 32px;
-    height: 32px;
-    background: #ffffff;
+    width: 25px;
+    height: 25px;
+    background: transparent;
+    color: #278b39;
+  }
+
+  .location-icon svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .delivery-location div {
+    flex: 1;
+    min-width: 0;
+    gap: 3px;
   }
 
   .delivery-location small {
-    color: #617b65;
-    font-size: 9px;
+    font-size: 10px;
+    color: #737b69;
+    font-weight: 600;
   }
 
   .delivery-location strong {
-    max-width: 190px;
-    font-size: 11px;
-    font-weight: 900;
+    max-width: 100%;
+    font-size: 14px;
+    color: #222b1f;
+    font-weight: 800;
   }
 
-  /* ACCOUNT */
+  /* MOBILE ACCOUNT */
 
   .header-account {
+    display: block;
     grid-area: account;
+    position: relative;
   }
 
   .header-account-button {
-    min-height: 42px;
-    padding: 4px 7px;
-    gap: 5px;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+    border: 1px solid #d8ebdc;
+    border-radius: 50%;
+  }
+
+  .header-account-button:active {
+    background: #e8f7ec;
   }
 
   .account-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 15px;
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #e4f5e8;
+    color: #159447;
+    border-radius: 50%;
   }
 
-  .account-button-text {
-    gap: 2px;
-  }
-
-  .account-button-text small {
-    font-size: 8px;
-  }
-
-  .account-button-text strong {
-    max-width: 75px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 9px;
-  }
-
+  .account-button-text,
   .account-arrow {
-    font-size: 11px;
+    display: none;
   }
 
   .account-dropdown {
     width: 230px;
+    max-width: calc(100vw - 20px);
     right: 0;
     top: calc(100% + 9px);
+    z-index: 9999;
   }
 
-  /* CART */
+  /* HIDE DESKTOP CART AND LOGIN */
 
-  .header-cart {
-    grid-area: cart;
-    min-width: 88px;
-    min-height: 42px;
-    padding: 0 9px;
-    font-size: 11px;
+  .header-cart,
+  .header-login {
+    display: none !important;
   }
 
   /* SEARCH */
@@ -1148,13 +1446,13 @@
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    height: 46px;
+    height: 45px;
 
     padding: 0 13px;
 
     background: #ffffff;
     border: 1px solid #d9e9db;
-    border-radius: 11px;
+    border-radius: 10px;
 
     box-shadow: 0 2px 7px rgba(30, 90, 40, 0.05);
   }
@@ -1163,10 +1461,61 @@
     font-size: 13px;
   }
 
-  /* HIDE DESKTOP BADGE */
-
   .hygiene-badge {
     display: none;
+  }
+
+  /* LOCATION BAR */
+
+  .Organigo-header .organigo-location-bar {
+    height: 50px !important;
+    min-height: 50px !important;
+    padding: 4px 9px !important;
+    gap: 2px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+
+    background: linear-gradient(120deg, #e5f7e9, #f0fae9) !important;
+    border: 1px solid #c8e8ce !important;
+    border-radius: 9px !important;
+
+    box-shadow: 0 2px 7px rgba(30, 120, 55, 0.08);
+  }
+
+  .organigo-location-top {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+  }
+
+  .organigo-location-top > strong {
+    color: #167b38 !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+  }
+
+  .organigo-distance-badge {
+    padding: 2px 5px !important;
+    font-size: 8px !important;
+  }
+
+  .organigo-location-bottom {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .organigo-address-label {
+    font-size: 8px !important;
+  }
+
+  .organigo-address-name {
+    font-size: 10px !important;
   }
 
   /* LOCATION MODAL */
@@ -1181,7 +1530,7 @@
   .location-modal-content {
     width: 100%;
     max-width: 100%;
-    max-height: 88vh;
+    max-height: 90vh;
 
     padding: 22px 17px 28px;
 
@@ -1190,7 +1539,8 @@
 
   .location-modal-header h2,
   .location-modal h2,
-  .location-modal-title {
+  .location-modal-title,
+  .location-modal-heading h2 {
     font-size: 19px;
   }
 
@@ -1220,11 +1570,19 @@
     height: 38px;
     min-width: 38px;
   }
+
+  .saved-address-item {
+    padding: 12px;
+  }
+
+  .saved-address-details small {
+    font-size: 11px;
+  }
 }
 
-/* =========================================
+/* =====================================================
    SMALL MOBILE
-========================================= */
+===================================================== */
 
 @media (max-width: 360px) {
 
@@ -1244,33 +1602,17 @@
   }
 
   .header-account-button {
-    padding: 4px 5px;
-    gap: 3px;
-  }
-
-  .account-button-text strong {
-    max-width: 60px;
-    font-size: 8px;
+    width: 40px;
+    height: 40px;
   }
 
   .account-icon {
-    width: 25px;
-    height: 25px;
-    font-size: 13px;
-  }
-
-  .account-arrow {
-    font-size: 10px;
+    width: 30px;
+    height: 30px;
   }
 
   .account-dropdown {
     width: 215px;
-  }
-
-  .header-cart {
-    min-width: 80px;
-    padding: 0 7px;
-    font-size: 10px;
   }
 
   .app-banner-text small {
@@ -1283,15 +1625,16 @@
   }
 }
 
-/* =========================================
+/* =====================================================
    ACCOUNT PAGE - SEARCH ONLY HEADER
-========================================= */
+===================================================== */
 
 .Organigo-header.profile-search-only .organigo-app-banner,
 .Organigo-header.profile-search-only .Organigo-logo,
 .Organigo-header.profile-search-only .delivery-location,
 .Organigo-header.profile-search-only .header-account,
-.Organigo-header.profile-search-only .header-cart {
+.Organigo-header.profile-search-only .header-cart,
+.Organigo-header.profile-search-only .header-login {
   display: none !important;
 }
 
@@ -1351,525 +1694,81 @@
     padding: 8px;
   }
 }
-/* =====================================
-   ORGANIGO - BLINKIT STYLE MOBILE LOCATION
-===================================== */
 
-@media (max-width: 650px) {
-
-  .Organigo-header {
-    background: #f7f9e9;
-  }
-
-  .header-container {
-    grid-template-columns: minmax(0, 1fr) auto !important;
-    grid-template-areas:
-      "location cart"
-      "search search" !important;
-    column-gap: 10px;
-    row-gap: 10px;
-    padding: 10px 12px 12px;
-  }
-
-  .delivery-location {
-    grid-area: location;
-    width: 100%;
-    min-height: 55px;
-    padding: 5px 0;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    background: transparent;
-    border: none;
-    border-radius: 0;
-  }
-
-  .delivery-location:hover {
-    background: transparent;
-  }
-
-  .location-icon {
-    width: 25px;
-    height: 25px;
-    background: transparent;
-    color: #278b39;
-  }
-
-  .location-icon svg {
-    width: 23px;
-    height: 23px;
-  }
-
-  .delivery-location div {
-    flex: 1;
-    min-width: 0;
-    gap: 3px;
-  }
-
-  .delivery-location small {
-    font-size: 10px;
-    color: #737b69;
-    font-weight: 600;
-  }
-
-  .delivery-location strong {
-    max-width: 100%;
-    font-size: 14px;
-    color: #222b1f;
-    font-weight: 800;
-  }
-
-  .delivery-location .location-edit-icon {
-    font-size: 17px;
-    color: #278b39;
-  }
-
-  .header-cart {
-    grid-area: cart;
-  }
-
-  .header-search {
-    grid-area: search;
-    height: 45px;
-    border-radius: 10px;
-    background: #ffffff;
-  }
-}
-/* ORGANIGO GREEN DELIVERY LOCATION BAR */
-
-@media (max-width: 650px) {
-
-  .organigo-location-bar {
-    background: #eaf7e9 !important;
-    border: 1px solid #d6ecd4 !important;
-    border-radius: 12px !important;
-    padding: 10px 12px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 7px !important;
-    width: 100%;
-    text-align: left;
-  }
-
-  .organigo-location-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .organigo-location-top > strong {
-    color: #176b32;
-    font-size: 17px;
-    font-weight: 800;
-  }
-
-  .organigo-distance-badge {
-    background: #d2f0d5;
-    color: #18783a;
-    padding: 5px 9px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .organigo-location-bottom {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    flex-wrap: wrap;
-  }
-
-  .organigo-address-label {
-    font-size: 9px;
-    color: #66816a;
-    font-weight: 700;
-  }
-
-  .organigo-address-name {
-    font-size: 12px;
-    color: #263d2b;
-    font-weight: 700;
-  }
-
-  .organigo-location-bottom .location-edit-icon {
-    color: #16833b;
-    font-size: 18px;
-  }
-}
-/* ORGANIGO - COMPACT MOBILE LOCATION BAR */
-
-@media (max-width: 650px) {
-
-  .organigo-location-bar {
-    padding: 6px 9px !important;
-    gap: 3px !important;
-    border-radius: 9px !important;
-  }
-
-  .organigo-location-top > strong {
-    font-size: 14px !important;
-  }
-
-  .organigo-distance-badge {
-    font-size: 9px !important;
-    padding: 3px 7px !important;
-  }
-
-  .organigo-location-bottom {
-    gap: 4px !important;
-  }
-
-  .organigo-address-label {
-    font-size: 8px !important;
-  }
-
-  .organigo-address-name {
-    font-size: 10px !important;
-  }
-
-  .organigo-location-bottom .location-edit-icon {
-    font-size: 15px !important;
-  }
-}
-/* ORGANIGO - PERFECT COMPACT LOCATION BAR */
-
-@media (max-width: 650px) {
-
-  .organigo-home ~ .Organigo-header .organigo-location-bar,
-  .Organigo-header .organigo-location-bar {
-    height: 50px !important;
-    min-height: 50px !important;
-    padding: 4px 9px !important;
-    gap: 2px !important;
-    border-radius: 9px !important;
-    background: #eaf7e9 !important;
-    border: 1px solid #d6ecd4 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-  }
-
-  .organigo-location-bar .organigo-location-top {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center;
-    justify-content: space-between;
-    gap: 4px;
-  }
-
-  .organigo-location-bar .organigo-location-top strong {
-    font-size: 12px !important;
-  }
-
-  .organigo-location-bar .organigo-distance-badge {
-    font-size: 8px !important;
-    padding: 2px 5px !important;
-  }
-
-  .organigo-location-bar .organigo-location-bottom {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .organigo-location-bar .organigo-address-label {
-    font-size: 8px !important;
-  }
-
-  .organigo-location-bar .organigo-address-name {
-    font-size: 10px !important;
-  }
-}
-/* ORGANIGO - GREEN ORANGE LOCATION BADGE */
-
-@media (max-width: 650px) {
-
-  .organigo-location-bar {
-    background: linear-gradient(
-      120deg,
-      #e5f7e9,
-      #f0fae9
-    ) !important;
-
-    border: 1px solid #c8e8ce !important;
-    box-shadow: 0 2px 7px rgba(30, 120, 55, 0.08);
-  }
-
-  /* Delivery Time */
-  .organigo-location-top > strong {
-    color: #167b38 !important;
-    font-weight: 800 !important;
-  }
-
-  /* Distance Badge */
-  .organigo-distance-badge {
-    background: linear-gradient(
-      135deg,
-      #ff9638,
-      #ff6b27
-    ) !important;
-
-    color: #ffffff !important;
-    padding: 4px 8px !important;
-    border-radius: 20px !important;
-    font-size: 9px !important;
-    font-weight: 800 !important;
-
-    box-shadow: 0 2px 5px rgba(255, 107, 39, 0.25);
-  }
-
-  /* Address */
-  .organigo-address-name {
-    color: #176b32 !important;
-  }
-
-  .organigo-location-bottom .location-edit-icon {
-    color: #f07828 !important;
-    font-weight: 800;
-  }
-}
-/* ORGANIGO delivery text - Blinkit style (All Screens) */
-
-.organigo-location-top > strong {
-  font-size: 16px !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.5px;
-  color: #176b32 !important;
-}
-
-.organigo-distance-badge {
-  font-size: 10px !important;
-  font-weight: 800 !important;
-}
-
-.organigo-address-label {
-  font-size: 9px !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.5px;
-}
-
-.organigo-address-name {
-  font-size: 12px !important;
-  font-weight: 800 !important;
-}
-/* LOCATION PERMISSION WARNING */
-
-.location-permission-banner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px;
-  margin-bottom: 18px;
-  background: #fff0f1;
-  border: 1px solid #ffd9dc;
-  border-radius: 12px;
-}
-
-.location-permission-icon {
-  font-size: 25px;
-}
-
-.location-permission-text {
-  flex: 1;
-}
-
-.location-permission-text strong {
-  display: block;
-  color: #d83b50;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.location-permission-text p {
-  margin: 4px 0 0;
-  color: #777;
-  font-size: 11px;
-}
-
-.location-permission-banner button {
-  border: none;
-  border-radius: 7px;
-  background: #e84459;
-  color: white;
-  padding: 8px 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-/* REQUEST ADDRESS BUTTON */
-
-.request-address-btn {
-  width: 100%;
-  min-height: 58px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  margin: 12px 0;
-  background: #ffffff;
-  border: 1px solid #e8eee9;
-  border-radius: 12px;
-  color: #26382b;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  text-align: left;
-}
-
-.request-address-icon {
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  background: #e5f8e9;
-  color: #16843b;
-  border-radius: 9px;
-  font-size: 23px;
-}
-
-.request-address-btn span:nth-child(2) {
-  flex: 1;
-}
-
-.request-address-arrow {
-  font-size: 25px;
-  color: #89928c;
-}
-/* =====================================
-   ORGANIGO - PREMIUM LOCATION MODAL
-===================================== */
-
-.location-modal {
-  font-family: "DM Sans", Arial, sans-serif;
-}
-
-.location-modal-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 22px;
-}
-
-.location-modal-heading h2 {
-  font-size: 20px;
-  font-weight: 900;
-  color: #173d26;
-}
-
-.location-modal-heading p {
-  margin-top: 5px;
-  font-size: 13px;
-  color: #718075;
-}
-
-.saved-addresses-section {
-  margin-bottom: 18px;
-}
-
-.saved-addresses-heading {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  margin-bottom: 13px;
-}
-
-.saved-addresses-heading > a {
-  color: #16843b;
-  font-size: 13px;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.saved-addresses-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.saved-address-item {
-  width: 100%;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px;
-  background: #ffffff;
-  border: 1px solid #e4eee6;
-  border-radius: 13px;
-  text-align: left;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.saved-address-item:hover,
-.saved-address-item.selected {
-  background: #f0faf2;
-  border-color: #159447;
-  box-shadow: 0 3px 10px rgba(21,148,71,0.08);
-}
-
-.saved-address-details {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.saved-address-details strong {
-  color: #263b2c;
-  font-size: 14px;
-  font-weight: 900;
-}
-
-.saved-address-details small {
-  color: #77847a;
-  font-size: 11px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
-.location-modal-footer {
-  margin-top: 13px;
-  color: #718075;
-  font-size: 11px;
-  line-height: 1.5;
-}
-
-/* MOBILE */
-
-@media (max-width: 650px) {
-  .location-modal {
-    padding: 22px 17px 28px;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-
-  .location-modal-heading h2 {
-    font-size: 19px;
-  }
-
-  .saved-address-item {
-    padding: 12px;
-  }
-
-  .saved-address-details small {
-    font-size: 11px;
-  }
-}
-/* Hide Bottom Navigation While Location Modal Is Open */
+/* =====================================================
+   HIDE BOTTOM NAV WHEN LOCATION MODAL IS OPEN
+===================================================== */
 
 body:has(.location-modal) .organigo-bottom-nav {
   display: none !important;
 }
+/* =====================================
+   ORGANIGO - DELIVERY LOCATION OVERLAP FIX
+===================================== */
 
-/* Location Modal Scroll */
+.delivery-location {
+  min-width: 0;
+  overflow: hidden;
+}
 
-.location-modal {
-  max-height: 92vh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+.delivery-location > div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+/* Delivery time row */
+.delivery-location .organigo-location-top {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+}
+
+.delivery-location .organigo-location-top > strong {
+  min-width: 0;
+  font-size: 12px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Distance badge */
+.delivery-location .organigo-distance-badge {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Address row */
+.delivery-location .organigo-location-bottom {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.delivery-location .organigo-address-label {
+  flex-shrink: 0;
+}
+
+.delivery-location .organigo-address-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Mobile adjustment */
+@media (max-width: 650px) {
+  .delivery-location .organigo-location-top > strong {
+    font-size: 12px !important;
+  }
 }

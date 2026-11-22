@@ -1,12 +1,13 @@
+import API_BASE_URL from "../services/api";
 import { useState, useEffect } from "react";
 import { getToken, getUser, clearSession } from "../utils/auth";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "../styles/Checkout.css";
 
-const API_URL = "http://localhost:5000/api/orders";
-const ADDRESS_API = "http://localhost:5000/api/addresses";
-const DELIVERY_SETTINGS_API = "http://localhost:5000/api/delivery-settings";
+const API_URL = `${API_BASE_URL}/api/orders`;
+const ADDRESS_API = `${API_BASE_URL}/api/addresses`;
+const DELIVERY_SETTINGS_API = `${API_BASE_URL}/api/delivery-settings`;
 
 const DEFAULT_HUB = {
   latitude: 22.5504,

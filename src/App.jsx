@@ -23,6 +23,7 @@ import OrderTracking from "./pages/OrderTracking";
 import RiderDashboard from "./pages/RiderDashboard";
 import Account from "./pages/Account";
 import About from "./pages/About";
+import AboutDetails from "./pages/AboutDetails";
 import Addresses from "./pages/Addresses";
 
 // CUSTOMER LAYOUT
@@ -30,13 +31,12 @@ function CustomerLayout() {
   const location = useLocation();
 
   const hideHeader =
-    location.pathname === "/account";
+    location.pathname === "/account" ||
+    location.pathname.startsWith("/about");
 
-  const hideBottomNavigation = [
-    "/login",
-    "/signup",
-    "/checkout",
-  ].includes(location.pathname);
+  const hideBottomNavigation =
+    ["/signup", "/checkout"].includes(location.pathname) ||
+    location.pathname.startsWith("/about");
 
   return (
     <>
@@ -55,14 +55,17 @@ function App() {
       <CartProvider>
         <Routes>
 
-          {/* ADMIN ROUTES */}
+          {/* ADMIN */}
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin-login" element={<AdminLogin />} />
 
-          {/* RIDER ROUTE */}
+          {/* RIDER */}
           <Route path="/rider" element={<RiderDashboard />} />
 
-          {/* CUSTOMER ROUTES */}
+          {/* LOGIN */}
+          <Route path="/login" element={<Login />} />
+
+          {/* CUSTOMER */}
           <Route element={<CustomerLayout />}>
 
             <Route path="/" element={<Home />} />
@@ -71,15 +74,19 @@ function App() {
 
             <Route path="/checkout" element={<Checkout />} />
 
-            <Route path="/login" element={<Login />} />
-
             <Route path="/signup" element={<Signup />} />
 
             <Route path="/account" element={<Account />} />
 
             <Route path="/addresses" element={<Addresses />} />
 
+            {/* ABOUT */}
             <Route path="/about" element={<About />} />
+
+            <Route
+              path="/about/:section"
+              element={<AboutDetails />}
+            />
 
             <Route path="/my-orders" element={<MyOrders />} />
 

@@ -1,3 +1,4 @@
+import API_BASE_URL from "../services/api";
 import React, {
   useEffect,
   useState,
@@ -9,7 +10,7 @@ import { useCart } from "../context/CartContext";
 import Footer from "../components/Footer";
 import "../styles/Home.css";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = `${API_BASE_URL}/api`;
 
 // =========================================
 // CATEGORY IMAGES

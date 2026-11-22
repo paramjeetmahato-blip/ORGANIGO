@@ -1,8 +1,9 @@
+import API_BASE_URL from "../services/api";
 import { useCallback, useEffect, useState } from "react";
 import { getToken } from "../utils/auth";
 import { Link, useParams } from "react-router-dom";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = `${API_BASE_URL}/api`;
 
 const trackingSteps = [
   {

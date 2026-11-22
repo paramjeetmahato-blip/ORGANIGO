@@ -1,3 +1,7 @@
+/* =====================================
+   ORGANIGO ABOUT SECTION
+===================================== */
+
 .about-page {
   min-height: 100vh;
   background: #ffffff;
@@ -5,80 +9,109 @@
   font-family: Arial, sans-serif;
 }
 
+/* HEADER */
+
 .about-header {
-  height: 85px;
+  min-height: 78px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
   padding: 0 25px;
+  background: #ffffff;
   border-bottom: 1px solid #eeeeee;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .about-header h1 {
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 23px;
+  font-weight: 700;
   margin: 0;
 }
 
 .about-back {
+  width: 42px;
+  height: 42px;
   border: none;
-  background: transparent;
-  font-size: 34px;
+  border-radius: 50%;
+  background: #f2f8f3;
+  font-size: 28px;
   cursor: pointer;
-  color: #222;
+  color: #168b45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.about-back:hover {
+  background: #e3f3e7;
+}
+
+/* ABOUT MENU */
+
 .about-content {
-  padding: 20px 25px;
+  width: 100%;
+  max-width: 850px;
+  margin: auto;
+  padding: 25px;
 }
 
 .about-item {
   width: 100%;
-  min-height: 75px;
+  min-height: 72px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border: none;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid #eeeeee;
   background: white;
-  font-size: 19px;
+  font-size: 17px;
   text-align: left;
   cursor: pointer;
   color: #222;
   padding: 15px;
+  transition: 0.2s ease;
 }
 
 .about-item:hover {
-  background: #f8faf8;
+  background: #f5faf6;
+  padding-left: 20px;
 }
 
 .about-arrow {
-  font-size: 30px;
-  color: #777;
+  font-size: 28px;
+  color: #168b45;
 }
+
+/* VERSION */
 
 .about-version {
   padding: 25px 15px;
-  border-bottom: 1px solid #e8e8e8;
-  font-size: 19px;
+  border-bottom: 1px solid #eeeeee;
+  font-size: 17px;
 }
 
 .about-version p {
   margin: 8px 0 0;
-  color: #555;
+  color: #777;
+  font-size: 15px;
 }
+
+/* COPYRIGHT */
 
 .about-copyright {
   text-align: center;
-  margin-top: 70px;
+  margin-top: 55px;
   padding: 25px 10px;
   color: #777;
 }
 
 .about-copyright h3 {
   color: #168b45;
-  font-size: 25px;
+  font-size: 27px;
   margin-bottom: 8px;
+  letter-spacing: 1px;
 }
 
 .about-copyright p {
@@ -89,15 +122,86 @@
   font-size: 12px;
 }
 
+/* DETAIL PAGE */
+
+.about-detail-content {
+  max-width: 850px;
+  margin: auto;
+  padding: 25px;
+}
+
+.about-brand-card {
+  background: linear-gradient(135deg, #e8f8ec, #f8fff9);
+  border: 1px solid #d9efdf;
+  border-radius: 16px;
+  padding: 30px 20px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.about-brand-icon {
+  font-size: 38px;
+  margin-bottom: 8px;
+}
+
+.about-brand-card h2 {
+  color: #168b45;
+  font-size: 27px;
+  letter-spacing: 1px;
+  margin: 5px 0;
+}
+
+.about-brand-card p {
+  color: #666;
+  font-size: 14px;
+  margin: 8px 0 0;
+}
+
+/* CONTENT SECTIONS */
+
+.about-section {
+  padding: 20px 5px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.about-section h3 {
+  font-size: 17px;
+  color: #222;
+  margin: 0 0 10px;
+}
+
+.about-section p {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #666;
+  margin: 0;
+}
+
+.about-detail-footer {
+  text-align: center;
+  color: #888;
+  font-size: 12px;
+  padding: 35px 10px;
+}
+
+/* MOBILE RESPONSIVE */
+
 @media (max-width: 600px) {
 
   .about-header {
-    height: 70px;
-    padding: 0 18px;
+    min-height: 65px;
+    padding: 0 15px;
+    gap: 12px;
   }
 
   .about-header h1 {
-    font-size: 24px;
+    font-size: 19px;
+  }
+
+  .about-back {
+    width: 38px;
+    height: 38px;
+    font-size: 25px;
   }
 
   .about-content {
@@ -105,13 +209,42 @@
   }
 
   .about-item {
-    min-height: 68px;
-    font-size: 16px;
+    min-height: 65px;
+    font-size: 15px;
     padding: 12px;
   }
 
+  .about-arrow {
+    font-size: 25px;
+  }
+
   .about-version {
-    font-size: 17px;
+    font-size: 16px;
+  }
+
+  .about-copyright {
+    margin-top: 40px;
+  }
+
+  .about-detail-content {
+    padding: 15px;
+  }
+
+  .about-brand-card {
+    padding: 25px 15px;
+  }
+
+  .about-section {
+    padding: 18px 3px;
+  }
+
+  .about-section h3 {
+    font-size: 16px;
+  }
+
+  .about-section p {
+    font-size: 14px;
+    line-height: 1.7;
   }
 
 }

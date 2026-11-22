@@ -3,6 +3,17 @@ import { NavLink, useNavigate } from "react-router-dom";
 import "./BottomNavigation.css";
 
 function BottomNavigation() {
+  const isDevelopment = import.meta.env.VITE_APP_MODE === "development";
+
+const isInstalledApp =
+  window.matchMedia("(display-mode: standalone)").matches ||
+  window.navigator.standalone === true;
+
+// Development mein hamesha dikhega.
+// Production mein sirf installed app mein dikhega.
+if (!isDevelopment && !isInstalledApp) {
+  return null;
+}
   const navigate = useNavigate();
 
   const handleCategories = () => {
