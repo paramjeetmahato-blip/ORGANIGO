@@ -27,7 +27,6 @@ const defaultHub = {
 
 function getDistanceKm(lat1, lon1, lat2, lon2) {
   const toRad = (value) => (value * Math.PI) / 180;
-
   const earthRadius = 6371;
 
   const dLat = toRad(lat2 - lat1);
@@ -39,10 +38,9 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
       Math.cos(toRad(lat2)) *
       Math.sin(dLon / 2) ** 2;
 
-  return (
-    earthRadius *
-    2 *
-    Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return earthRadius * 2 * Math.atan2(
+    Math.sqrt(a),
+    Math.sqrt(1 - a)
   );
 }
 
@@ -79,61 +77,69 @@ function getSavedLocation() {
 }
 
 // =====================================
+// LOCATION ICON
+// =====================================
+
+function LocationIcon({ className = "" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </svg>
+  );
+}
+
+// =====================================
 // HEADER COMPONENT
 // =====================================
 
 function Header() {
   const navigate = useNavigate();
-
   const accountRef = useRef(null);
 
   const { cartItems } = useCart();
 
   const [searchQuery, setSearchQuery] = useState("");
-
   const [user, setUser] = useState(getUser);
 
   const [accountOpen, setAccountOpen] = useState(false);
-
   const [locationOpen, setLocationOpen] = useState(false);
 
   const [locationQuery, setLocationQuery] = useState("");
-
   const [locationResults, setLocationResults] = useState([]);
 
   const [selectedLocation, setSelectedLocation] =
     useState(getSavedLocation);
 
   const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
 
-  const [selectedAddressId, setSelectedAddressId] =
-    useState(null);
+  const [addressesLoading, setAddressesLoading] = useState(false);
+  const [selectingAddressId, setSelectingAddressId] = useState(null);
 
-  const [addressesLoading, setAddressesLoading] =
-    useState(false);
-
-  const [selectingAddressId, setSelectingAddressId] =
-    useState(null);
-
-  const [locationLoading, setLocationLoading] =
-    useState(false);
-
-  const [locationMessage, setLocationMessage] =
-    useState("");
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationMessage, setLocationMessage] = useState("");
 
   const [locationPermission, setLocationPermission] =
     useState("prompt");
 
-  const [hubSettings, setHubSettings] =
-    useState(getHubSettings);
+  const [hubSettings, setHubSettings] = useState(getHubSettings);
 
   // =====================================
   // CART COUNT
   // =====================================
 
   const cartCount = cartItems.reduce(
-    (total, item) =>
-      total + Number(item.quantity || 0),
+    (total, item) => total + Number(item.quantity || 0),
     0
   );
 
@@ -153,7 +159,6 @@ function Header() {
 
     return {
       distance: Number(distance.toFixed(2)),
-
       available:
         hub.active !== false &&
         distance <= Number(hub.radius || 10),
@@ -161,7 +166,7 @@ function Header() {
   };
 
   // =====================================
-  // LOGIN STATUS UPDATE
+  // REFRESH USER
   // =====================================
 
   useEffect(() => {
@@ -169,31 +174,17 @@ function Header() {
       setUser(getUser());
     };
 
-    window.addEventListener(
-      "organigoAuthChanged",
-      refreshUser
-    );
-
-    window.addEventListener(
-      "storage",
-      refreshUser
-    );
+    window.addEventListener("organigoAuthChanged", refreshUser);
+    window.addEventListener("storage", refreshUser);
 
     return () => {
-      window.removeEventListener(
-        "organigoAuthChanged",
-        refreshUser
-      );
-
-      window.removeEventListener(
-        "storage",
-        refreshUser
-      );
+      window.removeEventListener("organigoAuthChanged", refreshUser);
+      window.removeEventListener("storage", refreshUser);
     };
   }, []);
 
   // =====================================
-  // DEVICE LOCATION PERMISSION
+  // LOCATION PERMISSION
   // =====================================
 
   useEffect(() => {
@@ -206,24 +197,17 @@ function Header() {
           return;
         }
 
-        permissionStatus =
-          await navigator.permissions.query({
-            name: "geolocation",
-          });
+        permissionStatus = await navigator.permissions.query({
+          name: "geolocation",
+        });
 
         setLocationPermission(permissionStatus.state);
 
         permissionStatus.onchange = () => {
-          setLocationPermission(
-            permissionStatus.state
-          );
+          setLocationPermission(permissionStatus.state);
         };
       } catch (error) {
-        console.log(
-          "Location permission check:",
-          error
-        );
-
+        console.log("Location permission:", error);
         setLocationPermission("prompt");
       }
     };
@@ -238,7 +222,7 @@ function Header() {
   }, []);
 
   // =====================================
-  // LOAD SAVED ADDRESSES FROM MONGODB
+  // LOAD SAVED ADDRESSES
   // =====================================
 
   const loadSavedAddresses = async () => {
@@ -255,7 +239,6 @@ function Header() {
 
       const response = await fetch(API_URL, {
         method: "GET",
-
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -264,16 +247,11 @@ function Header() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.message || "Unable to load addresses."
-        );
+        throw new Error(data.message || "Unable to load addresses.");
       }
 
       setSavedAddresses(data.addresses || []);
-
-      setSelectedAddressId(
-        data.selectedAddressId || null
-      );
+      setSelectedAddressId(data.selectedAddressId || null);
 
       if (data.selectedAddress) {
         const address = data.selectedAddress;
@@ -289,9 +267,7 @@ function Header() {
             address.area,
             address.city,
             address.state,
-          ]
-            .filter(Boolean)
-            .join(", "),
+          ].filter(Boolean).join(", "),
 
           fullAddress: [
             address.houseNo,
@@ -300,20 +276,12 @@ function Header() {
             address.city,
             address.state,
             address.pincode,
-          ]
-            .filter(Boolean)
-            .join(", "),
+          ].filter(Boolean).join(", "),
 
-          latitude: hasCoordinates
-            ? Number(address.latitude)
-            : null,
-
-          longitude: hasCoordinates
-            ? Number(address.longitude)
-            : null,
+          latitude: hasCoordinates ? Number(address.latitude) : null,
+          longitude: hasCoordinates ? Number(address.longitude) : null,
 
           source: "saved-address",
-
           addressId: address._id,
         };
 
@@ -324,7 +292,6 @@ function Header() {
           );
 
           finalLocation.distance = result.distance;
-
           finalLocation.available = result.available;
         } else {
           finalLocation.available = null;
@@ -344,15 +311,10 @@ function Header() {
       } else {
         setSelectedLocation(null);
 
-        localStorage.removeItem(
-          "organigoSelectedLocation"
-        );
+        localStorage.removeItem("organigoSelectedLocation");
       }
     } catch (error) {
-      console.error(
-        "Load Saved Addresses Error:",
-        error
-      );
+      console.error("Load Saved Addresses Error:", error);
 
       setLocationMessage(
         "Saved addresses load nahi ho paaye. Please try again."
@@ -376,7 +338,7 @@ function Header() {
   }, [user]);
 
   // =====================================
-  // CLOSE ACCOUNT DROPDOWN
+  // CLOSE DROPDOWNS
   // =====================================
 
   useEffect(() => {
@@ -396,36 +358,14 @@ function Header() {
       }
     };
 
-    document.addEventListener(
-      "mousedown",
-      handleOutsideClick
-    );
-
-    document.addEventListener(
-      "touchstart",
-      handleOutsideClick
-    );
-
-    document.addEventListener(
-      "keydown",
-      handleEscape
-    );
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleOutsideClick
-      );
-
-      document.removeEventListener(
-        "touchstart",
-        handleOutsideClick
-      );
-
-      document.removeEventListener(
-        "keydown",
-        handleEscape
-      );
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, []);
 
@@ -436,25 +376,19 @@ function Header() {
   const handleLogout = () => {
     clearSession();
 
-    localStorage.removeItem(
-      "organigoSelectedLocation"
-    );
+    localStorage.removeItem("organigoSelectedLocation");
 
     setUser(null);
-
     setSelectedLocation(null);
-
     setSavedAddresses([]);
-
     setSelectedAddressId(null);
-
     setAccountOpen(false);
 
     navigate("/");
   };
 
   // =====================================
-  // PRODUCT SEARCH
+  // SEARCH
   // =====================================
 
   const handleSearch = (event) => {
@@ -475,7 +409,38 @@ function Header() {
 
   useEffect(() => {
     const refreshSettings = () => {
-      setHubSettings(getHubSettings());
+      const newSettings = getHubSettings();
+
+      setHubSettings(newSettings);
+
+      const saved = getSavedLocation();
+
+      if (
+        saved?.latitude != null &&
+        saved?.longitude != null
+      ) {
+        const distance = getDistanceKm(
+          Number(newSettings.latitude),
+          Number(newSettings.longitude),
+          Number(saved.latitude),
+          Number(saved.longitude)
+        );
+
+        const updated = {
+          ...saved,
+          distance: Number(distance.toFixed(2)),
+          available:
+            newSettings.active !== false &&
+            distance <= Number(newSettings.radius || 10),
+        };
+
+        localStorage.setItem(
+          "organigoSelectedLocation",
+          JSON.stringify(updated)
+        );
+
+        setSelectedLocation(updated);
+      }
     };
 
     window.addEventListener(
@@ -483,10 +448,7 @@ function Header() {
       refreshSettings
     );
 
-    window.addEventListener(
-      "storage",
-      refreshSettings
-    );
+    window.addEventListener("storage", refreshSettings);
 
     return () => {
       window.removeEventListener(
@@ -494,15 +456,12 @@ function Header() {
         refreshSettings
       );
 
-      window.removeEventListener(
-        "storage",
-        refreshSettings
-      );
+      window.removeEventListener("storage", refreshSettings);
     };
   }, []);
 
   // =====================================
-  // SAVE CUSTOMER LOCATION
+  // SAVE LOCATION
   // =====================================
 
   const saveLocation = (location) => {
@@ -513,11 +472,8 @@ function Header() {
 
     const finalLocation = {
       ...location,
-
       distance: result.distance,
-
       available: result.available,
-
       updatedAt: new Date().toISOString(),
     };
 
@@ -527,13 +483,9 @@ function Header() {
     );
 
     setSelectedLocation(finalLocation);
-
     setLocationOpen(false);
-
     setLocationQuery("");
-
     setLocationResults([]);
-
     setLocationMessage("");
   };
 
@@ -548,23 +500,19 @@ function Header() {
       setLocationMessage(
         "Please login to select a saved address."
       );
-
       return;
     }
 
     try {
       setSelectingAddressId(address._id);
-
       setLocationMessage("");
 
       const response = await fetch(
         `${API_URL}/${address._id}/select`,
         {
           method: "PATCH",
-
           headers: {
             Authorization: `Bearer ${token}`,
-
             "Content-Type": "application/json",
           },
         }
@@ -574,14 +522,11 @@ function Header() {
 
       if (!response.ok) {
         throw new Error(
-          data.message ||
-            "Unable to select this address."
+          data.message || "Unable to select this address."
         );
       }
 
-      setSelectedAddressId(
-        data.selectedAddressId
-      );
+      setSelectedAddressId(data.selectedAddressId);
 
       const selected = data.selectedAddress;
 
@@ -596,9 +541,7 @@ function Header() {
           selected.area,
           selected.city,
           selected.state,
-        ]
-          .filter(Boolean)
-          .join(", "),
+        ].filter(Boolean).join(", "),
 
         fullAddress: [
           selected.houseNo,
@@ -607,20 +550,12 @@ function Header() {
           selected.city,
           selected.state,
           selected.pincode,
-        ]
-          .filter(Boolean)
-          .join(", "),
+        ].filter(Boolean).join(", "),
 
-        latitude: hasCoordinates
-          ? Number(selected.latitude)
-          : null,
-
-        longitude: hasCoordinates
-          ? Number(selected.longitude)
-          : null,
+        latitude: hasCoordinates ? Number(selected.latitude) : null,
+        longitude: hasCoordinates ? Number(selected.longitude) : null,
 
         source: "saved-address",
-
         addressId: selected._id,
       };
 
@@ -631,11 +566,9 @@ function Header() {
         );
 
         finalLocation.distance = result.distance;
-
         finalLocation.available = result.available;
       } else {
         finalLocation.distance = null;
-
         finalLocation.available = null;
       }
 
@@ -645,24 +578,16 @@ function Header() {
       );
 
       setSelectedLocation(finalLocation);
-
-      setSavedAddresses(
-        data.addresses || savedAddresses
-      );
+      setSavedAddresses(data.addresses || savedAddresses);
 
       setLocationOpen(false);
-
       setLocationMessage("");
 
       window.dispatchEvent(
         new Event("organigoSelectedAddressUpdated")
       );
     } catch (error) {
-      console.error(
-        "Select Address Error:",
-        error
-      );
-
+      console.error("Select Address Error:", error);
       setLocationMessage(error.message);
     } finally {
       setSelectingAddressId(null);
@@ -674,10 +599,7 @@ function Header() {
   // =====================================
 
   useEffect(() => {
-    if (
-      !locationOpen ||
-      locationQuery.trim().length < 3
-    ) {
+    if (!locationOpen || locationQuery.trim().length < 3) {
       setLocationResults([]);
       return;
     }
@@ -688,13 +610,9 @@ function Header() {
 
         const params = new URLSearchParams({
           format: "jsonv2",
-
           addressdetails: "1",
-
           limit: "5",
-
           countrycodes: "in",
-
           q: locationQuery,
         });
 
@@ -730,30 +648,17 @@ function Header() {
 
     const name = [
       address.road,
-
-      address.suburb ||
-        address.neighbourhood,
-
-      address.city ||
-        address.town ||
-        address.village,
-
+      address.suburb || address.neighbourhood,
+      address.city || address.town || address.village,
       address.state,
-
       address.postcode,
-    ]
-      .filter(Boolean)
-      .join(", ") || place.display_name;
+    ].filter(Boolean).join(", ") || place.display_name;
 
     saveLocation({
       name,
-
       fullAddress: place.display_name,
-
       latitude: Number(place.lat),
-
       longitude: Number(place.lon),
-
       source: "manual",
     });
   };
@@ -767,30 +672,21 @@ function Header() {
       setLocationMessage(
         "Your browser does not support GPS location."
       );
-
       return;
     }
 
     setLocationLoading(true);
-
-    setLocationMessage(
-      "Detecting your current location..."
-    );
+    setLocationMessage("Detecting your current location...");
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const latitude =
-          position.coords.latitude;
-
-        const longitude =
-          position.coords.longitude;
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
 
         try {
           const params = new URLSearchParams({
             format: "jsonv2",
-
             lat: String(latitude),
-
             lon: String(longitude),
           });
 
@@ -805,35 +701,20 @@ function Header() {
           const data = await response.json();
 
           saveLocation({
-            name:
-              data.display_name ||
-              "Current Location",
-
-            fullAddress:
-              data.display_name ||
-              "Current Location",
-
+            name: data.display_name || "Current Location",
+            fullAddress: data.display_name || "Current Location",
             latitude,
-
             longitude,
-
             accuracy: position.coords.accuracy,
-
             source: "gps",
           });
         } catch {
           saveLocation({
             name: "Current GPS Location",
-
-            fullAddress:
-              "Address could not be identified",
-
+            fullAddress: "Address could not be identified",
             latitude,
-
             longitude,
-
             accuracy: position.coords.accuracy,
-
             source: "gps",
           });
         } finally {
@@ -861,9 +742,7 @@ function Header() {
 
       {
         enableHighAccuracy: true,
-
         timeout: 20000,
-
         maximumAge: 0,
       }
     );
@@ -893,33 +772,17 @@ function Header() {
     ? selectedLocation.available === true
       ? "Delivery Available"
       : selectedLocation.available === false
-        ? "Not Available"
+        ? "Delivery Not Available"
         : "Verify Location"
     : "Select Location";
-
-  const estimatedMinutes =
-    selectedLocation?.distance != null
-      ? Math.max(
-          10,
-          Math.ceil(
-            5 +
-              (Number(selectedLocation.distance) /
-                15) *
-                60
-          )
-        )
-      : null;
 
   const displayDistance =
     selectedLocation?.distance != null
       ? Number(selectedLocation.distance) < 1
         ? `${Math.round(
-            Number(selectedLocation.distance) *
-              1000
+            Number(selectedLocation.distance) * 1000
           )} m away`
-        : `${Number(
-            selectedLocation.distance
-          ).toFixed(1)} km away`
+        : `${Number(selectedLocation.distance).toFixed(1)} km away`
       : "Set delivery location";
 
   // =====================================
@@ -932,16 +795,11 @@ function Header() {
       {/* APP BANNER */}
 
       <div className="organigo-app-banner">
-        <div className="app-banner-icon">
-          🥬
-        </div>
+        <div className="app-banner-icon">🥬</div>
 
         <div className="app-banner-text">
           <strong>ORGANIGO APP</strong>
-
-          <small>
-            Get a fresher shopping experience!
-          </small>
+          <small>Get a fresher shopping experience!</small>
         </div>
 
         <button
@@ -955,75 +813,74 @@ function Header() {
 
       <div className="header-container">
 
-        {/* LOGO */}
+    {/* ORGANIGO LOGO */}
 
-        <Link
-          to="/"
-          className="Organigo-logo"
-        >
-          <img
-            src="/organigo-logo.png"
-            alt="ORGANIGO"
-          />
-        </Link>
+<Link to="/" className="organigo-header-logo">
+  <img
+    src="/organigo_logo.svg"
+    alt="ORGANIGO"
+    className="organigo-header-logo-image"
+  />
+</Link>
 
-        {/* DELIVERY LOCATION */}
+{/* DELIVERY LOCATION BAR */}
 
-        <button
-          type="button"
-          className="delivery-location organigo-location-bar"
-          onClick={() => {
-            setLocationOpen(true);
+<button
+  type="button"
+  className="organigo-location-bar"
+  onClick={() => {
+    setLocationOpen(true);
+    setLocationMessage("");
+    setAccountOpen(false);
 
-            setLocationMessage("");
+    if (user) {
+      loadSavedAddresses();
+    }
+  }}
+>
+  <div className="organigo-location-details">
 
-            setAccountOpen(false);
+    <LocationIcon className="organigo-pin-icon" />
 
-            if (user) {
-              loadSavedAddresses();
-            }
-          }}
-        >
-          <div className="organigo-location-top">
+    <div className="organigo-location-address">
+      <span>
+        {selectedLocation ? "DELIVERING TO" : "DELIVERY LOCATION"}
+      </span>
 
-            <strong>
-              ORGANIGO in{" "}
-              {estimatedMinutes !== null
-                ? `${estimatedMinutes} minutes`
-                : "15 minutes"}
-            </strong>
+      <strong>
+        {selectedLocation?.name
+          ? selectedLocation.name
+              .split(",")
+              .slice(0, 2)
+              .join(", ")
+          : "Choose your delivery address"}
+      </strong>
+    </div>
 
-            {selectedLocation?.distance != null && (
-              <span className="organigo-distance-badge">
-                🚚 {displayDistance}
-              </span>
-            )}
+    <span className="organigo-location-chevron">⌄</span>
 
-          </div>
+  </div>
 
-          <div className="organigo-location-bottom">
+  <div className="organigo-delivery-status">
 
-            <span className="organigo-address-label">
-              {selectedLocation
-                ? "DELIVERING TO"
-                : "SELECT LOCATION"}
-            </span>
+    <span
+      className={
+        selectedLocation?.available === true
+          ? "status-available"
+          : selectedLocation?.available === false
+            ? "status-unavailable"
+            : "status-pending"
+      }
+    >
+      {deliveryText}
+    </span>
 
-            <strong className="organigo-address-name">
-              {selectedLocation
-                ? selectedLocation.name
-                    .split(",")
-                    .slice(0, 2)
-                    .join(", ")
-                : "Choose your delivery address"}
-            </strong>
+    {selectedLocation?.distance != null && (
+      <small>{displayDistance}</small>
+    )}
 
-            <span className="location-edit-icon">
-              ⌄
-            </span>
-
-          </div>
-        </button>
+  </div>
+</button>
 
         {/* SEARCH */}
 
@@ -1044,31 +901,22 @@ function Header() {
 
         {/* DESKTOP CART */}
 
-        <Link
-          to="/cart"
-          className="header-cart"
-        >
-          <span className="cart-icon">
-            🛒
-          </span>
+        <Link to="/cart" className="header-cart">
 
+          <span className="cart-icon">🛒</span>
           <span>My Cart</span>
 
           {cartCount > 0 && (
             <span className="cart-count">
-              {cartCount > 99
-                ? "99+"
-                : cartCount}
+              {cartCount > 99 ? "99+" : cartCount}
             </span>
           )}
+
         </Link>
 
-        {/* MOBILE ACCOUNT MENU */}
+        {/* ACCOUNT */}
 
-        <div
-          className="header-account"
-          ref={accountRef}
-        >
+        <div className="header-account" ref={accountRef}>
 
           <button
             type="button"
@@ -1084,6 +932,7 @@ function Header() {
               setAccountOpen((prev) => !prev);
             }}
           >
+
             <span className="account-icon">
 
               <svg
@@ -1096,20 +945,16 @@ function Header() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <circle
-                  cx="12"
-                  cy="8"
-                  r="4"
-                />
-
+                <circle cx="12" cy="8" r="4" />
                 <path d="M4 21a8 8 0 0 1 16 0" />
-
               </svg>
 
             </span>
+
           </button>
 
           {user && accountOpen && (
+
             <div className="account-dropdown">
 
               <div className="account-dropdown-heading">
@@ -1118,9 +963,7 @@ function Header() {
                   {user.name || "ORGANIGO Customer"}
                 </strong>
 
-                <small>
-                  {user.phone || ""}
-                </small>
+                <small>{user.phone || ""}</small>
 
               </div>
 
@@ -1161,6 +1004,7 @@ function Header() {
               </button>
 
             </div>
+
           )}
 
         </div>
@@ -1174,9 +1018,7 @@ function Header() {
           {user ? "My Account" : "Login"}
         </Link>
 
-        {/* =====================================
-            LOCATION MODAL
-        ===================================== */}
+        {/* LOCATION MODAL */}
 
         {locationOpen && (
 
@@ -1190,17 +1032,14 @@ function Header() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="location-modal-title"
-              onClick={(event) =>
-                event.stopPropagation()
-              }
+              onClick={(event) => event.stopPropagation()}
             >
 
-              {/* MODAL HEADING */}
+              {/* HEADING */}
 
               <div className="location-modal-heading">
 
                 <div>
-
                   <h2 id="location-modal-title">
                     Select Delivery Location
                   </h2>
@@ -1208,7 +1047,6 @@ function Header() {
                   <p>
                     Choose where you want your order delivered.
                   </p>
-
                 </div>
 
                 <button
@@ -1229,14 +1067,12 @@ function Header() {
                 <div className="location-permission-banner">
 
                   <div className="location-permission-icon">
-                    📍
+                    <LocationIcon />
                   </div>
 
                   <div className="location-permission-text">
 
-                    <strong>
-                      Device Location Not Enabled
-                    </strong>
+                    <strong>Device Location Not Enabled</strong>
 
                     <p>
                       Enable your location to find the nearest delivery address.
@@ -1249,12 +1085,11 @@ function Header() {
                     onClick={useCurrentLocation}
                     disabled={locationLoading}
                   >
-                    {locationLoading
-                      ? "Please wait..."
-                      : "Enable"}
+                    {locationLoading ? "Please wait..." : "Enable"}
                   </button>
 
                 </div>
+
               )}
 
               {/* SAVED ADDRESSES */}
@@ -1266,28 +1101,7 @@ function Header() {
                   <div className="saved-addresses-heading">
 
                     <strong className="address-section-heading">
-
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="19"
-                        height="19"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-
-                        <circle
-                          cx="12"
-                          cy="10"
-                          r="2.5"
-                        />
-                      </svg>
-
                       Your Saved Addresses
-
                     </strong>
 
                     <Link
@@ -1319,91 +1133,19 @@ function Header() {
                               ? "selected"
                               : ""
                           }`}
-                          onClick={() =>
-                            selectSavedAddress(address)
-                          }
-                          disabled={
-                            selectingAddressId !== null
-                          }
+                          onClick={() => selectSavedAddress(address)}
+                          disabled={selectingAddressId !== null}
                         >
 
                           <span className="saved-address-icon">
-
-                            {address.label === "Work" ? (
-
-                              <svg
-                                viewBox="0 0 24 24"
-                                width="21"
-                                height="21"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <rect
-                                  x="3"
-                                  y="7"
-                                  width="18"
-                                  height="14"
-                                  rx="2"
-                                />
-
-                                <path d="M8 7V4h8v3M3 12h18M10 12v2h4v-2" />
-
-                              </svg>
-
-                            ) : address.label === "Other" ? (
-
-                              <svg
-                                viewBox="0 0 24 24"
-                                width="21"
-                                height="21"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-
-                                <circle
-                                  cx="12"
-                                  cy="10"
-                                  r="2.5"
-                                />
-
-                              </svg>
-
-                            ) : (
-
-                              <svg
-                                viewBox="0 0 24 24"
-                                width="21"
-                                height="21"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />
-
-                                <path d="M9 21v-8h6v8" />
-
-                              </svg>
-
-                            )}
-
+                            {address.label === "Work" ? "🏢" : "🏠"}
                           </span>
 
                           <div className="saved-address-details">
 
                             <strong>
                               {address.label || "Home"}
-
-                              {selectedAddressId === address._id &&
-                                " ✓"}
+                              {selectedAddressId === address._id && " ✓"}
                             </strong>
 
                             <small>
@@ -1414,9 +1156,7 @@ function Header() {
                                 address.city,
                                 address.state,
                                 address.pincode,
-                              ]
-                                .filter(Boolean)
-                                .join(", ")}
+                              ].filter(Boolean).join(", ")}
                             </small>
 
                             <small>
@@ -1445,6 +1185,7 @@ function Header() {
                   )}
 
                 </div>
+
               )}
 
               {/* LOGIN MESSAGE */}
@@ -1465,17 +1206,16 @@ function Header() {
                   </Link>
 
                 </div>
+
               )}
 
               {/* DIVIDER */}
 
               <div className="location-divider">
-                <span>
-                  OR USE ANOTHER LOCATION
-                </span>
+                <span>OR USE ANOTHER LOCATION</span>
               </div>
 
-              {/* GPS LOCATION */}
+              {/* GPS */}
 
               <button
                 type="button"
@@ -1484,24 +1224,7 @@ function Header() {
                 disabled={locationLoading}
               >
 
-                <svg
-                  viewBox="0 0 24 24"
-                  width="21"
-                  height="21"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-
-                  <circle
-                    cx="12"
-                    cy="10"
-                    r="2.5"
-                  />
-                </svg>
+                <LocationIcon />
 
                 {locationLoading
                   ? "Detecting Location..."
@@ -1509,7 +1232,7 @@ function Header() {
 
               </button>
 
-              {/* REQUEST ADDRESS */}
+              {/* WHATSAPP ADDRESS REQUEST */}
 
               <button
                 type="button"
@@ -1517,21 +1240,17 @@ function Header() {
                 onClick={requestAddressOnWhatsApp}
               >
 
-                <span className="request-address-icon">
-                  ☏
-                </span>
+                <span className="request-address-icon">☏</span>
 
                 <span>
                   Request Address from Someone Else
                 </span>
 
-                <span className="request-address-arrow">
-                  ›
-                </span>
+                <span className="request-address-arrow">›</span>
 
               </button>
 
-              {/* MANUAL LOCATION SEARCH */}
+              {/* MANUAL SEARCH */}
 
               <div className="location-search-box">
 
@@ -1545,7 +1264,6 @@ function Header() {
                   value={locationQuery}
                   onChange={(event) => {
                     setLocationQuery(event.target.value);
-
                     setLocationMessage("");
                   }}
                 />
@@ -1583,28 +1301,7 @@ function Header() {
                       onClick={() => selectAddress(place)}
                     >
 
-                      <span className="modern-location-icon">
-
-                        <svg
-                          viewBox="0 0 24 24"
-                          width="20"
-                          height="20"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-
-                          <circle
-                            cx="12"
-                            cy="10"
-                            r="2.5"
-                          />
-                        </svg>
-
-                      </span>
+                      <LocationIcon className="modern-location-icon" />
 
                       <div>
 
@@ -1613,9 +1310,7 @@ function Header() {
                             place.display_name.split(",")[0]}
                         </strong>
 
-                        <small>
-                          {place.display_name}
-                        </small>
+                        <small>{place.display_name}</small>
 
                       </div>
 
@@ -1624,6 +1319,7 @@ function Header() {
                   ))}
 
                 </div>
+
               )}
 
               {/* NO RESULTS */}
@@ -1646,25 +1342,20 @@ function Header() {
 
                 <div className="current-selected-location">
 
-                  <strong>
-                    Currently selected location
-                  </strong>
+                  <strong>Currently selected location</strong>
 
-                  <p>
-                    {selectedLocation.name}
-                  </p>
+                  <p>{selectedLocation.name}</p>
 
                   <small>
-
                     {selectedLocation.available === true
                       ? `✓ Delivery available · ${selectedLocation.distance} KM from hub`
                       : selectedLocation.available === false
                         ? `✕ Outside delivery area · ${selectedLocation.distance} KM from hub`
                         : "Location coordinates need verification."}
-
                   </small>
 
                 </div>
+
               )}
 
               {/* FOOTER */}
@@ -1677,9 +1368,11 @@ function Header() {
             </div>
 
           </div>
+
         )}
 
       </div>
+
     </header>
   );
 }

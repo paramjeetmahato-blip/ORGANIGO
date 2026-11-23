@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">ORGANIGO logo</title>
+  <desc id="desc">A fresh grocery brand logo with a green shopping basket, fruit and vegetable leaves, and ORGANIGO lettering.</desc>
+  <defs>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#35b84b"/>
+      <stop offset="1" stop-color="#087b35"/>
+    </linearGradient>
+    <linearGradient id="yellow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe65a"/>
+      <stop offset="1" stop-color="#f5bd22"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Symbol: leafy produce basket -->
+  <g transform="translate(55 42)">
+    <path d="M165 84 C116 12 56 22 43 66 C88 91 128 99 165 84Z" fill="#35b84b"/>
+    <path d="M166 84 C178 15 239 4 270 40 C245 79 208 96 166 84Z" fill="#087b35"/>
+    <path d="M165 82 C153 45 117 28 82 37" fill="none" stroke="#e8f8d9" stroke-width="7" stroke-linecap="round"/>
+    <path d="M168 82 C188 48 219 34 248 37" fill="none" stroke="#e8f8d9" stroke-width="7" stroke-linecap="round"/>
+    <path d="M43 133 L288 133 L263 275 Q260 292 242 292 L89 292 Q71 292 67 275Z" fill="url(#green)"/>
+    <path d="M61 153 L270 153 L250 260 L101 260Z" fill="#f7fbe9"/>
+    <!-- leafy greens -->
+    <path d="M104 160 C83 125 105 111 125 142 C142 111 165 126 144 162Z" fill="#54bd48"/>
+    <path d="M146 158 C136 120 161 108 175 143 C198 117 215 136 187 166Z" fill="#178a3b"/>
+    <!-- apple -->
+    <path d="M116 190 C94 166 65 181 69 213 C72 245 104 255 124 237 C145 255 177 240 177 211 C177 181 147 168 126 190Z" fill="#ed3e32"/>
+    <path d="M122 185 C123 172 132 165 144 164" fill="none" stroke="#166b32" stroke-width="8" stroke-linecap="round"/>
+    <path d="M134 171 C148 151 167 158 165 174 C153 183 142 181 134 171Z" fill="#39a949"/>
+    <ellipse cx="91" cy="202" rx="8" ry="13" fill="#ffaaa0" transform="rotate(25 91 202)"/>
+    <!-- carrot -->
+    <path d="M202 183 L247 187 L225 250 Q220 260 212 249 L190 197Z" fill="#f59b28"/>
+    <path d="M211 181 C196 160 206 146 223 162 C227 140 248 145 243 169 C263 153 276 169 252 184Z" fill="#249846"/>
+    <path d="M206 204 L225 210 M201 220 L218 225" stroke="#ffd078" stroke-width="5" stroke-linecap="round"/>
+    <!-- basket base and wheels -->
+    <path d="M77 310 H278" stroke="#087b35" stroke-width="17" stroke-linecap="round"/>
+    <circle cx="111" cy="343" r="17" fill="#087b35"/>
+    <circle cx="245" cy="343" r="17" fill="#087b35"/>
+    <path d="M33 130 H7 M27 169 H0 M31 208 H8" stroke="#35b84b" stroke-width="12" stroke-linecap="round"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="390" y="238" font-family="Arial, Helvetica, sans-serif" font-size="126" font-weight="900" letter-spacing="-5" fill="#087b35">ORGANIGO</text>
+  <path d="M397 278 H1080" stroke="url(#yellow)" stroke-width="12" stroke-linecap="round"/>
+  <text x="400" y="333" font-family="Arial, Helvetica, sans-serif" font-size="39" font-weight="700" letter-spacing="1.5" fill="#278b3d">FRESHNESS AT YOUR DOORSTEP</text>
+</svg>

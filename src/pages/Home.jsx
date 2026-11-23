@@ -1,4 +1,5 @@
 import API_BASE_URL from "../services/api";
+import { Link } from "react-router-dom";
 import React, {
   useEffect,
   useState,
@@ -47,16 +48,41 @@ const categoryImages = {
 // =========================================
 
 function Home() {
-  const {
-    cartItems,
-    addToCart,
-    increaseQuantity,
-    decreaseQuantity,
-  } = useCart();
+const {
+  cartItems,
+  addToCart,
+  increaseQuantity,
+  decreaseQuantity,
+  cartCount,
+  cartTotal,
+} = useCart();
 
   const [products, setProducts] = useState([]);
 
   const [selectedCategory, setSelectedCategory] = useState("All");
+  useEffect(() => {
+  const handleFooterCategory = (event) => {
+    setSelectedCategory(event.detail);
+
+    setTimeout(() => {
+      document
+        .getElementById("shop-products")
+        ?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
+  window.addEventListener(
+    "organigoCategorySelect",
+    handleFooterCategory
+  );
+
+  return () => {
+    window.removeEventListener(
+      "organigoCategorySelect",
+      handleFooterCategory
+    );
+  };
+}, []);
   const [searchQuery, setSearchQuery] = useState("");
 
   const [loading, setLoading] = useState(true);
@@ -775,7 +801,28 @@ function Home() {
           )}
         </section>
 
-      </main>
+         </main>
+
+      {/* FLOATING CART BAR */}
+      {cartCount > 0 && (
+        <div className="organigo-floating-cart">
+          <div className="floating-cart-info">
+            <span className="floating-cart-icon">🛒</span>
+
+            <div>
+              <strong>
+                {cartCount} {cartCount === 1 ? "Item" : "Items"}
+              </strong>
+
+              <p>₹{Number(cartTotal).toFixed(0)}</p>
+            </div>
+          </div>
+
+          <Link to="/cart" className="floating-cart-button">
+            View Cart <span>→</span>
+          </Link>
+        </div>
+      )}
 
       <Footer />
     </>

@@ -4,33 +4,6 @@ import "../styles/About.css";
 function About() {
   const navigate = useNavigate();
 
-  const aboutItems = [
-    {
-      title: "Terms of Services",
-      path: "/about/terms",
-    },
-    {
-      title: "Privacy Policy",
-      path: "/about/privacy",
-    },
-    {
-      title: "Refund & Cancellation Policy",
-      path: "/about/refund",
-    },
-    {
-      title: "Open Source Libraries",
-      path: "/about/open-source",
-    },
-    {
-      title: "Licenses and Registrations",
-      path: "/about/licenses",
-    },
-    {
-      title: "Contact Us",
-      path: "/about/contact",
-    },
-  ];
-
   return (
     <div className="about-page">
 
@@ -43,43 +16,57 @@ function About() {
           ←
         </button>
 
-        <h1>About</h1>
+        <h1>About ORGANIGO</h1>
 
       </div>
 
-      <div className="about-content">
+      <div className="about-detail-content">
 
-        {aboutItems.map((item, index) => (
-          <button
-            className="about-item"
-            key={index}
-            onClick={() => navigate(item.path)}
-          >
-            <span>{item.title}</span>
-            <span className="about-arrow">›</span>
-          </button>
-        ))}
+        <div className="about-brand-card">
+          <div className="about-brand-icon">🥬</div>
 
-        <div className="about-version">
+          <h2>ORGANIGO</h2>
 
-          <div>App version</div>
-
-          <p>v1.0.0 Live</p>
-
+          <p>Freshness Delivered to Your Doorstep.</p>
         </div>
 
-        <div className="about-copyright">
-
-          <h3>ORGANIGO</h3>
+        <section className="about-section">
+          <h3>Who We Are</h3>
 
           <p>
-            Freshness Delivered to Your Doorstep.
+            ORGANIGO is your everyday grocery shopping
+            destination for fresh fruits, vegetables,
+            dairy products, bakery items and daily essentials.
           </p>
+        </section>
 
-          <small>
-            © 2026 ORGANIGO. All Rights Reserved.
-          </small>
+        <section className="about-section">
+          <h3>Our Mission</h3>
 
+          <p>
+            Our mission is to make fresh and quality groceries
+            easily accessible to every household with a
+            convenient and reliable shopping experience.
+          </p>
+        </section>
+
+        <section className="about-section">
+          <h3>Our Commitment</h3>
+
+          <p>
+            We focus on freshness, quality, customer
+            satisfaction and convenient doorstep delivery.
+          </p>
+        </section>
+
+        <section className="about-section">
+          <h3>Our Location</h3>
+
+          <p>Chaibasa, Jharkhand, India.</p>
+        </section>
+
+        <div className="about-detail-footer">
+          © {new Date().getFullYear()} ORGANIGO. All Rights Reserved.
         </div>
 
       </div>

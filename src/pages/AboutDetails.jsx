@@ -1,7 +1,12 @@
 import { useNavigate, useParams } from "react-router-dom";
 import "../styles/About.css";
 
+// ======================================
+// ORGANIGO - ALL INFORMATION PAGES
+// ======================================
+
 const aboutContent = {
+  // TERMS OF SERVICE
   terms: {
     title: "Terms of Service",
     sections: [
@@ -36,6 +41,7 @@ const aboutContent = {
     ],
   },
 
+  // PRIVACY POLICY
   privacy: {
     title: "Privacy Policy",
     sections: [
@@ -66,6 +72,7 @@ const aboutContent = {
     ],
   },
 
+  // REFUND & CANCELLATION
   refund: {
     title: "Refund & Cancellation Policy",
     sections: [
@@ -91,11 +98,108 @@ const aboutContent = {
       },
       {
         heading: "6. Important Note",
-        text: "Refund eligibility and timelines will depend on order status, the nature of the complaint and the applicable consumer protection requirements.",
+        text: "Refund eligibility and timelines will depend on order status, the nature of the complaint and applicable consumer protection requirements.",
       },
     ],
   },
 
+  // HELP CENTER
+  help: {
+    title: "Help Center",
+    sections: [
+      {
+        heading: "How can we help you?",
+        text: "ORGANIGO is here to help you with products, orders, payments and deliveries.",
+      },
+      {
+        heading: "Shopping Help",
+        text: "Browse fresh products, add your favourite items to cart and place your order.",
+      },
+      {
+        heading: "Account Help",
+        text: "Sign in to manage your account, addresses and order history.",
+      },
+      {
+        heading: "Need More Help?",
+        text: "Please contact ORGANIGO customer support when the official support channel becomes available.",
+      },
+    ],
+  },
+
+  // FREQUENTLY ASKED QUESTIONS
+  faqs: {
+    title: "Frequently Asked Questions",
+    sections: [
+      {
+        heading: "1. What is ORGANIGO?",
+        text: "ORGANIGO is a grocery shopping platform for fresh fruits, vegetables and daily essentials.",
+      },
+      {
+        heading: "2. Where does ORGANIGO deliver?",
+        text: "Our initial delivery service is planned for Chaibasa, Jharkhand.",
+      },
+      {
+        heading: "3. How can I place an order?",
+        text: "Browse products, add them to your cart and proceed to checkout.",
+      },
+      {
+        heading: "4. How can I track my order?",
+        text: "You can check your order status from the My Orders section.",
+      },
+      {
+        heading: "5. Can I cancel my order?",
+        text: "Cancellation depends on the current order status. Please refer to our Refund & Cancellation Policy.",
+      },
+    ],
+  },
+
+  // ORDER SUPPORT
+  "order-support": {
+    title: "Order Support",
+    sections: [
+      {
+        heading: "Order Assistance",
+        text: "For assistance with an order, keep your Order ID ready.",
+      },
+      {
+        heading: "Missing Products",
+        text: "Contact customer support if any product is missing from your delivery.",
+      },
+      {
+        heading: "Damaged Products",
+        text: "Report damaged or incorrect products as soon as possible.",
+      },
+      {
+        heading: "Order Status",
+        text: "Visit My Orders to check your order status.",
+      },
+    ],
+  },
+
+  // DELIVERY INFORMATION
+  delivery: {
+    title: "Delivery Information",
+    sections: [
+      {
+        heading: "Delivery Location",
+        text: "ORGANIGO is initially planned to serve customers in Chaibasa, Jharkhand.",
+      },
+      {
+        heading: "Delivery Time",
+        text: "Delivery times may vary depending on location, product availability and operational conditions.",
+      },
+      {
+        heading: "Delivery Charges",
+        text: "Applicable delivery charges, if any, will be displayed during checkout.",
+      },
+      {
+        heading: "Receiving Your Order",
+        text: "Please ensure that someone is available at the delivery address to receive the order.",
+      },
+    ],
+  },
+
+  // OPEN SOURCE LIBRARIES
   "open-source": {
     title: "Open Source Libraries",
     sections: [
@@ -122,6 +226,7 @@ const aboutContent = {
     ],
   },
 
+  // LICENSES AND REGISTRATIONS
   licenses: {
     title: "Licenses and Registrations",
     sections: [
@@ -144,6 +249,7 @@ const aboutContent = {
     ],
   },
 
+  // CONTACT US
   contact: {
     title: "Contact Us",
     sections: [
@@ -171,12 +277,17 @@ const aboutContent = {
   },
 };
 
+// ======================================
+// ABOUT DETAILS PAGE
+// ======================================
+
 function AboutDetails() {
   const navigate = useNavigate();
   const { section } = useParams();
 
   const content = aboutContent[section];
 
+  // PAGE NOT FOUND
   if (!content) {
     return (
       <div className="about-page">
@@ -184,6 +295,7 @@ function AboutDetails() {
           <button
             className="about-back"
             onClick={() => navigate("/about")}
+            aria-label="Go back"
           >
             ←
           </button>
@@ -201,22 +313,23 @@ function AboutDetails() {
   return (
     <div className="about-page">
 
+      {/* PAGE HEADER */}
       <div className="about-header">
-
         <button
           className="about-back"
-          onClick={() => navigate("/about")}
+          onClick={() => navigate(-1)}
           aria-label="Go back"
         >
           ←
         </button>
 
         <h1>{content.title}</h1>
-
       </div>
 
+      {/* PAGE CONTENT */}
       <div className="about-detail-content">
 
+        {/* ORGANIGO BRAND CARD */}
         <div className="about-brand-card">
           <div className="about-brand-icon">🌿</div>
 
@@ -225,22 +338,21 @@ function AboutDetails() {
           <p>Freshness Delivered to Your Doorstep.</p>
         </div>
 
+        {/* INFORMATION SECTIONS */}
         {content.sections.map((item, index) => (
           <section className="about-section" key={index}>
-
             <h3>{item.heading}</h3>
 
             <p>{item.text}</p>
-
           </section>
         ))}
 
+        {/* FOOTER */}
         <div className="about-detail-footer">
-          © 2026 ORGANIGO. All Rights Reserved.
+          © {new Date().getFullYear()} ORGANIGO. All Rights Reserved.
         </div>
 
       </div>
-
     </div>
   );
 }

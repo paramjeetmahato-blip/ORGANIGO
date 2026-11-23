@@ -1,6 +1,6 @@
-/* =====================================
-   ORGANIGO - BOTTOM NAVIGATION
-===================================== */
+/* =========================================
+   ORGANIGO - PREMIUM BOTTOM NAVIGATION
+========================================= */
 
 .organigo-bottom-nav {
   display: none;
@@ -10,65 +10,196 @@
 
   .organigo-bottom-nav {
     position: fixed;
-    bottom: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
+
     width: 100%;
-    height: 65px;
-    background: #ffffff;
+    min-height: 72px;
+
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 5px 4px;
-    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
-    border-top: 1px solid #eeeeee;
-    z-index: 9999;
+
+    padding: 7px 5px calc(7px + env(safe-area-inset-bottom));
+
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border-top: 1px solid #edf1ed;
+
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.07);
+
+    z-index: 99999;
   }
+
+  /* Navigation Items */
 
   .bottom-nav-item {
     flex: 1;
-    height: 100%;
+    min-width: 0;
+    height: 58px;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+
+    gap: 5px;
+
     border: none;
+    outline: none;
     background: transparent;
-    color: #777777;
+
+    color: #89918a;
+
     text-decoration: none;
+
+    font-family: inherit;
     font-size: 10px;
-    font-weight: 500;
+    font-weight: 600;
+
     cursor: pointer;
-    position: relative;
+
+    transition: all 0.25s ease;
+
+    -webkit-tap-highlight-color: transparent;
   }
+
+  /* Navigation Icons */
 
   .bottom-nav-icon {
-    font-size: 22px;
-    line-height: 1;
-    position: relative;
-  }
+    width: 35px;
+    height: 29px;
 
-  .bottom-nav-item.active {
-    color: #168b42;
-    font-weight: 700;
-  }
-
-  .bottom-cart-count {
-    position: absolute;
-    top: -7px;
-    right: -10px;
-    background: #ff5a36;
-    color: white;
-    font-size: 9px;
-    border-radius: 50%;
-    min-width: 15px;
-    height: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
+
+    font-size: 23px;
+    line-height: 1;
+
+    border-radius: 12px;
+
+    transition: all 0.25s ease;
   }
 
-  .organigo-home {
-    padding-bottom: 75px;
+  /* Active Navigation */
+
+  .bottom-nav-item.active {
+    color: #168b42;
+    font-weight: 800;
   }
+
+  .bottom-nav-item.active .bottom-nav-icon {
+    color: #168b42;
+    background: #e9f8ee;
+
+    transform: translateY(-2px);
+  }
+
+  /* Button Interaction */
+
+  .bottom-nav-item:active {
+    transform: scale(0.92);
+  }
+
+  .bottom-nav-item:focus-visible {
+    outline: 2px solid #168b42;
+    outline-offset: -3px;
+    border-radius: 12px;
+  }
+
+  /* Cart Badge - Future Use */
+
+  .bottom-cart-count {
+    position: absolute;
+
+    top: -5px;
+    right: -5px;
+
+    min-width: 16px;
+    height: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ff5636;
+    color: #ffffff;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+  }
+
+  /* Page Bottom Spacing */
+
+  body {
+    padding-bottom: calc(85px + env(safe-area-inset-bottom));
+  }
+
+}
+
+/* =========================================
+   SMALL MOBILE DEVICES
+========================================= */
+
+@media (max-width: 360px) {
+
+  .organigo-bottom-nav {
+    min-height: 66px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .bottom-nav-item {
+    font-size: 9px;
+    gap: 4px;
+  }
+
+  .bottom-nav-icon {
+    font-size: 21px;
+  }
+
+}
+
+/* =========================================
+   TABLET AND DESKTOP
+========================================= */
+
+@media (min-width: 651px) {
+
+  .organigo-bottom-nav {
+    display: none;
+  }
+
+}
+/* ORGANIGO SVG ICONS */
+
+.bottom-nav-icon svg {
+  width: 23px;
+  height: 23px;
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.bottom-nav-item.active .bottom-nav-icon svg {
+  transform: scale(1.08);
+}
+
+.bottom-nav-item.active {
+  color: #168b42;
+}
+
+.bottom-nav-item.active .bottom-nav-icon {
+  background: #e9f8ee;
+  border-radius: 12px;
+}
+
+.bottom-nav-item:not(.active):hover {
+  color: #168b42;
 }

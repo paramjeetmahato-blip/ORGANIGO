@@ -1,54 +1,71 @@
-/* =====================================
-   ORGANIGO ABOUT SECTION
-===================================== */
+/* =========================================
+   ORGANIGO - ABOUT & INFORMATION PAGES
+   Premium Responsive Design
+========================================= */
 
 .about-page {
   min-height: 100vh;
-  background: #ffffff;
-  color: #222;
+  background: #f7f8f7;
+  color: #202820;
   font-family: Arial, sans-serif;
 }
 
-/* HEADER */
+/* =========================================
+   HEADER
+========================================= */
 
 .about-header {
-  min-height: 78px;
+  min-height: 70px;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   padding: 0 25px;
   background: #ffffff;
   border-bottom: 1px solid #eeeeee;
+
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.035);
 }
 
 .about-header h1 {
-  font-size: 23px;
+  font-size: 21px;
   font-weight: 700;
   margin: 0;
+  color: #202820;
 }
 
 .about-back {
   width: 42px;
   height: 42px;
+  flex-shrink: 0;
+
   border: none;
-  border-radius: 50%;
-  background: #f2f8f3;
-  font-size: 28px;
-  cursor: pointer;
+  border-radius: 12px;
+
+  background: #eff8f1;
   color: #168b45;
+
+  font-size: 27px;
+  cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  transition: 0.2s ease;
 }
 
 .about-back:hover {
-  background: #e3f3e7;
+  background: #dff2e4;
+  transform: translateX(-2px);
 }
 
-/* ABOUT MENU */
+/* =========================================
+   ABOUT MAIN CONTENT
+========================================= */
 
 .about-content {
   width: 100%;
@@ -60,16 +77,21 @@
 .about-item {
   width: 100%;
   min-height: 72px;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   border: none;
   border-bottom: 1px solid #eeeeee;
+
   background: white;
+
   font-size: 17px;
   text-align: left;
   cursor: pointer;
   color: #222;
+
   padding: 15px;
   transition: 0.2s ease;
 }
@@ -84,7 +106,9 @@
   color: #168b45;
 }
 
-/* VERSION */
+/* =========================================
+   VERSION
+========================================= */
 
 .about-version {
   padding: 25px 15px;
@@ -98,7 +122,9 @@
   font-size: 15px;
 }
 
-/* COPYRIGHT */
+/* =========================================
+   COPYRIGHT
+========================================= */
 
 .about-copyright {
   text-align: center;
@@ -122,85 +148,164 @@
   font-size: 12px;
 }
 
-/* DETAIL PAGE */
+/* =========================================
+   DETAIL PAGE CONTAINER
+========================================= */
 
 .about-detail-content {
+  width: 100%;
   max-width: 850px;
-  margin: auto;
-  padding: 25px;
+  margin: 25px auto;
+  padding: 0 25px 30px;
 }
 
+/* =========================================
+   ORGANIGO BRAND CARD
+========================================= */
+
 .about-brand-card {
-  background: linear-gradient(135deg, #e8f8ec, #f8fff9);
-  border: 1px solid #d9efdf;
-  border-radius: 16px;
-  padding: 30px 20px;
+  position: relative;
+  overflow: hidden;
+
+  background: linear-gradient(
+    135deg,
+    #e4f7e9 0%,
+    #f5fff7 55%,
+    #eaf8ed 100%
+  );
+
+  border: 1px solid #d7eddd;
+  border-radius: 18px;
+
+  padding: 32px 20px;
   text-align: center;
-  margin-bottom: 30px;
+
+  margin-bottom: 22px;
 }
 
 .about-brand-icon {
-  font-size: 38px;
-  margin-bottom: 8px;
+  width: 65px;
+  height: 65px;
+
+  margin: 0 auto 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ffffff;
+  border-radius: 20px;
+
+  font-size: 35px;
+
+  box-shadow: 0 4px 14px rgba(22, 139, 69, 0.10);
 }
 
 .about-brand-card h2 {
   color: #168b45;
-  font-size: 27px;
-  letter-spacing: 1px;
+  font-size: 29px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
   margin: 5px 0;
 }
 
 .about-brand-card p {
-  color: #666;
+  color: #63766a;
   font-size: 14px;
   margin: 8px 0 0;
 }
 
-/* CONTENT SECTIONS */
+/* =========================================
+   INFORMATION CARDS
+========================================= */
 
 .about-section {
-  padding: 20px 5px;
-  border-bottom: 1px solid #eeeeee;
+  background: #ffffff;
+
+  border: 1px solid #eeeeee;
+  border-radius: 13px;
+
+  padding: 21px 22px;
+  margin-bottom: 13px;
+
+  transition: 0.2s ease;
+}
+
+.about-section:hover {
+  border-color: #d6eadb;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.035);
 }
 
 .about-section h3 {
-  font-size: 17px;
-  color: #222;
-  margin: 0 0 10px;
+  position: relative;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  color: #168b45;
+
+  margin: 0 0 11px;
+  line-height: 1.5;
 }
 
 .about-section p {
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.8;
-  color: #666;
+
+  color: #626b64;
   margin: 0;
 }
 
+/* =========================================
+   DETAIL PAGE FOOTER
+========================================= */
+
 .about-detail-footer {
   text-align: center;
-  color: #888;
+
+  color: #929a93;
   font-size: 12px;
-  padding: 35px 10px;
+
+  padding: 30px 10px;
 }
 
-/* MOBILE RESPONSIVE */
+/* =========================================
+   TABLET RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+  .about-detail-content {
+    max-width: 750px;
+  }
+
+}
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
 
 @media (max-width: 600px) {
 
+  .about-page {
+    background: #f7f8f7;
+  }
+
   .about-header {
-    min-height: 65px;
-    padding: 0 15px;
+    min-height: 62px;
+    padding: 0 14px;
     gap: 12px;
   }
 
   .about-header h1 {
-    font-size: 19px;
+    font-size: 18px;
+    line-height: 1.3;
   }
 
   .about-back {
     width: 38px;
     height: 38px;
+    border-radius: 11px;
     font-size: 25px;
   }
 
@@ -209,7 +314,7 @@
   }
 
   .about-item {
-    min-height: 65px;
+    min-height: 62px;
     font-size: 15px;
     padding: 12px;
   }
@@ -227,24 +332,69 @@
   }
 
   .about-detail-content {
-    padding: 15px;
+    padding: 0 13px 25px;
+    margin: 18px auto;
   }
 
   .about-brand-card {
     padding: 25px 15px;
+    border-radius: 15px;
+    margin-bottom: 16px;
+  }
+
+  .about-brand-icon {
+    width: 58px;
+    height: 58px;
+    font-size: 31px;
+    border-radius: 17px;
+  }
+
+  .about-brand-card h2 {
+    font-size: 25px;
+  }
+
+  .about-brand-card p {
+    font-size: 13px;
   }
 
   .about-section {
-    padding: 18px 3px;
+    padding: 17px 16px;
+    margin-bottom: 11px;
+    border-radius: 12px;
   }
 
   .about-section h3 {
-    font-size: 16px;
+    font-size: 15px;
+    margin-bottom: 8px;
   }
 
   .about-section p {
-    font-size: 14px;
-    line-height: 1.7;
+    font-size: 13.5px;
+    line-height: 1.75;
+  }
+
+  .about-detail-footer {
+    padding: 25px 10px;
+  }
+
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 360px) {
+
+  .about-header h1 {
+    font-size: 16px;
+  }
+
+  .about-section {
+    padding: 15px 13px;
+  }
+
+  .about-section p {
+    font-size: 13px;
   }
 
 }
