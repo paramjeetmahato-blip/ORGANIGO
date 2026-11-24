@@ -1,890 +1,571 @@
-/* =========================================
-   ORGANIGO - PREMIUM AUTHENTICATION
-========================================= */
+/* ==========================================
+   ORGANIGO PREMIUM ADMIN LOGIN
+========================================== */
 
-.auth-page,
-.auth-page * {
+.organigo-login-page,
+.organigo-login-page * {
   box-sizing: border-box;
 }
 
-.auth-page {
-  min-height: 100vh;
-  font-family: "DM Sans", Arial, sans-serif;
-}
-
-/* =========================================
-   DESKTOP BACKGROUND
-========================================= */
-
-.auth-desktop-background {
+.organigo-login-page {
   min-height: 100vh;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 35px;
+  position: relative;
+  overflow: hidden;
+  background: #f1f6f0;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+/* BACKGROUND DECORATIONS */
+
+.login-decoration {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.login-decoration-one {
+  width: 450px;
+  height: 450px;
+  background: #d8efda;
+  top: -200px;
+  right: -100px;
+}
+
+.login-decoration-two {
+  width: 350px;
+  height: 350px;
+  background: #e1f1df;
+  bottom: -180px;
+  left: -100px;
+}
+
+/* MAIN CARD */
+
+.login-main-card {
+  width: 100%;
+  max-width: 1080px;
+  min-height: 650px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: white;
+  border-radius: 25px;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 25px 80px rgba(26, 70, 39, 0.12);
+}
+
+/* LEFT BRAND PANEL */
+
+.login-brand-panel {
+  background: linear-gradient(145deg, #087c3c, #075b32);
+  padding: 45px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: white;
+  position: relative;
   overflow: hidden;
 }
 
-.auth-desktop-background .Organigo-header {
-  position: relative;
-  top: 0;
+.login-brand-panel::before {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 50%;
+  right: -190px;
+  bottom: -100px;
 }
 
-.auth-desktop-background .organigo-bottom-nav {
+.login-brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-size: 29px;
+  font-weight: 850;
+  letter-spacing: -1px;
+  text-decoration: none;
+}
+
+.brand-icon {
+  font-size: 32px;
+}
+
+.brand-content {
+  position: relative;
+  z-index: 2;
+  margin: 45px 0;
+}
+
+.brand-small-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: #b9edc9;
+}
+
+.brand-content h1 {
+  font-size: 43px;
+  line-height: 1.18;
+  margin: 20px 0;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+}
+
+.brand-content h1 span {
+  color: #b9ed9c;
+}
+
+.brand-content p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #d7eadc;
+  max-width: 360px;
+}
+
+.brand-features {
+  margin-top: 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.brand-feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: #effff2;
+}
+
+.brand-feature span {
+  width: 23px;
+  height: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.17);
+  color: #c5ffb5;
+  font-weight: bold;
+}
+
+.brand-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #c0dfc8;
+}
+
+/* RIGHT FORM PANEL */
+
+.login-form-panel {
+  padding: 55px 55px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: white;
+}
+
+.login-form-content {
+  width: 100%;
+  max-width: 380px;
+  margin: auto;
+}
+
+.login-mobile-logo {
   display: none;
 }
 
-/* =========================================
-   LOGIN OVERLAY
-========================================= */
-
-.auth-container {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-
-  display: flex;
+.login-security-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-
-  background: rgba(0, 0, 0, 0.25);
-
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  gap: 8px;
+  padding: 8px 13px;
+  background: #edfaef;
+  border-radius: 30px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #168746;
+  letter-spacing: 0.8px;
 }
 
-/* =========================================
-   LOGIN CARD
-========================================= */
-
-.auth-card {
-  position: relative;
-
-  width: 100%;
-  max-width: 570px;
-
-  padding: 25px 55px 15px;
-
-  background: #ffffff;
-  border-radius: 17px;
-
-  box-shadow: 0 15px 55px rgba(0, 0, 0, 0.2);
-
-  text-align: center;
-
-  animation: authPopup 0.3s ease;
-}
-
-@keyframes authPopup {
-  from {
-    opacity: 0;
-    transform: translateY(15px) scale(0.97);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* =========================================
-   BRAND LOGO
-========================================= */
-
-.auth-brand {
-  width: 65px;
-  height: 65px;
-
-  margin: 0 auto 17px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.auth-brand img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* =========================================
-   BACK BUTTON
-========================================= */
-
-.auth-back-button {
-  position: absolute;
-  top: 20px;
-  left: 22px;
-
-  width: 32px;
-  height: 32px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: transparent !important;
-  color: #26382b !important;
-
-  border: none;
+.security-dot {
+  height: 7px;
+  width: 7px;
   border-radius: 50%;
-
-  font-size: 25px;
-  cursor: pointer;
+  background: #16a34a;
 }
 
-.auth-back-button:hover {
-  background: #f2f7f2 !important;
-  transform: none !important;
-}
-
-/* =========================================
-   HEADINGS
-========================================= */
-
-.auth-card h1 {
-  color: #159447;
+.login-form-content h2 {
+  margin: 25px 0 8px;
   font-size: 30px;
-  font-weight: 900;
-  margin: 0;
+  font-weight: 800;
+  color: #172b20;
+  letter-spacing: -1px;
 }
 
-.auth-card h2 {
-  margin: 0 0 5px;
-
-  color: #242424;
-
-  font-size: 23px;
-  font-weight: 900;
-  line-height: 1.3;
+.login-description {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #849087;
+  margin-bottom: 28px;
 }
 
-.auth-subtitle {
-  margin: 5px 0 18px;
+/* PROGRESS */
 
-  color: #555;
-  font-size: 15px;
-  font-weight: 500;
+.login-progress {
+  display: flex;
+  align-items: center;
+  margin-bottom: 35px;
 }
 
-/* =========================================
-   FORM
-========================================= */
-
-.auth-card form {
+.progress-step {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.auth-card label {
-  display: block;
-
-  color: #344b3b;
-  font-size: 13px;
-  font-weight: 700;
-
-  text-align: left;
-}
-
-.auth-card input {
-  width: 100%;
-  min-width: 0;
-
-  padding: 14px;
-
-  border: 1px solid #cfcfcf;
-  border-radius: 10px;
-
-  outline: none;
-
-  color: #26382b;
-  background: #ffffff;
-
-  font-family: inherit;
-  font-size: 14px;
-}
-
-.auth-card input:focus {
-  border-color: #159447;
-  box-shadow: 0 0 0 3px rgba(21, 148, 71, 0.08);
-}
-
-/* =========================================
-   PHONE INPUT
-========================================= */
-
-.phone-input-wrapper {
-  width: 100%;
-  min-height: 49px;
-
-  display: flex;
   align-items: center;
-
-  border: 1px solid #aaa;
-  border-radius: 11px;
-
-  overflow: hidden;
-  background: #ffffff;
+  gap: 7px;
+  min-width: 45px;
 }
 
-.phone-input-wrapper:focus-within {
-  border-color: #159447;
-  box-shadow: 0 0 0 3px rgba(21, 148, 71, 0.08);
-}
-
-.phone-input-wrapper span {
-  padding: 0 13px;
-
-  color: #222;
-  font-size: 14px;
+.progress-step span {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #edf0ed;
+  color: #879189;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
   font-weight: 700;
 }
 
-.phone-input-wrapper input {
-  flex: 1;
-
-  width: 100%;
-  min-width: 0;
-
-  padding: 13px 8px;
-
-  border: none;
-  border-radius: 0;
-
-  outline: none;
-  box-shadow: none !important;
-
-  font-size: 14px;
+.progress-step.active span {
+  background: #138443;
+  color: white;
 }
 
-/* =========================================
-   PASSWORD INPUT
-========================================= */
+.progress-step small {
+  font-size: 10px;
+  color: #879189;
+}
 
-.password-input-wrapper {
+.progress-step.active small {
+  color: #138443;
+  font-weight: 700;
+}
+
+.progress-line {
+  flex: 1;
+  height: 2px;
+  background: #e8eee8;
+  margin: 0 8px 20px;
+}
+
+.progress-line.completed {
+  background: #138443;
+}
+
+/* FORM */
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-form label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #344a3a;
+  margin-top: 3px;
+}
+
+.login-input-wrapper {
   width: 100%;
+  height: 55px;
+  border: 1px solid #dce5dd;
+  border-radius: 11px;
   display: flex;
   align-items: center;
-
-  border: 1px solid #dce9df;
-  border-radius: 10px;
-
-  overflow: hidden;
-}
-
-.password-input-wrapper input {
-  flex: 1;
-  border: none;
-  border-radius: 0;
-}
-
-.password-toggle {
-  margin: 0 !important;
-  padding: 10px 12px !important;
-
-  color: #16833b !important;
-  background: #ffffff !important;
-
-  border: none;
-  font-size: 12px !important;
-}
-
-/* =========================================
-   PRIMARY BUTTON
-========================================= */
-
-.auth-primary-button {
-  width: 100%;
-  min-height: 51px;
-
-  margin-top: 7px !important;
-  padding: 13px 18px;
-
-  border: none;
-  border-radius: 11px;
-
-  color: #ffffff;
-  background: #159447;
-
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 800;
-
-  cursor: pointer;
+  padding: 0 14px;
+  background: #fbfdfb;
   transition: 0.25s ease;
 }
 
-.auth-primary-button:hover {
-  background: #087a35;
-  transform: translateY(-1px);
+.login-input-wrapper:focus-within {
+  border-color: #16934d;
+  box-shadow: 0 0 0 4px rgba(22,147,77,0.09);
+  background: white;
 }
 
-.auth-primary-button:disabled {
-  opacity: 0.6;
+.login-input-wrapper input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: #263a2d;
+  min-width: 0;
+}
+
+.login-input-wrapper input::placeholder {
+  color: #a6b0a8;
+}
+
+.country-code {
+  font-size: 13px;
+  font-weight: 700;
+  color: #344b3a;
+  padding-right: 13px;
+  margin-right: 12px;
+  border-right: 1px solid #dce5dd;
+  white-space: nowrap;
+}
+
+/* BUTTON */
+
+.login-submit-btn {
+  height: 54px;
+  width: 100%;
+  border: none;
+  border-radius: 11px;
+  background: linear-gradient(110deg, #15934c, #08743a);
+  color: white;
+  font-size: 14px;
+  font-weight: 750;
+  cursor: pointer;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: 0.25s ease;
+  box-shadow: 0 8px 18px rgba(13,125,60,0.16);
+}
+
+.login-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(13,125,60,0.24);
+}
+
+.login-submit-btn:disabled {
+  opacity: 0.65;
   cursor: not-allowed;
+  transform: none;
 }
 
-/* =========================================
-   PHONE DISPLAY
-========================================= */
+.login-submit-btn span {
+  font-size: 20px;
+}
 
-.auth-phone-display {
+/* PASSWORD */
+
+.password-toggle {
+  border: none;
+  background: transparent;
+  color: #138443;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* OTP */
+
+.otp-phone-text {
+  font-size: 12px;
+  color: #849087;
+}
+
+.dev-otp-box {
+  background: #fff8e7;
+  border: 1px solid #f5dfaa;
+  color: #805b0b;
+  padding: 12px;
+  border-radius: 9px;
+  font-size: 12px;
+}
+
+.login-back-btn {
+  background: transparent;
+  border: none;
+  color: #168443;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 10px;
+}
+
+/* MESSAGES */
+
+.auth-message {
+  padding: 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  margin-top: 18px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.auth-message.success {
+  background: #eaf8ed;
+  color: #14743a;
+}
+
+.auth-message.error {
+  background: #fff0f0;
+  color: #d12c2c;
+}
+
+/* BOTTOM */
+
+.login-bottom {
+  width: 100%;
+  max-width: 380px;
+  margin: 35px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid #edf0ed;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  padding: 12px 14px;
-
-  background: #f2faf3;
-  border-radius: 9px;
-
-  color: #24452e;
-  font-size: 14px;
-  font-weight: 700;
+  gap: 10px;
 }
 
-.auth-phone-display button {
-  margin: 0 !important;
-  padding: 5px !important;
-
-  color: #159447 !important;
-  background: transparent !important;
-
-  font-size: 12px !important;
+.login-protected {
+  font-size: 10px;
+  color: #849087;
 }
 
-/* =========================================
-   REMEMBER ME
-========================================= */
-
-.remember-option {
-  display: flex !important;
-  align-items: center;
-  gap: 8px;
-
-  margin: 5px 0;
-
-  font-size: 12px !important;
-  cursor: pointer;
+.login-protected span {
+  margin-right: 5px;
 }
 
-.remember-option input {
-  width: 16px;
-  height: 16px;
-}
-
-/* =========================================
-   LINKS
-========================================= */
-
-.auth-card a {
-  color: #159447;
+.login-back-website {
+  color: #128344;
   text-decoration: none;
-  font-weight: 700;
-}
-
-.auth-card a:hover {
-  text-decoration: underline;
-}
-
-.auth-create-account {
-  margin: 17px 0;
-
-  color: #666;
-  font-size: 13px;
-}
-
-.auth-link-button,
-.auth-secondary-button {
-  width: 100%;
-
-  margin: 8px 0 !important;
-  padding: 10px;
-
-  color: #16833b !important;
-  background: transparent !important;
-
-  border: none;
-  font-family: inherit;
-  font-size: 13px !important;
-  font-weight: 700;
-
-  cursor: pointer;
-}
-
-.auth-secondary-button:hover,
-.auth-link-button:hover {
-  text-decoration: underline;
-  transform: none !important;
-}
-
-/* =========================================
-   TERMS AND PRIVACY
-========================================= */
-
-.auth-terms {
-  margin: 15px -55px -15px;
-  padding: 12px 15px;
-
-  color: #777;
-  background: #fafafa;
-
-  border-radius: 0 0 17px 17px;
-
   font-size: 11px;
-  line-height: 1.6;
+  font-weight: 750;
 }
 
-.auth-terms a {
-  color: #526d91;
+.login-back-website:hover {
   text-decoration: underline;
-  font-weight: 500;
 }
 
-/* =========================================
-   MESSAGE
-========================================= */
+/* TABLET */
 
-.auth-message {
-  margin: 13px 0;
-  padding: 10px;
+@media (max-width: 850px) {
 
-  color: #315c3a;
-  background: #eef8ef;
-
-  border-radius: 8px;
-
-  font-size: 12px;
-  line-height: 1.5;
-
-  overflow-wrap: anywhere;
-}
-
-.dev-otp {
-  padding: 10px;
-
-  color: #795500;
-  background: #fff4d6;
-
-  border-radius: 6px;
-  text-align: center;
-}
-
-/* =========================================
-   PRODUCT SHOWCASE
-========================================= */
-
-.auth-mobile-showcase {
-  display: none;
-}
-
-/* =========================================
-   TABLET
-========================================= */
-
-@media (min-width: 651px) and (max-width: 900px) {
-  .auth-card {
-    max-width: 520px;
-    padding: 25px 40px 15px;
+  .organigo-login-page {
+    padding: 20px;
   }
 
-  .auth-terms {
-    margin-left: -40px;
-    margin-right: -40px;
+  .login-main-card {
+    max-width: 650px;
+    grid-template-columns: 0.8fr 1.2fr;
   }
+
+  .login-brand-panel {
+    padding: 30px;
+  }
+
+  .brand-content h1 {
+    font-size: 32px;
+  }
+
+  .login-form-panel {
+    padding: 35px 28px;
+  }
+
 }
 
-/* =========================================
-   MOBILE LOGIN
-========================================= */
+/* MOBILE */
 
-@media (max-width: 650px) {
+@media (max-width: 600px) {
 
-  .auth-desktop-background {
+  .organigo-login-page {
+    min-height: 100vh;
+    padding: 16px;
+    align-items: center;
+  }
+
+  .login-main-card {
+    display: block;
+    max-width: 430px;
+    min-height: auto;
+    border-radius: 20px;
+  }
+
+  .login-brand-panel {
     display: none;
   }
 
-  .auth-container {
-    position: fixed;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-    min-height: 100vh;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-
-    padding: 0;
-
-    background: #ffffff;
-
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-
-    overflow-x: hidden;
-    overflow-y: auto;
+  .login-form-panel {
+    padding: 28px 23px 22px;
   }
 
-  /* PRODUCT ANIMATION */
-
-  .auth-mobile-showcase {
-    width: 100%;
-    height: 37vh;
-    min-height: 240px;
-    max-height: 340px;
-
+  .login-mobile-logo {
     display: flex;
-    flex-direction: column;
     justify-content: center;
-
-    gap: 12px;
-
-    padding: 12px 0;
-
-    overflow: hidden;
-
-    background: linear-gradient(
-      135deg,
-      #effaf2,
-      #e4f5eb,
-      #f4fbf8
-    );
-  }
-
-  .auth-animation-row {
-    width: 100%;
-    overflow: hidden;
-  }
-
-  .auth-product-track {
-    width: max-content;
-
-    display: flex;
     align-items: center;
-    gap: 13px;
-
-    animation: authSlideLeft 35s linear infinite;
-
-    will-change: transform;
-  }
-
-  .auth-product-track.reverse {
-    animation: authSlideRight 40s linear infinite;
-  }
-
-  .auth-product-item {
-    width: 105px;
-    height: 88px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    gap: 5px;
-
-    padding: 7px;
-
-    background: #ffffff;
-    border: 1px solid #e2eee5;
-    border-radius: 18px;
-
-    box-shadow: 0 5px 15px rgba(25, 90, 48, 0.08);
-
-    overflow: hidden;
-  }
-
-  .auth-product-item img {
-    width: 60px;
-    height: 53px;
-
-    object-fit: contain;
-
-    display: block;
-  }
-
-  .auth-product-item span {
-    max-width: 95px;
-
-    color: #315b3c;
-
-    font-size: 10px;
-    font-weight: 700;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  @keyframes authSlideLeft {
-    from {
-      transform: translateX(0);
-    }
-
-    to {
-      transform: translateX(-33.333%);
-    }
-  }
-
-  @keyframes authSlideRight {
-    from {
-      transform: translateX(-33.333%);
-    }
-
-    to {
-      transform: translateX(0);
-    }
-  }
-
-  /* LOGIN CARD */
-
-  .auth-card {
-    width: 100%;
-    max-width: 100%;
-
-    flex: 1;
-
-    padding: 23px 24px 25px;
-
-    border: none;
-    border-radius: 0;
-
-    box-shadow: none;
-
-    background: #ffffff;
-  }
-
-  .auth-brand {
-    width: 75px;
-    height: 75px;
-
-    margin: 0 auto 20px;
-  }
-
-  .auth-back-button {
-    top: 18px;
-    left: 17px;
-  }
-
-  .auth-card h2 {
+    gap: 8px;
     font-size: 25px;
-    line-height: 1.3;
+    font-weight: 850;
+    color: #108344;
+    margin-bottom: 30px;
   }
 
-  .auth-subtitle {
-    margin: 7px 0 25px;
-    font-size: 15px;
+  .login-mobile-logo span {
+    font-size: 27px;
   }
 
-  .phone-input-wrapper {
-    min-height: 58px;
-    border-radius: 13px;
+  .login-form-content h2 {
+    font-size: 27px;
   }
 
-  .phone-input-wrapper span {
-    padding: 0 15px;
-    font-size: 16px;
+  .login-description {
+    font-size: 12px;
   }
 
-  .phone-input-wrapper input {
-    padding: 16px 7px;
-    font-size: 16px;
+  .login-progress {
+    margin-bottom: 28px;
   }
 
-  .auth-primary-button {
-    min-height: 58px;
-    margin-top: 13px !important;
-
-    border-radius: 12px;
-
-    font-size: 16px;
+  .login-bottom {
+    margin-top: 28px;
   }
 
-  .auth-create-account {
-    margin-top: 20px;
-    font-size: 13px;
+  .login-decoration-one {
+    width: 250px;
+    height: 250px;
   }
 
-  .auth-terms {
-    margin: 25px -24px -25px;
-    padding: 17px 15px;
-
-    background: #fafafa;
-
-    border-radius: 0;
-
-    font-size: 11px;
+  .login-decoration-two {
+    width: 200px;
+    height: 200px;
   }
 
-  .auth-card form {
-    gap: 13px;
-  }
-
-  .auth-card label {
-    font-size: 13px;
-  }
-
-  .auth-card input {
-    font-size: 15px;
-  }
 }
 
-/* =========================================
-   SMALL MOBILE
-========================================= */
+@media (max-width: 360px) {
 
-@media (max-width: 380px) {
-
-  .auth-mobile-showcase {
-    height: 34vh;
-    min-height: 210px;
+  .login-form-panel {
+    padding: 24px 17px;
   }
 
-  .auth-product-item {
-    width: 88px;
-    height: 75px;
+  .login-bottom {
+    flex-direction: column;
   }
 
-  .auth-product-item img {
-    width: 50px;
-    height: 43px;
-  }
-
-  .auth-product-item span {
-    max-width: 78px;
-    font-size: 9px;
-  }
-
-  .auth-card {
-    padding: 20px 17px 22px;
-  }
-
-  .auth-card h2 {
-    font-size: 22px;
-  }
-
-  .auth-terms {
-    margin-left: -17px;
-    margin-right: -17px;
-  }
-}
-
-/* REDUCED MOTION */
-
-@media (prefers-reduced-motion: reduce) {
-
-  .auth-product-track {
-    animation: none !important;
-  }
-
-  .auth-card {
-    animation: none !important;
-  }
-}
-/* Remove Login Page Background Blur */
-.auth-container {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  filter: none !important;
-}
-
-/* Remove Blur From Desktop Background */
-.auth-desktop-background {
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  opacity: 1 !important;
-}
-/* ORGANIGO HOME PAGE - LOGIN BACKGROUND */
-
-.auth-desktop-background {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  z-index: 1;
-
-  filter: none !important;
-  backdrop-filter: none !important;
-  opacity: 1 !important;
-}
-
-/* LOGIN OVERLAY */
-
-.auth-container {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  filter: none !important;
-}
-
-/* LOGIN CARD */
-
-.auth-card {
-  position: relative;
-  z-index: 10000;
-}
-/* =====================================
-   ORGANIGO LOGIN DESKTOP BACKGROUND
-===================================== */
-
-.auth-page {
-  position: relative;
-  min-height: 100vh;
-}
-
-.auth-desktop-background {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  overflow-y: auto;
-  background: #fff;
-
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Login overlay */
-.auth-container {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: rgba(0, 0, 0, 0.12) !important;
-
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Login card */
-.auth-card {
-  position: relative;
-  z-index: 10000;
-}
-
-/* Mobile background */
-@media (max-width: 650px) {
-  .auth-desktop-background {
-    display: none !important;
-  }
 }

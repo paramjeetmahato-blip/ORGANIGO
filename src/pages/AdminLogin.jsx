@@ -12,6 +12,7 @@ function AdminLogin() {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [verificationToken, setVerificationToken] = useState("");
 
   const [step, setStep] = useState("phone");
@@ -139,7 +140,6 @@ function AdminLogin() {
         return;
       }
 
-      // SAVE ADMIN SESSION IN CURRENT TAB ONLY
       saveSession(data.token, data.user);
 
       setMessage("Admin Login Successful!");
@@ -156,97 +156,302 @@ function AdminLogin() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <div className="organigo-login-page">
 
-        <h1>ORGANIGO</h1>
-        <p>Admin Control Panel</p>
+      {/* BACKGROUND DECORATION */}
+      <div className="login-decoration login-decoration-one"></div>
+      <div className="login-decoration login-decoration-two"></div>
 
-        {step === "phone" && (
-          <>
-            <h2>Admin Login</h2>
-            <p>Enter your registered mobile number.</p>
+      <div className="login-main-card">
 
-            <form onSubmit={requestOTP}>
-              <label>Mobile Number</label>
+        {/* LEFT BRANDING PANEL */}
+        <div className="login-brand-panel">
 
-              <input
-                type="tel"
-                placeholder="10-digit mobile number"
-                value={phone}
-                onChange={(e) =>
-                  setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
-                }
-                required
-              />
+          <Link to="/" className="login-brand-logo">
+            <span className="brand-icon">🌿</span>
+            <span>ORGANIGO</span>
+          </Link>
 
-              <button type="submit" disabled={loading}>
-                {loading ? "Sending OTP..." : "Send OTP"}
-              </button>
-            </form>
-          </>
-        )}
+          <div className="brand-content">
 
-        {step === "otp" && (
-          <>
-            <h2>Verify OTP</h2>
-            <p>OTP verification for +91 {cleanPhone}</p>
+            <span className="brand-small-label">
+              MANAGEMENT PORTAL
+            </span>
 
-            {devOtp && (
-              <p>
-                Development OTP: <strong>{devOtp}</strong>
-              </p>
+            <h1>
+              Manage your
+              <br />
+              business with
+              <br />
+              <span>confidence.</span>
+            </h1>
+
+            <p>
+              Welcome to your ORGANIGO control center.
+              Manage products, orders, customers and
+              delivery operations from one place.
+            </p>
+
+            <div className="brand-features">
+
+              <div className="brand-feature">
+                <span>✓</span>
+                Secure Admin Access
+              </div>
+
+              <div className="brand-feature">
+                <span>✓</span>
+                Smart Business Management
+              </div>
+
+              <div className="brand-feature">
+                <span>✓</span>
+                Real-time Operations
+              </div>
+
+            </div>
+
+          </div>
+
+          <div className="brand-footer">
+            <span>GROW SMART. DELIVER FRESH.</span>
+            <span>© 2026 ORGANIGO</span>
+          </div>
+
+        </div>
+
+        {/* RIGHT LOGIN PANEL */}
+        <div className="login-form-panel">
+
+          <div className="login-mobile-logo">
+            <span>🌿</span>
+            ORGANIGO
+          </div>
+
+          <div className="login-form-content">
+
+            <div className="login-security-badge">
+              <span className="security-dot"></span>
+              SECURE ADMIN PORTAL
+            </div>
+
+            <h2>
+              {step === "phone" && "Welcome back!"}
+              {step === "otp" && "Verify your number"}
+              {step === "password" && "Almost there!"}
+            </h2>
+
+            <p className="login-description">
+              {step === "phone" &&
+                "Sign in to access your admin dashboard."}
+
+              {step === "otp" &&
+                "Enter the verification code sent to your mobile."}
+
+              {step === "password" &&
+                "Your number is verified. Enter your password."}
+            </p>
+
+            {/* STEP INDICATOR */}
+            <div className="login-progress">
+
+              <div className={`progress-step ${step === "phone" || step === "otp" || step === "password" ? "active" : ""}`}>
+                <span>1</span>
+                <small>Mobile</small>
+              </div>
+
+              <div className={`progress-line ${step !== "phone" ? "completed" : ""}`}></div>
+
+              <div className={`progress-step ${step === "otp" || step === "password" ? "active" : ""}`}>
+                <span>2</span>
+                <small>Verify</small>
+              </div>
+
+              <div className={`progress-line ${step === "password" ? "completed" : ""}`}></div>
+
+              <div className={`progress-step ${step === "password" ? "active" : ""}`}>
+                <span>3</span>
+                <small>Login</small>
+              </div>
+
+            </div>
+
+            {/* PHONE STEP */}
+            {step === "phone" && (
+
+              <form onSubmit={requestOTP} className="login-form">
+
+                <label>Mobile Number</label>
+
+                <div className="login-input-wrapper">
+
+                  <span className="country-code">🇮🇳 +91</span>
+
+                  <input
+                    type="tel"
+                    placeholder="Enter mobile number"
+                    value={phone}
+                    onChange={(e) =>
+                      setPhone(
+                        e.target.value.replace(/\D/g, "").slice(0, 10)
+                      )
+                    }
+                    required
+                  />
+
+                </div>
+
+                <button
+                  type="submit"
+                  className="login-submit-btn"
+                  disabled={loading}
+                >
+                  {loading ? "Sending OTP..." : "Continue with OTP"}
+                  {!loading && <span>→</span>}
+                </button>
+
+              </form>
+
             )}
 
-            <form onSubmit={verifyOTP}>
-              <label>6-Digit OTP</label>
+            {/* OTP STEP */}
+            {step === "otp" && (
 
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={otp}
-                onChange={(e) =>
-                  setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
-                }
-                required
-              />
+              <form onSubmit={verifyOTP} className="login-form">
 
-              <button type="submit" disabled={loading}>
-                {loading ? "Verifying..." : "Verify OTP"}
-              </button>
-            </form>
-          </>
-        )}
+                <label>6-Digit Verification Code</label>
 
-        {step === "password" && (
-          <>
-            <h2>Enter Password</h2>
-            <p>OTP verified. Now enter your admin password.</p>
+                <div className="login-input-wrapper otp-input-wrapper">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    placeholder="Enter 6-digit OTP"
+                    value={otp}
+                    onChange={(e) =>
+                      setOtp(
+                        e.target.value.replace(/\D/g, "").slice(0, 6)
+                      )
+                    }
+                    required
+                  />
+                </div>
 
-            <form onSubmit={handleLogin}>
-              <label>Password</label>
+                <p className="otp-phone-text">
+                  Verification for +91 {cleanPhone}
+                </p>
 
-              <input
-                type="password"
-                placeholder="Enter admin password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+                {devOtp && (
+                  <div className="dev-otp-box">
+                    Development OTP: <strong>{devOtp}</strong>
+                  </div>
+                )}
 
-              <button type="submit" disabled={loading}>
-                {loading ? "Logging in..." : "Login to Dashboard"}
-              </button>
-            </form>
-          </>
-        )}
+                <button
+                  type="submit"
+                  className="login-submit-btn"
+                  disabled={loading}
+                >
+                  {loading ? "Verifying..." : "Verify OTP"}
+                  {!loading && <span>→</span>}
+                </button>
 
-        {message && <p className="auth-message">{message}</p>}
+                <button
+                  type="button"
+                  className="login-back-btn"
+                  onClick={() => {
+                    setStep("phone");
+                    setOtp("");
+                    setDevOtp("");
+                    setMessage("");
+                  }}
+                >
+                  ← Change mobile number
+                </button>
 
-        <Link to="/">Back to Website</Link>
+              </form>
+
+            )}
+
+            {/* PASSWORD STEP */}
+            {step === "password" && (
+
+              <form onSubmit={handleLogin} className="login-form">
+
+                <label>Admin Password</label>
+
+                <div className="login-input-wrapper">
+
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+
+                </div>
+
+                <button
+                  type="submit"
+                  className="login-submit-btn"
+                  disabled={loading}
+                >
+                  {loading ? "Logging in..." : "Login to Dashboard"}
+                  {!loading && <span>→</span>}
+                </button>
+
+                <button
+                  type="button"
+                  className="login-back-btn"
+                  onClick={() => {
+                    setStep("phone");
+                    setPassword("");
+                    setOtp("");
+                    setVerificationToken("");
+                    setMessage("");
+                  }}
+                >
+                  ← Start again
+                </button>
+
+              </form>
+
+            )}
+
+            {message && (
+              <div className={`auth-message ${message.toLowerCase().includes("failed") || message.toLowerCase().includes("valid") || message.toLowerCase().includes("required") ? "error" : "success"}`}>
+                {message}
+              </div>
+            )}
+
+          </div>
+
+          <div className="login-bottom">
+
+            <div className="login-protected">
+              <span>🔒</span>
+              Protected Admin Access
+            </div>
+
+            <Link to="/" className="login-back-website">
+              ← Back to Website
+            </Link>
+
+          </div>
+
+        </div>
 
       </div>
+
     </div>
   );
 }

@@ -2,7 +2,8 @@ import API_BASE_URL from "../services/api";
 import { useEffect, useState } from "react";
 import { saveSession, clearSession } from "../utils/auth";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import "../styles/Auth.css";
+import "../styles/CustomerAuth.css";
+
 import Home from "./Home";
 import Header from "../components/Header";
 
@@ -99,6 +100,7 @@ function Login() {
                 e.currentTarget.parentElement.style.display = "none";
               }}
             />
+
             <span>{product.name}</span>
           </div>
         ))}
@@ -303,25 +305,21 @@ function Login() {
   return (
     <div className="auth-page">
 
-      {/* DESKTOP HOME BACKGROUND */}
-    <div className="auth-desktop-background">
-  <Header />
-  <Home />
-</div>
+      {/* DESKTOP HOME PAGE BACKGROUND */}
+      <div className="auth-desktop-background">
+        <Header />
+        <Home />
+      </div>
 
-      {/* LOGIN OVERLAY */}
+      {/* DARK BACKDROP */}
+      <div className="auth-backdrop"></div>
+
+      {/* LOGIN CONTAINER */}
       <div className="auth-container">
 
         {/* MOBILE PRODUCT ANIMATION */}
         {animationProducts.length > 0 && (
           <div className="auth-mobile-showcase">
-            <div className="auth-animation-row">
-              {renderProductRow(false)}
-            </div>
-
-            <div className="auth-animation-row">
-              {renderProductRow(true)}
-            </div>
 
             <div className="auth-animation-row">
               {renderProductRow(false)}
@@ -330,6 +328,15 @@ function Login() {
             <div className="auth-animation-row">
               {renderProductRow(true)}
             </div>
+
+            <div className="auth-animation-row">
+              {renderProductRow(false)}
+            </div>
+
+            <div className="auth-animation-row">
+              {renderProductRow(true)}
+            </div>
+
           </div>
         )}
 
@@ -373,6 +380,7 @@ function Login() {
 
               {!showPasswordStep ? (
                 <form onSubmit={handleContinue}>
+
                   <div className="phone-input-wrapper">
                     <span>+91</span>
 
@@ -401,11 +409,14 @@ function Login() {
                   >
                     Continue
                   </button>
+
                 </form>
               ) : (
                 <form onSubmit={handleLogin}>
+
                   <div className="auth-phone-display">
                     <span>+91 {cleanPhone}</span>
+
                     <button type="button" onClick={backToPhone}>
                       Change
                     </button>
@@ -460,6 +471,7 @@ function Login() {
                   >
                     Forgot Password?
                   </button>
+
                 </form>
               )}
 
@@ -482,6 +494,7 @@ function Login() {
               </p>
 
               <form onSubmit={requestResetOTP}>
+
                 <div className="phone-input-wrapper">
                   <span>+91</span>
 
@@ -509,6 +522,7 @@ function Login() {
                 >
                   {loading ? "Sending OTP..." : "Send Reset OTP"}
                 </button>
+
               </form>
 
               <button
@@ -531,6 +545,7 @@ function Login() {
               </p>
 
               <form onSubmit={resetPassword}>
+
                 <label>6-Digit OTP</label>
 
                 <input
@@ -594,6 +609,7 @@ function Login() {
                 >
                   {loading ? "Updating..." : "Reset Password"}
                 </button>
+
               </form>
 
               <button
