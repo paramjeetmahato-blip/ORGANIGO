@@ -661,3 +661,181 @@
     padding-top: 12px;
   }
 }
+/* ==========================================
+   ORGANIGO MOBILE LOGIN - FINAL DESIGN
+========================================== */
+
+@media (max-width: 600px) {
+
+  .auth-page {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    min-height: 100svh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px 14px;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    background: linear-gradient(
+      180deg,
+      #e8f8df 0%,
+      #f5ffed 35%,
+      #ffffff 100%
+    );
+  }
+
+  /* Desktop background hide */
+  .auth-desktop-background,
+  .auth-backdrop {
+    display: none !important;
+  }
+
+  /* Main container */
+  .auth-container {
+    width: 100%;
+    max-width: 440px;
+    min-height: auto;
+    height: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 16px;
+    margin: 0 auto;
+    padding: 0;
+
+    pointer-events: auto;
+  }
+
+  /* Product animation section */
+  .auth-mobile-showcase {
+    display: flex !important;
+    flex-direction: column;
+
+    width: 100%;
+    height: 145px;
+    max-height: 145px;
+
+    gap: 7px;
+    padding: 4px 0;
+
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* Animation rows */
+  .auth-animation-row {
+    width: 100%;
+    height: 62px;
+    min-height: 62px;
+
+    display: flex;
+    align-items: center;
+
+    overflow: hidden;
+    padding: 2px 0;
+  }
+
+  /* Product movement */
+  .auth-product-track {
+    width: max-content;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    animation: authProductMove 28s linear infinite;
+    will-change: transform;
+  }
+
+  .auth-product-track.reverse {
+    animation: authProductMoveReverse 28s linear infinite;
+  }
+
+  /* Product cards */
+  .auth-product-item {
+    width: 58px;
+    min-width: 58px;
+    height: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px;
+
+    background: #ffffff;
+    border: 1px solid #e8efdf;
+    border-radius: 14px;
+
+    box-shadow: 0 3px 10px rgba(30, 70, 20, 0.08);
+    overflow: hidden;
+  }
+
+  .auth-product-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Login card */
+  .auth-card {
+    position: relative;
+
+    width: 100%;
+    max-width: 440px;
+    height: auto;
+    min-height: auto;
+
+    margin: 0;
+    padding: 25px 21px 20px;
+
+    background: #ffffff;
+    border-radius: 22px;
+
+    box-shadow: 0 8px 30px rgba(30, 70, 20, 0.10);
+  }
+
+  /* Terms section */
+  .auth-terms {
+    margin-top: 14px;
+    padding-top: 12px;
+  }
+
+  /* Prevent unwanted bottom spacing */
+  .auth-container > * {
+    flex-shrink: 0;
+  }
+
+  .auth-card:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 360px) {
+
+  .auth-page {
+    padding: 12px 10px;
+  }
+
+  .auth-container {
+    gap: 12px;
+  }
+
+  .auth-mobile-showcase {
+    height: 125px;
+    max-height: 125px;
+  }
+
+  .auth-card {
+    padding: 22px 16px 18px;
+  }
+}
