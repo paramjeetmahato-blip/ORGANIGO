@@ -2,6 +2,7 @@ import API_BASE_URL from "../services/api";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { getToken, getUser, clearSession } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "../admin/components/Sidebar";
 import "../styles/Admin.css";
 
 // Admin Components
