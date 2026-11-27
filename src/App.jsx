@@ -25,6 +25,7 @@ import Account from "./pages/Account";
 import About from "./pages/About";
 import AboutDetails from "./pages/AboutDetails";
 import Addresses from "./pages/Addresses";
+import ProductDetails from "./pages/ProductDetails";
 
 // CUSTOMER LAYOUT
 function CustomerLayout() {
@@ -94,6 +95,10 @@ function App() {
               path="/track-order/:orderId"
               element={<OrderTracking />}
             />
+            <Route
+  path="/product/:productId"
+  element={<ProductDetails />}
+/>
 
           </Route>
 

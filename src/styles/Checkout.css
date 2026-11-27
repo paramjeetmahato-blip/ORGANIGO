@@ -491,3 +491,38 @@
   font-size: 14px;
   margin: 12px 0;
 }
+/* =====================================
+   CHECKOUT LOCATION ICON
+===================================== */
+
+.checkout-location-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.checkout-location-icon {
+  width: 21px;
+  height: 21px;
+  flex-shrink: 0;
+  color: #159447;
+}
+
+.location-btn .checkout-location-icon {
+  width: 19px;
+  height: 19px;
+  color: currentColor;
+  vertical-align: middle;
+  margin-right: 7px;
+}
+
+.checkout-success-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkout-success-location .checkout-location-icon {
+  width: 19px;
+  height: 19px;
+}

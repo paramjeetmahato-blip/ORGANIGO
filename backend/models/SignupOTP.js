@@ -4,8 +4,8 @@ const signupOTPSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
       trim: true,
+      default: undefined,
     },
 
     phone: {
@@ -23,7 +23,13 @@ const signupOTPSchema = new mongoose.Schema(
 
     passwordHash: {
       type: String,
-      required: true,
+      default: undefined,
+    },
+
+    purpose: {
+      type: String,
+      enum: ["signup", "login"],
+      default: "signup",
     },
 
     otpHash: {
@@ -51,7 +57,7 @@ const signupOTPSchema = new mongoose.Schema(
   }
 );
 
-// Automatically delete expired signup records
+// Automatically delete expired OTP records
 signupOTPSchema.index(
   { otpExpiresAt: 1 },
   { expireAfterSeconds: 0 }

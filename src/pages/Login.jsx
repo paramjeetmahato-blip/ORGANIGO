@@ -14,27 +14,31 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // =====================================
+  // STATES
+  // =====================================
+
   const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
 
   const [step, setStep] = useState("login");
-  const [showPasswordStep, setShowPasswordStep] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [verificationToken, setVerificationToken] = useState("");
 
-  const [rememberMe, setRememberMe] = useState(true);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
   const [devOtp, setDevOtp] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
 
   const [animationProducts, setAnimationProducts] = useState([]);
 
   const cleanPhone = phone.replace(/\D/g, "");
 
-  // FETCH REAL PRODUCTS
+  // =====================================
+  // FETCH PRODUCTS FOR MOBILE ANIMATION
+  // =====================================
+
   useEffect(() => {
     let isMounted = true;
 
@@ -74,7 +78,24 @@ function Login() {
     };
   }, []);
 
-  // PRODUCT ANIMATION
+  // =====================================
+  // OTP RESEND TIMER
+  // =====================================
+
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+
+    const timer = setTimeout(() => {
+      setResendTimer((previous) => previous - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [resendTimer]);
+
+  // =====================================
+  // PRODUCT ANIMATION ROW
+  // =====================================
+
   const renderProductRow = (reverse = false) => {
     if (!animationProducts.length) return null;
 
@@ -108,79 +129,35 @@ function Login() {
     );
   };
 
-  // CONTINUE WITH PHONE
-  const handleContinue = (e) => {
-    e.preventDefault();
-    setMessage("");
+  // =====================================
+  // FINISH CUSTOMER LOGIN
+  // =====================================
 
-    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
-      setMessage("Please enter a valid 10-digit mobile number.");
+  const finishLogin = (data) => {
+    if (!data.token || data.user?.role !== "customer") {
+      setMessage("Customer authentication failed.");
       return;
     }
 
-    setShowPasswordStep(true);
+    clearSession();
+    saveSession(data.token, data.user);
+
+    window.dispatchEvent(new Event("organigoAuthChanged"));
+
+    setMessage("Login successful!");
+
+    const redirectPath = location.state?.from || "/";
+
+    setTimeout(() => {
+      navigate(redirectPath, { replace: true });
+    }, 700);
   };
 
-  // CUSTOMER LOGIN
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setMessage("");
+  // =====================================
+  // STEP 1: REQUEST OTP
+  // =====================================
 
-    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
-      setMessage("Please enter a valid 10-digit mobile number.");
-      return;
-    }
-
-    if (!password) {
-      setMessage("Please enter your password.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await fetch(`${API_URL}/customer-login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          phone: cleanPhone,
-          password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setMessage(data.message || "Login failed.");
-        return;
-      }
-
-      if (data.user?.role !== "customer") {
-        setMessage("Customer account required.");
-        return;
-      }
-
-      clearSession();
-      saveSession(data.token, data.user);
-
-      setMessage("Login successful!");
-
-      const redirectPath = location.state?.from || "/";
-
-      setTimeout(() => {
-        navigate(redirectPath, { replace: true });
-      }, 700);
-    } catch (error) {
-      setMessage("Server connection failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // REQUEST RESET OTP
-  const requestResetOTP = async (e) => {
+  const handleContinue = async (e) => {
     e.preventDefault();
 
     setMessage("");
@@ -194,15 +171,18 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/request-reset-otp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          phone: cleanPhone,
-        }),
-      });
+      const response = await fetch(
+        `${API_URL}/request-customer-login-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phone: cleanPhone,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -211,22 +191,30 @@ function Login() {
         return;
       }
 
-      setStep("reset");
-      setMessage(data.message || "Reset OTP sent successfully.");
+      setStep("otp");
+      setOtp("");
+      setResendTimer(60);
+
+      setMessage(data.message || "OTP sent successfully.");
 
       if (data.devOtp) {
         setDevOtp(data.devOtp);
       }
     } catch (error) {
+      console.error("Customer OTP Request Error:", error);
       setMessage("Server connection failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // RESET PASSWORD
-  const resetPassword = async (e) => {
+  // =====================================
+  // STEP 2: VERIFY OTP
+  // =====================================
+
+  const handleVerifyOTP = async (e) => {
     e.preventDefault();
+
     setMessage("");
 
     if (!/^\d{6}$/.test(otp)) {
@@ -234,93 +222,204 @@ function Login() {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setMessage("Password must be at least 6 characters.");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setMessage("Passwords do not match.");
-      return;
-    }
-
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/reset-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          phone: cleanPhone,
-          otp,
-          newPassword,
-          confirmPassword,
-        }),
-      });
+      const response = await fetch(
+        `${API_URL}/verify-customer-login-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phone: cleanPhone,
+            otp,
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        setMessage(data.message || "Password reset failed.");
+        setMessage(data.message || "OTP verification failed.");
         return;
       }
 
-      setStep("login");
-      setShowPasswordStep(false);
+      // EXISTING CUSTOMER
+      if (!data.isNewCustomer) {
+        finishLogin(data);
+        return;
+      }
 
-      setOtp("");
-      setPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setDevOtp("");
+      // NEW CUSTOMER
+      if (data.isNewCustomer && data.verificationToken) {
+        setVerificationToken(data.verificationToken);
+        setStep("profile");
+        setMessage("Mobile number verified successfully!");
+        return;
+      }
 
-      setMessage("Password changed successfully. Please login.");
+      setMessage("Unable to verify customer account.");
     } catch (error) {
+      console.error("OTP Verification Error:", error);
       setMessage("Server connection failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // BACK TO LOGIN
-  const backToLogin = () => {
-    setStep("login");
-    setShowPasswordStep(false);
-    setOtp("");
-    setNewPassword("");
-    setConfirmPassword("");
+  // =====================================
+  // STEP 3: COMPLETE CUSTOMER PROFILE
+  // =====================================
+
+  const handleCompleteProfile = async (e) => {
+    e.preventDefault();
+
+    setMessage("");
+
+    const cleanName = name.trim().replace(/\s+/g, " ");
+
+    if (cleanName.length < 3 || cleanName.length > 50) {
+      setMessage("Please enter a name between 3 and 50 characters.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/complete-customer-profile`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: cleanName,
+            verificationToken,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Unable to create account.");
+        return;
+      }
+
+      finishLogin(data);
+    } catch (error) {
+      console.error("Customer Profile Error:", error);
+      setMessage("Server connection failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // =====================================
+  // RESEND OTP
+  // =====================================
+
+  const resendOTP = async () => {
+    if (resendTimer > 0 || loading) return;
+
+    setMessage("");
     setDevOtp("");
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/request-customer-login-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phone: cleanPhone,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Unable to resend OTP.");
+        return;
+      }
+
+      setOtp("");
+      setResendTimer(60);
+
+      setMessage("A new OTP has been sent.");
+
+      if (data.devOtp) {
+        setDevOtp(data.devOtp);
+      }
+    } catch (error) {
+      console.error("Resend OTP Error:", error);
+      setMessage("Server connection failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // =====================================
+  // BACK TO PHONE
+  // =====================================
+
+  const backToPhone = () => {
+    setStep("login");
+    setOtp("");
+    setDevOtp("");
+    setVerificationToken("");
+    setResendTimer(0);
     setMessage("");
   };
 
-  // BACK TO PHONE
-  const backToPhone = () => {
-    setShowPasswordStep(false);
-    setPassword("");
+  // =====================================
+  // BACK TO LOGIN
+  // =====================================
+
+  const backToLogin = () => {
+    setStep("login");
+    setPhone("");
+    setOtp("");
+    setName("");
+    setDevOtp("");
+    setVerificationToken("");
+    setResendTimer(0);
     setMessage("");
   };
+
+  // =====================================
+  // MAIN UI
+  // =====================================
 
   return (
     <div className="auth-page">
 
-      {/* DESKTOP HOME PAGE BACKGROUND */}
+      {/* DESKTOP BACKGROUND */}
+
       <div className="auth-desktop-background">
         <Header />
         <Home />
       </div>
 
       {/* DARK BACKDROP */}
+
       <div className="auth-backdrop"></div>
 
       {/* LOGIN CONTAINER */}
+
       <div className="auth-container">
 
         {/* MOBILE PRODUCT ANIMATION */}
+
         {animationProducts.length > 0 && (
           <div className="auth-mobile-showcase">
-
             <div className="auth-animation-row">
               {renderProductRow(false)}
             </div>
@@ -336,180 +435,67 @@ function Login() {
             <div className="auth-animation-row">
               {renderProductRow(true)}
             </div>
-
           </div>
         )}
 
         {/* LOGIN CARD */}
+
         <div className="auth-card">
+
+          {/* BACK BUTTON */}
 
           <button
             type="button"
             className="auth-back-button"
             onClick={() => {
-              if (step !== "login") {
-                backToLogin();
-              } else if (showPasswordStep) {
+              if (step === "login") {
+                navigate("/");
+              } else if (step === "profile") {
                 backToPhone();
               } else {
-                navigate("/");
+                backToLogin();
               }
             }}
           >
             ←
           </button>
 
+          {/* BRAND */}
+
           <div className="auth-brand">
-            <img src="/organigo-logo.png" alt="ORGANIGO" />
+            <img src="/organigo_logo.svg" alt="ORGANIGO" />
           </div>
 
-          {/* LOGIN */}
+          {/* =====================================
+              STEP 1: PHONE NUMBER
+          ===================================== */}
+
           {step === "login" && (
             <>
-              <h2>
-                {showPasswordStep
-                  ? "Welcome Back!"
-                  : "India's Fresh Grocery App"}
-              </h2>
+              <h2>India's Fresh Grocery App</h2>
 
               <p className="auth-subtitle">
-                {showPasswordStep
-                  ? "Enter your password to continue"
-                  : "Log in or Sign up"}
+                Log in or Sign up
               </p>
 
-              {!showPasswordStep ? (
-                <form onSubmit={handleContinue}>
-
-                  <div className="phone-input-wrapper">
-                    <span>+91</span>
-
-                    <input
-                      id="login-phone"
-                      name="phone"
-                      type="tel"
-                      inputMode="numeric"
-                      placeholder="Enter mobile number"
-                      value={phone}
-                      onChange={(e) => {
-                        setPhone(
-                          e.target.value.replace(/\D/g, "").slice(0, 10)
-                        );
-                        setMessage("");
-                      }}
-                      maxLength={10}
-                      required
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="auth-primary-button"
-                    disabled={loading}
-                  >
-                    Continue
-                  </button>
-
-                </form>
-              ) : (
-                <form onSubmit={handleLogin}>
-
-                  <div className="auth-phone-display">
-                    <span>+91 {cleanPhone}</span>
-
-                    <button type="button" onClick={backToPhone}>
-                      Change
-                    </button>
-                  </div>
-
-                  <label>Password</label>
-
-                  <div className="password-input-wrapper">
-                    <input
-                      id="login-password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-
-                    <button
-                      type="button"
-                      className="password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? "Hide" : "Show"}
-                    </button>
-                  </div>
-
-                  <label className="remember-option">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                    />
-                    Remember Me
-                  </label>
-
-                  <button
-                    type="submit"
-                    className="auth-primary-button"
-                    disabled={loading}
-                  >
-                    {loading ? "Logging in..." : "Login"}
-                  </button>
-
-                  <button
-                    type="button"
-                    className="auth-link-button"
-                    onClick={() => {
-                      setStep("forgot");
-                      setMessage("");
-                    }}
-                  >
-                    Forgot Password?
-                  </button>
-
-                </form>
-              )}
-
-              {!showPasswordStep && (
-                <p className="auth-create-account">
-                  Don't have an account?{" "}
-                  <Link to="/signup">Create Account</Link>
-                </p>
-              )}
-            </>
-          )}
-
-          {/* FORGOT PASSWORD */}
-          {step === "forgot" && (
-            <>
-              <h2>Forgot Password?</h2>
-
-              <p className="auth-subtitle">
-                Enter your registered mobile number.
-              </p>
-
-              <form onSubmit={requestResetOTP}>
-
+              <form onSubmit={handleContinue}>
                 <div className="phone-input-wrapper">
                   <span>+91</span>
 
                   <input
-                    id="forgot-phone"
+                    id="login-phone"
                     name="phone"
                     type="tel"
                     inputMode="numeric"
+                    autoComplete="tel-national"
                     placeholder="Enter mobile number"
                     value={phone}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setPhone(
                         e.target.value.replace(/\D/g, "").slice(0, 10)
-                      )
-                    }
+                      );
+                      setMessage("");
+                    }}
                     maxLength={10}
                     required
                   />
@@ -520,44 +506,49 @@ function Login() {
                   className="auth-primary-button"
                   disabled={loading}
                 >
-                  {loading ? "Sending OTP..." : "Send Reset OTP"}
+                  {loading ? "Sending OTP..." : "Continue"}
                 </button>
-
               </form>
-
-              <button
-                type="button"
-                className="auth-secondary-button"
-                onClick={backToLogin}
-              >
-                Back to Login
-              </button>
             </>
           )}
 
-          {/* RESET PASSWORD */}
-          {step === "reset" && (
+          {/* =====================================
+              STEP 2: OTP VERIFICATION
+          ===================================== */}
+
+          {step === "otp" && (
             <>
-              <h2>Reset Password</h2>
+              <h2>Verify Mobile Number</h2>
 
               <p className="auth-subtitle">
-                Enter OTP sent to +91 {cleanPhone}
+                Enter the 6-digit OTP sent to
               </p>
 
-              <form onSubmit={resetPassword}>
+              <div className="auth-phone-display">
+                <span>+91 {cleanPhone}</span>
 
-                <label>6-Digit OTP</label>
+                <button type="button" onClick={backToPhone}>
+                  Change
+                </button>
+              </div>
+
+              <form onSubmit={handleVerifyOTP}>
+                <label htmlFor="login-otp">6-Digit OTP</label>
 
                 <input
-                  id="reset-otp"
+                  id="login-otp"
                   name="otp"
                   type="text"
                   inputMode="numeric"
+                  autoComplete="one-time-code"
                   placeholder="Enter OTP"
                   value={otp}
-                  onChange={(e) =>
-                    setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
-                  }
+                  onChange={(e) => {
+                    setOtp(
+                      e.target.value.replace(/\D/g, "").slice(0, 6)
+                    );
+                    setMessage("");
+                  }}
                   maxLength={6}
                   required
                 />
@@ -568,37 +559,66 @@ function Login() {
                   </p>
                 )}
 
-                <label>New Password</label>
+                <button
+                  type="submit"
+                  className="auth-primary-button"
+                  disabled={loading}
+                >
+                  {loading ? "Verifying..." : "Verify & Continue"}
+                </button>
+              </form>
 
-                <div className="password-input-wrapper">
-                  <input
-                    id="new-password"
-                    name="newPassword"
-                    type={showNewPassword ? "text" : "password"}
-                    placeholder="Enter new password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    required
-                  />
-
+              <div className="auth-resend-section">
+                {resendTimer > 0 ? (
+                  <p>
+                    Resend OTP in <strong>{resendTimer}s</strong>
+                  </p>
+                ) : (
                   <button
                     type="button"
-                    className="password-toggle"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="auth-link-button"
+                    onClick={resendOTP}
+                    disabled={loading}
                   >
-                    {showNewPassword ? "Hide" : "Show"}
+                    Resend OTP
                   </button>
-                </div>
+                )}
+              </div>
+            </>
+          )}
 
-                <label>Confirm New Password</label>
+          {/* =====================================
+              STEP 3: NEW CUSTOMER PROFILE
+          ===================================== */}
+
+          {step === "profile" && (
+            <>
+              <h2>Welcome to ORGANIGO!</h2>
+
+              <p className="auth-subtitle">
+                Let's create your account.
+              </p>
+
+              <div className="auth-phone-display">
+                <span>+91 {cleanPhone}</span>
+                <span>✓ Verified</span>
+              </div>
+
+              <form onSubmit={handleCompleteProfile}>
+                <label htmlFor="customer-name">Your Name</label>
 
                 <input
-                  id="confirm-password"
-                  name="confirmPassword"
-                  type="password"
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  id="customer-name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  placeholder="Enter your full name"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setMessage("");
+                  }}
+                  maxLength={50}
                   required
                 />
 
@@ -607,30 +627,42 @@ function Login() {
                   className="auth-primary-button"
                   disabled={loading}
                 >
-                  {loading ? "Updating..." : "Reset Password"}
+                  {loading ? "Creating Account..." : "Create Account"}
                 </button>
-
               </form>
 
-              <button
-                type="button"
-                className="auth-secondary-button"
-                onClick={backToLogin}
-              >
-                Back to Login
-              </button>
+              <p className="auth-subtitle">
+                Your mobile number is your login ID.
+              </p>
             </>
           )}
 
           {/* MESSAGE */}
-          {message && <p className="auth-message">{message}</p>}
+
+          {message && (
+            <p
+              className="auth-message"
+              role="status"
+              aria-live="polite"
+            >
+              {message}
+            </p>
+          )}
 
           {/* TERMS */}
+
           <div className="auth-terms">
             By continuing, you agree to our{" "}
-            <Link to="/about">Terms of Service</Link>
+
+            <Link to="/about">
+              Terms of Service
+            </Link>
+
             {" & "}
-            <Link to="/about">Privacy Policy</Link>.
+
+            <Link to="/about">
+              Privacy Policy
+            </Link>.
           </div>
 
         </div>

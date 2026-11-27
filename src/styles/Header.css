@@ -1660,3 +1660,386 @@ body:has(.location-modal) .organigo-bottom-nav {
     width: 100%;
   }
 }
+/* =====================================================
+ORGANIGO - PREMIUM DESKTOP HEADER UPDATE
+===================================================== */
+
+@media (min-width: 1101px) {
+
+.Organigo-header {
+background: #ffffff;
+border-bottom: 1px solid #eeeeee;
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.Organigo-header .header-container {
+width: 100%;
+max-width: 1900px;
+min-height: 90px;
+padding: 10px 35px;
+
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 22px;
+
+}
+
+/* LOGO */
+
+.organigo-header-logo {
+flex: 0 0 155px;
+width: 155px;
+}
+
+.organigo-header-logo-image {
+width: 150px;
+height: 55px;
+}
+
+/* DELIVERY LOCATION */
+
+.Organigo-header .organigo-location-bar {
+flex: 0 0 260px;
+width: 260px;
+min-height: 65px;
+
+padding: 8px 5px;
+
+background: transparent;
+border: none;
+border-radius: 0;
+box-shadow: none;
+
+gap: 5px;
+
+}
+
+.Organigo-header .organigo-location-bar:hover {
+background: #f7fbf7;
+border: none;
+box-shadow: none;
+}
+
+.organigo-location-details {
+gap: 8px;
+}
+
+.organigo-pin-icon {
+width: 21px;
+height: 21px;
+}
+
+.organigo-location-address > span {
+color: #202820;
+font-size: 17px;
+font-weight: 900;
+letter-spacing: 0;
+}
+
+.organigo-location-address > strong {
+max-width: 215px;
+color: #657168;
+font-size: 12px;
+font-weight: 500;
+}
+
+.organigo-location-chevron {
+margin-left: auto;
+font-size: 17px;
+}
+
+.organigo-delivery-status {
+padding-left: 29px;
+gap: 8px;
+}
+
+.organigo-delivery-status > span {
+font-size: 10px;
+}
+
+/* SEARCH */
+
+.Organigo-header .header-search {
+flex: 1;
+min-width: 180px;
+height: 53px;
+
+padding: 0 17px;
+
+background: #f7f8fa;
+border: 1px solid #e5e7eb;
+border-radius: 13px;
+
+box-shadow: none;
+
+}
+
+.Organigo-header .header-search:focus-within {
+background: #ffffff;
+border-color: #159447;
+box-shadow: 0 0 0 3px rgba(21, 148, 71, 0.08);
+}
+
+.Organigo-header .header-search input {
+font-size: 14px;
+}
+
+/* ACCOUNT */
+
+.Organigo-header .header-account {
+display: block;
+position: relative;
+flex-shrink: 0;
+}
+
+.Organigo-header .header-account-button {
+min-width: 105px;
+min-height: 48px;
+padding: 8px 12px;
+
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 9px;
+
+background: transparent;
+border: none;
+border-radius: 9px;
+
+color: #26382b;
+font-family: inherit;
+font-size: 15px;
+font-weight: 600;
+
+}
+
+.Organigo-header .header-account-button::after {
+content: "Account";
+}
+
+.Organigo-header .header-account-button:hover {
+background: #f2f8f3;
+}
+
+.Organigo-header .account-icon {
+width: 27px;
+height: 27px;
+background: transparent;
+color: #26382b;
+}
+
+.Organigo-header .account-icon svg {
+width: 23px;
+height: 23px;
+}
+
+/* ACCOUNT DROPDOWN */
+
+.Organigo-header .account-dropdown {
+position: fixed;
+top: 90px;
+right: 35px;
+
+width: 305px;
+max-width: calc(100vw - 30px);
+
+padding: 15px;
+
+background: #ffffff;
+border: none;
+border-radius: 0 0 18px 18px;
+
+box-shadow: 0 12px 35px rgba(0, 0, 0, 0.16);
+
+z-index: 1002;
+
+}
+
+.Organigo-header .account-dropdown-heading {
+padding: 16px;
+}
+
+.Organigo-header .account-dropdown-heading strong {
+font-size: 17px;
+}
+
+.Organigo-header .account-dropdown > a,
+.Organigo-header .account-logout-button {
+padding: 14px;
+font-size: 14px;
+}
+
+/* HIDE OLD DESKTOP LOGIN BUTTON */
+
+.Organigo-header .header-login {
+display: none !important;
+}
+
+/* DESKTOP CART */
+
+.Organigo-header .header-cart {
+min-width: 120px;
+min-height: 53px;
+border-radius: 11px;
+}
+
+/* LOCATION POPUP - LEFT SIDE */
+
+.Organigo-header .location-modal-backdrop {
+align-items: flex-start;
+justify-content: flex-start;
+
+padding: 90px 0 30px 5.4%;
+
+}
+
+.Organigo-header .location-modal {
+width: 550px;
+max-width: min(550px, 90vw);
+max-height: calc(100vh - 115px);
+
+padding: 26px;
+
+border-radius: 0 0 14px 14px;
+box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+
+}
+
+}
+
+/* =====================================================
+ACCOUNT OPEN OVERLAY - DESKTOP
+===================================================== */
+
+@media (min-width: 1101px) {
+
+.Organigo-header:has(.account-dropdown)::after {
+content: "";
+position: fixed;
+inset: 0;
+
+background: rgba(0, 0, 0, 0.25);
+
+z-index: 900;
+pointer-events: none;
+
+}
+
+.Organigo-header .header-account {
+z-index: 1001;
+}
+
+.Organigo-header .account-dropdown {
+z-index: 1002;
+}
+
+}
+
+/* =====================================================
+TABLET HEADER
+===================================================== */
+
+@media (min-width: 651px) and (max-width: 1100px) {
+
+.Organigo-header .header-account {
+display: block;
+}
+
+.Organigo-header .header-login {
+display: none !important;
+}
+
+.Organigo-header .account-dropdown {
+right: 0;
+}
+
+}
+
+/* =====================================================
+MOBILE - PRESERVE EXISTING LAYOUT
+===================================================== */
+
+@media (max-width: 650px) {
+
+.Organigo-header .header-account-button::after {
+content: none;
+}
+
+.Organigo-header .header-login {
+display: none !important;
+}
+
+}
+/* =====================================
+   SOLID DROPDOWN ARROW ICONS
+===================================== */
+
+@media (min-width: 1101px) {
+
+  /* LOCATION ARROW */
+
+  .Organigo-header .organigo-location-chevron {
+    font-size: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+  }
+
+  .Organigo-header .organigo-location-chevron::after {
+    content: "";
+    width: 0;
+    height: 0;
+
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 7px solid #111111;
+  }
+
+  /* ACCOUNT ARROW */
+
+  .Organigo-header .header-account-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .Organigo-header .header-account-button::after {
+    content: "Account";
+
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    color: #222222;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .Organigo-header .header-account-button::before {
+    content: "";
+    width: 0;
+    height: 0;
+
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 7px solid #111111;
+
+    order: 2;
+  }
+
+}
+@media (min-width: 1101px) {
+
+  /* Location dropdown arrow */
+  .Organigo-header .organigo-location-chevron::after {
+    border-top-color: #ff8c00 !important;
+  }
+
+  /* Account dropdown arrow */
+  .Organigo-header .header-account-button::before {
+    border-top-color: #ff8c00 !important;
+  }
+
+}            
