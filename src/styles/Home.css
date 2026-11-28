@@ -1523,3 +1523,23 @@ html {
     z-index: 99999;
   }
 }
+/* =========================================
+   ORGANIGO - HIDE CART WHEN LOCATION POPUP OPENS
+========================================= */
+
+body:has(.location-modal) .organigo-floating-cart,
+body:has(.location-modal-backdrop) .organigo-floating-cart {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+/* =========================================
+   ORGANIGO - HIDE HERO ON MOBILE WEBSITE
+========================================= */
+
+@media screen and (max-width: 650px) {
+  .organigo-home .organigo-hero {
+    display: none !important;
+  }
+}

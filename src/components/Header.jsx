@@ -38,9 +38,10 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
       Math.cos(toRad(lat2)) *
       Math.sin(dLon / 2) ** 2;
 
-  return earthRadius * 2 * Math.atan2(
-    Math.sqrt(a),
-    Math.sqrt(1 - a)
+  return (
+    earthRadius *
+    2 *
+    Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   );
 }
 
@@ -109,10 +110,39 @@ function Header() {
   const { cartItems, cartTotal } = useCart();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [isListening, setIsListening] = useState(false);
+const [voiceSupported, setVoiceSupported] = useState(true);
+const recognitionRef = useRef(null);
   const [user, setUser] = useState(getUser);
+
+  // APP BANNER
+  const [appBannerVisible, setAppBannerVisible] = useState(
+    () => localStorage.getItem("organigoAppBannerHidden") !== "true"
+  );
+
+  const closeAppBanner = () => {
+    localStorage.setItem("organigoAppBannerHidden", "true");
+    setAppBannerVisible(false);
+  };
 
   const [accountOpen, setAccountOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
+
+  // LOCATION MODAL OPEN/CLOSE CONTROL
+useEffect(() => {
+  if (locationOpen) {
+    document.body.classList.add("organigo-location-modal-open");
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.classList.remove("organigo-location-modal-open");
+    document.body.style.overflow = "";
+  }
+
+  return () => {
+    document.body.classList.remove("organigo-location-modal-open");
+    document.body.style.overflow = "";
+  };
+}, [locationOpen]);
 
   const [locationQuery, setLocationQuery] = useState("");
   const [locationResults, setLocationResults] = useState([]);
@@ -131,8 +161,6 @@ function Header() {
 
   const [locationPermission, setLocationPermission] =
     useState("prompt");
-
-  const [hubSettings, setHubSettings] = useState(getHubSettings);
 
   // =====================================
   // CART COUNT
@@ -310,7 +338,6 @@ function Header() {
         );
       } else {
         setSelectedLocation(null);
-
         localStorage.removeItem("organigoSelectedLocation");
       }
     } catch (error) {
@@ -404,15 +431,80 @@ function Header() {
   };
 
   // =====================================
+// ORGANIGO VOICE SEARCH
+// =====================================
+
+const startVoiceSearch = () => {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    setVoiceSupported(false);
+    alert("Voice search is not supported in this browser. Please use Chrome.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+
+  recognition.lang = "hi-IN";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognitionRef.current = recognition;
+
+  recognition.onstart = () => {
+    setIsListening(true);
+  };
+
+  recognition.onresult = (event) => {
+    const spokenText = event.results[0][0].transcript.trim();
+
+    setSearchQuery(spokenText);
+
+    window.dispatchEvent(
+      new CustomEvent("organigoSearch", {
+        detail: spokenText,
+      })
+    );
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Voice Search Error:", event.error);
+
+    if (event.error === "not-allowed") {
+      alert("Please allow microphone permission to use voice search.");
+    } else if (event.error !== "no-speech") {
+      alert("Voice search failed. Please try again.");
+    }
+  };
+
+  recognition.onend = () => {
+    setIsListening(false);
+  };
+
+  recognition.start();
+};
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {
+          // Recognition may already have stopped.
+        }
+      }
+    };
+  }, []);
+
+  // =====================================
   // REFRESH DELIVERY SETTINGS
   // =====================================
 
   useEffect(() => {
     const refreshSettings = () => {
       const newSettings = getHubSettings();
-
-      setHubSettings(newSettings);
-
       const saved = getSavedLocation();
 
       if (
@@ -794,142 +886,250 @@ function Header() {
 
       {/* APP BANNER */}
 
-      <div className="organigo-app-banner">
-        <div className="app-banner-icon">🥬</div>
+      {appBannerVisible && (
+        <div className="organigo-app-banner">
 
-        <div className="app-banner-text">
-          <strong>ORGANIGO APP</strong>
-          <small>Get a fresher shopping experience!</small>
+          <div className="app-banner-icon">🥬</div>
+
+          <div className="app-banner-text">
+            <strong>ORGANIGO APP</strong>
+            <small>Get a fresher shopping experience!</small>
+          </div>
+
+          <button
+            className="app-download-button"
+            type="button"
+            disabled
+          >
+            Coming Soon
+          </button>
+
+          <button
+            type="button"
+            className="app-banner-close"
+            onClick={closeAppBanner}
+            aria-label="Close app announcement"
+          >
+            ✕
+          </button>
+
         </div>
+      )}
 
-        <button
-          className="app-download-button"
-          type="button"
-          disabled
-        >
-          Coming Soon
-        </button>
-      </div>
+      {/* HEADER CONTAINER - IMPORTANT */}
 
       <div className="header-container">
 
-    {/* ORGANIGO LOGO */}
+        {/* ORGANIGO LOGO */}
 
-<Link to="/" className="organigo-header-logo">
-  <img
-    src="/organigo_logo.svg"
-    alt="ORGANIGO"
-    className="organigo-header-logo-image"
-  />
-</Link>
-
-{/* DELIVERY LOCATION BAR */}
-
-<button
-  type="button"
-  className="organigo-location-bar"
-  onClick={() => {
-    setLocationOpen(true);
-    setLocationMessage("");
-    setAccountOpen(false);
-
-    if (user) {
-      loadSavedAddresses();
-    }
-  }}
->
-  <div className="organigo-location-details">
-
-    <LocationIcon className="organigo-pin-icon" />
-
-    <div className="organigo-location-address">
-      <span>
-        {selectedLocation ? "DELIVERING TO" : "DELIVERY LOCATION"}
-      </span>
-
-      <strong>
-        {selectedLocation?.name
-          ? selectedLocation.name
-              .split(",")
-              .slice(0, 2)
-              .join(", ")
-          : "Choose your delivery address"}
-      </strong>
-    </div>
-
-    <span className="organigo-location-chevron">⌄</span>
-
-  </div>
-
-  <div className="organigo-delivery-status">
-
-    <span
-      className={
-        selectedLocation?.available === true
-          ? "status-available"
-          : selectedLocation?.available === false
-            ? "status-unavailable"
-            : "status-pending"
-      }
-    >
-      {deliveryText}
-    </span>
-
-    {selectedLocation?.distance != null && (
-      <small>{displayDistance}</small>
-    )}
-
-  </div>
-</button>
-
-        {/* SEARCH */}
-
-        <div className="header-search">
-
-          <span>🔍</span>
-
-          <input
-            id="organigo-search"
-            name="search"
-            type="text"
-            placeholder="Search fruits, vegetables, juice..."
-            value={searchQuery}
-            onChange={handleSearch}
+        <Link to="/" className="organigo-header-logo">
+          <img
+            src="/organigo_logo.svg"
+            alt="ORGANIGO"
+            className="organigo-header-logo-image"
           />
+        </Link>
 
-        </div>
+        {/* DELIVERY LOCATION BAR */}
 
-  {/* DESKTOP CART */}
+        <button
+          type="button"
+          className="organigo-location-bar"
+          onClick={() => {
+            setLocationOpen(true);
+            setLocationMessage("");
+            setAccountOpen(false);
 
-<Link to="/cart" className="header-cart">
+            if (user) {
+              loadSavedAddresses();
+            }
+          }}
+        >
+
+          <div className="organigo-location-details">
+
+            <LocationIcon className="organigo-pin-icon" />
+
+            <div className="organigo-location-address">
+
+              <span>
+                {selectedLocation
+                  ? "DELIVERING TO"
+                  : "DELIVERY LOCATION"}
+              </span>
+
+              <strong>
+                {selectedLocation?.name
+                  ? selectedLocation.name
+                      .split(",")
+                      .slice(0, 2)
+                      .join(", ")
+                  : "Choose your delivery address"}
+              </strong>
+
+            </div>
+
+            <span className="organigo-location-chevron">
+              ⌄
+            </span>
+
+          </div>
+
+          <div className="organigo-delivery-status">
+
+            <span
+              className={
+                selectedLocation?.available === true
+                  ? "status-available"
+                  : selectedLocation?.available === false
+                    ? "status-unavailable"
+                    : "status-pending"
+              }
+            >
+              {deliveryText}
+            </span>
+
+            {selectedLocation?.distance != null && (
+              <small>{displayDistance}</small>
+            )}
+
+          </div>
+
+        </button>
+
+       {/* ORGANIGO SEARCH BAR */}
+
+<div className="header-search">
 
   <svg
-    className="header-cart-icon"
+    className="header-search-icon"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
   >
-    <circle cx="9" cy="21" r="1" />
-    <circle cx="20" cy="21" r="1" />
-    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-4-4" />
   </svg>
 
-  <span className="header-cart-info">
+  <input
+    id="organigo-search"
+    name="search"
+    type="search"
+    placeholder="Search fruits, vegetables, juice..."
+    value={searchQuery}
+    onChange={handleSearch}
+    aria-label="Search ORGANIGO products"
+  />
 
-    <strong>
-      {cartCount} {cartCount === 1 ? "item" : "items"}
-    </strong>
+  {searchQuery && (
+    <button
+      type="button"
+      className="header-search-clear"
+      onClick={() => {
+        setSearchQuery("");
+        window.dispatchEvent(
+          new CustomEvent("organigoSearch", {
+            detail: "",
+          })
+        );
+      }}
+      aria-label="Clear search"
+    >
+      ✕
+    </button>
+  )}
 
-    <strong>
-      ₹{Number(cartTotal || 0).toFixed(0)}
-    </strong>
+  <button
+    type="button"
+    className={`header-search-mic ${isListening ? "listening" : ""}`}
+    onClick={startVoiceSearch}
+    disabled={isListening}
+    aria-label="Search using voice"
+    title="Voice Search"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="9" y="2" width="6" height="12" rx="3" />
+      <path d="M5 10v2a7 7 0 0 0 14 0v-2" />
+      <path d="M12 19v3M8 22h8" />
+    </svg>
+  </button>
 
-  </span>
+</div>
 
-</Link>
+        {/* CART */}
+
+        <Link
+          to="/cart"
+          className={`header-cart ${
+            cartCount > 0 ? "has-items" : "is-empty"
+          }`}
+          aria-label={`Cart: ${cartCount} items, total ₹${Number(
+            cartTotal || 0
+          ).toFixed(0)}`}
+        >
+
+          <span className="header-cart-icon-wrapper">
+
+            <svg
+              className="header-cart-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+
+            {cartCount > 0 && (
+              <span className="header-cart-badge">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+
+          </span>
+
+          <span className="header-cart-info">
+
+            <span className="header-cart-label">
+              MY CART
+            </span>
+
+            <span className="header-cart-bottom">
+
+              <strong className="header-cart-count">
+                {cartCount} {cartCount === 1 ? "Item" : "Items"}
+              </strong>
+
+              <span className="header-cart-divider">|</span>
+
+              <strong className="header-cart-total">
+                ₹{Number(cartTotal || 0).toFixed(0)}
+              </strong>
+
+            </span>
+
+          </span>
+
+          <span className="header-cart-arrow">›</span>
+
+        </Link>
+
         {/* ACCOUNT */}
 
         <div className="header-account" ref={accountRef}>
@@ -991,13 +1191,6 @@ function Header() {
               </Link>
 
               <Link
-                to="/my-orders"
-                onClick={() => setAccountOpen(false)}
-              >
-                Order History
-              </Link>
-
-              <Link
                 to="/addresses"
                 onClick={() => setAccountOpen(false)}
               >
@@ -1034,15 +1227,12 @@ function Header() {
           {user ? "My Account" : "Login"}
         </Link>
 
-        {/* LOCATION MODAL */}
-
+        {/* ORGANIGO LOCATION SELECTOR */}
         {locationOpen && (
-
           <div
             className="location-modal-backdrop"
             onClick={() => setLocationOpen(false)}
           >
-
             <div
               className="location-modal"
               role="dialog"
@@ -1050,243 +1240,57 @@ function Header() {
               aria-labelledby="location-modal-title"
               onClick={(event) => event.stopPropagation()}
             >
-
-              {/* HEADING */}
+              <button
+                type="button"
+                className="location-modal-close"
+                aria-label="Close location dialog"
+                onClick={() => setLocationOpen(false)}
+              >
+                ×
+              </button>
 
               <div className="location-modal-heading">
-
                 <div>
-                  <h2 id="location-modal-title">
-                    Select Delivery Location
-                  </h2>
-
-                  <p>
-                    Choose where you want your order delivered.
-                  </p>
+                  <h2 id="location-modal-title">Select your Location</h2>
+                  <p>Choose where you want your order delivered.</p>
                 </div>
-
-                <button
-                  type="button"
-                  className="location-modal-close"
-                  aria-label="Close location dialog"
-                  onClick={() => setLocationOpen(false)}
-                >
-                  ✕
-                </button>
-
+                <img
+                  className="location-modal-logo"
+                  src="/organigo_logo.svg"
+                  alt="ORGANIGO"
+                />
               </div>
 
-              {/* LOCATION PERMISSION */}
-
-              {locationPermission !== "granted" && (
-
-                <div className="location-permission-banner">
-
-                  <div className="location-permission-icon">
-                    <LocationIcon />
-                  </div>
-
-                  <div className="location-permission-text">
-
-                    <strong>Device Location Not Enabled</strong>
-
-                    <p>
-                      Enable your location to find the nearest delivery address.
-                    </p>
-
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={useCurrentLocation}
-                    disabled={locationLoading}
-                  >
-                    {locationLoading ? "Please wait..." : "Enable"}
-                  </button>
-
-                </div>
-
-              )}
-
-              {/* SAVED ADDRESSES */}
-
-              {user && (
-
-                <div className="saved-addresses-section">
-
-                  <div className="saved-addresses-heading">
-
-                    <strong className="address-section-heading">
-                      Your Saved Addresses
-                    </strong>
-
-                    <Link
-                      to="/addresses"
-                      onClick={() => setLocationOpen(false)}
-                    >
-                      + Add New Address
-                    </Link>
-
-                  </div>
-
-                  {addressesLoading ? (
-
-                    <p className="location-loading">
-                      Loading your saved addresses...
-                    </p>
-
-                  ) : savedAddresses.length > 0 ? (
-
-                    <div className="saved-addresses-list">
-
-                      {savedAddresses.map((address) => (
-
-                        <button
-                          type="button"
-                          key={address._id}
-                          className={`saved-address-item ${
-                            selectedAddressId === address._id
-                              ? "selected"
-                              : ""
-                          }`}
-                          onClick={() => selectSavedAddress(address)}
-                          disabled={selectingAddressId !== null}
-                        >
-
-                          <span className="saved-address-icon">
-                            {address.label === "Work" ? "🏢" : "🏠"}
-                          </span>
-
-                          <div className="saved-address-details">
-
-                            <strong>
-                              {address.label || "Home"}
-                              {selectedAddressId === address._id && " ✓"}
-                            </strong>
-
-                            <small>
-                              {[
-                                address.houseNo,
-                                address.area,
-                                address.landmark,
-                                address.city,
-                                address.state,
-                                address.pincode,
-                              ].filter(Boolean).join(", ")}
-                            </small>
-
-                            <small>
-                              {address.fullName} · {address.phone}
-                            </small>
-
-                          </div>
-
-                          {selectingAddressId === address._id && (
-                            <span>Saving...</span>
-                          )}
-
-                        </button>
-
-                      ))}
-
-                    </div>
-
-                  ) : (
-
-                    <p className="location-no-results">
-                      You have not saved any address yet.
-                      Click Add New Address to save one.
-                    </p>
-
-                  )}
-
-                </div>
-
-              )}
-
-              {/* LOGIN MESSAGE */}
-
-              {!user && (
-
-                <div className="saved-addresses-section">
-
-                  <p>
-                    Login to view and select your saved addresses.
-                  </p>
-
-                  <Link
-                    to="/login"
-                    onClick={() => setLocationOpen(false)}
-                  >
-                    Login to Your Account
-                  </Link>
-
-                </div>
-
-              )}
-
-              {/* DIVIDER */}
-
-              <div className="location-divider">
-                <span>OR USE ANOTHER LOCATION</span>
-              </div>
-
-              {/* GPS */}
-
-              <button
-                type="button"
-                className="use-current-location-btn"
-                onClick={useCurrentLocation}
-                disabled={locationLoading}
-              >
-
-                <LocationIcon />
-
-                {locationLoading
-                  ? "Detecting Location..."
-                  : "Use My Current Location"}
-
-              </button>
-
-              {/* WHATSAPP ADDRESS REQUEST */}
-
-              <button
-                type="button"
-                className="request-address-btn"
-                onClick={requestAddressOnWhatsApp}
-              >
-
-                <span className="request-address-icon">☏</span>
-
-                <span>
-                  Request Address from Someone Else
-                </span>
-
-                <span className="request-address-arrow">›</span>
-
-              </button>
-
-              {/* MANUAL SEARCH */}
-
+              {/* ADDRESS SEARCH - FIRST */}
               <div className="location-search-box">
-
-                <span>🔍</span>
-
+                <LocationIcon />
                 <input
                   type="text"
                   id="organigo-location-search"
                   name="deliveryLocation"
-                  placeholder="Enter area, street, city or PIN code..."
+                  placeholder="Search delivery location"
                   value={locationQuery}
+                  autoComplete="off"
                   onChange={(event) => {
                     setLocationQuery(event.target.value);
                     setLocationMessage("");
                   }}
                 />
-
+                {locationQuery && (
+                  <button
+                    type="button"
+                    className="location-search-clear"
+                    aria-label="Clear location search"
+                    onClick={() => {
+                      setLocationQuery("");
+                      setLocationResults([]);
+                      setLocationMessage("");
+                    }}
+                  >
+                    ×
+                  </button>
+                )}
               </div>
-
-              {/* LOADING */}
 
               {locationLoading && (
                 <p className="location-loading">
@@ -1294,97 +1298,149 @@ function Header() {
                 </p>
               )}
 
-              {/* ERROR */}
-
               {locationMessage && (
-                <p className="location-error">
-                  {locationMessage}
-                </p>
+                <p className="location-error">{locationMessage}</p>
               )}
 
-              {/* SEARCH RESULTS */}
-
               {locationResults.length > 0 && (
-
                 <div className="location-results">
-
                   {locationResults.map((place) => (
-
                     <button
                       type="button"
                       key={place.place_id}
                       className="location-result-item"
                       onClick={() => selectAddress(place)}
                     >
-
                       <LocationIcon className="modern-location-icon" />
-
                       <div>
-
                         <strong>
-                          {place.name ||
-                            place.display_name.split(",")[0]}
+                          {place.name || place.display_name.split(",")[0]}
                         </strong>
-
                         <small>{place.display_name}</small>
-
                       </div>
-
                     </button>
-
                   ))}
-
                 </div>
-
               )}
-
-              {/* NO RESULTS */}
 
               {locationQuery.trim().length >= 3 &&
                 !locationLoading &&
                 locationResults.length === 0 &&
                 !locationMessage && (
-
                   <p className="location-no-results">
-                    No matching address found.
-                    Try another area or PIN code.
+                    No matching address found. Try another area or PIN code.
                   </p>
-
                 )}
 
-              {/* CURRENT LOCATION */}
+              {/* GPS ACTION */}
+              <button
+                type="button"
+                className="use-current-location-btn"
+                onClick={useCurrentLocation}
+                disabled={locationLoading}
+              >
+                <LocationIcon />
+                {locationLoading ? "Detecting current location..." : "Use current location"}
+              </button>
 
               {selectedLocation && (
-
                 <div className="current-selected-location">
-
                   <strong>Currently selected location</strong>
-
                   <p>{selectedLocation.name}</p>
-
                   <small>
                     {selectedLocation.available === true
-                      ? `✓ Delivery available · ${selectedLocation.distance} KM from hub`
+                      ? `✓ Delivery available · ${selectedLocation.distance} km from hub`
                       : selectedLocation.available === false
-                        ? `✕ Outside delivery area · ${selectedLocation.distance} KM from hub`
+                        ? `✕ Outside delivery area · ${selectedLocation.distance} km from hub`
                         : "Location coordinates need verification."}
                   </small>
-
                 </div>
-
               )}
 
-              {/* FOOTER */}
+              {/* SAVED ADDRESSES */}
+              <section className="saved-addresses-section">
+                <div className="saved-addresses-heading">
+                  <strong className="address-section-heading">
+                    Your saved addresses
+                  </strong>
+                  {user && (
+                    <Link
+                      to="/addresses"
+                      onClick={() => setLocationOpen(false)}
+                    >
+                      + Add new address
+                    </Link>
+                  )}
+                </div>
+
+                {!user ? (
+                  <div className="location-login-prompt">
+                    <p>Login to view and select your saved addresses.</p>
+                    <Link to="/login" onClick={() => setLocationOpen(false)}>
+                      Login to your account
+                    </Link>
+                  </div>
+                ) : addressesLoading ? (
+                  <p className="location-loading">Loading your saved addresses...</p>
+                ) : savedAddresses.length > 0 ? (
+                  <div className="saved-addresses-list">
+                    {savedAddresses.map((address) => (
+                      <button
+                        type="button"
+                        key={address._id}
+                        className={`saved-address-item ${
+                          selectedAddressId === address._id ? "selected" : ""
+                        }`}
+                        onClick={() => selectSavedAddress(address)}
+                        disabled={selectingAddressId !== null}
+                      >
+                        <span className="saved-address-icon">
+                          {address.label === "Work" ? "▣" : "⌂"}
+                        </span>
+                        <div className="saved-address-details">
+                          <strong>
+                            {address.label || "Home"}
+                            {selectedAddressId === address._id ? " ✓" : ""}
+                          </strong>
+                          <small>
+                            {[
+                              address.houseNo,
+                              address.area,
+                              address.landmark,
+                              address.city,
+                              address.state,
+                              address.pincode,
+                            ].filter(Boolean).join(", ")}
+                          </small>
+                        </div>
+                        {selectingAddressId === address._id && (
+                          <span className="address-saving">Saving...</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="location-no-results">
+                    You have not saved any address yet. Add an address to use it later.
+                  </p>
+                )}
+              </section>
+
+              <button
+                type="button"
+                className="request-address-btn"
+                onClick={requestAddressOnWhatsApp}
+              >
+                <span className="request-address-icon">↗</span>
+                <span>Request address from someone else</span>
+                <span className="request-address-arrow">›</span>
+              </button>
 
               <p className="location-modal-footer">
-                Delivery availability is calculated using your selected
-                location and the current ORGANIGO delivery radius.
+                Delivery availability is checked using your selected location and ORGANIGO delivery radius.
               </p>
-
             </div>
-
           </div>
-
         )}
 
       </div>

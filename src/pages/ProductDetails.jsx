@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 import API_BASE_URL from "../services/api";
@@ -6,7 +6,7 @@ import { useCart } from "../context/CartContext";
 
 import "../styles/ProductDetails.css";
 
-const API_URL = `${API_BASE_URL}/api`;
+const API_URL = `${API_BASE_URL}/api/products`;
 
 // =====================================
 // NORMALIZE PRODUCT DATA
@@ -18,29 +18,67 @@ const normalizeProduct = (item) => {
   return {
     ...item,
 
-    id: String(
-      item._id || item.id || item.name
-    ),
+    id: String(item._id || item.id || item.name),
 
-    quantity:
-      item.unit ||
-      item.quantity ||
-      "1 Unit",
+    name: item.name || "Fresh Product",
+
+    category: item.category || "Fresh Products",
+
+    image: item.image || "",
+
+    quantity: item.unit || item.quantity || "1 Unit",
+
+    price: Number(item.price ?? 0),
 
     oldPrice: Number(
-      item.originalPrice ||
-      item.oldPrice ||
-      0
+      item.originalPrice ?? item.oldPrice ?? 0
     ),
 
-    price: Number(item.price || 0),
+    stock: Number(item.stock ?? 0),
 
-    stock: Number(item.stock || 0),
+    description: item.description || "",
   };
 };
 
+// =====================================
+// FORMAT PRICE
+// =====================================
+
+const formatPrice = (price) => {
+  return Number(price || 0).toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+  });
+};
+
+// =====================================
+// EXTRACT PRODUCTS FROM API RESPONSE
+// =====================================
+
+const extractProducts = (data) => {
+  if (Array.isArray(data)) return data;
+
+  if (Array.isArray(data?.products)) {
+    return data.products;
+  }
+
+  if (Array.isArray(data?.data?.products)) {
+    return data.data.products;
+  }
+
+  if (Array.isArray(data?.data)) {
+    return data.data;
+  }
+
+  return [];
+};
+
+// =====================================
+// PRODUCT DETAILS COMPONENT
+// =====================================
+
 function ProductDetails() {
   const { productId } = useParams();
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -51,159 +89,168 @@ function ProductDetails() {
     decreaseQuantity,
   } = useCart();
 
-  const initialProduct = normalizeProduct(
-    location.state?.product
-  );
+  const [product, setProduct] = useState(null);
 
-  const [product, setProduct] = useState(
-    initialProduct &&
-    initialProduct.id === String(productId)
-      ? initialProduct
-      : null
-  );
+  const [allProducts, setAllProducts] = useState([]);
 
-  const [loading, setLoading] = useState(
-    !initialProduct ||
-    initialProduct.id !== String(productId)
-  );
+  const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState("");
 
+  const [imageError, setImageError] = useState(false);
+
+  const [retryCount, setRetryCount] = useState(0);
+
   // =====================================
-  // LOAD PRODUCT WHEN DIRECTLY OPENED
+  // LOAD PRODUCT AND SIMILAR PRODUCTS
   // =====================================
 
   useEffect(() => {
-    const stateProduct = normalizeProduct(
+    const controller = new AbortController();
+
+    const routeProduct = normalizeProduct(
       location.state?.product
     );
 
-    if (
-      stateProduct &&
-      stateProduct.id === String(productId)
-    ) {
-      setProduct(stateProduct);
-      setLoading(false);
-      setError("");
-      return;
-    }
-
-    const loadProduct = async () => {
+    const loadProducts = async () => {
       try {
         setLoading(true);
         setError("");
-        setProduct(null);
+        setImageError(false);
 
-        const response = await fetch(
-          `${API_URL}/products`
-        );
+        // Use product passed from Home if available
+        if (routeProduct?.id === String(productId)) {
+          setProduct(routeProduct);
+        } else {
+          setProduct(null);
+        }
+
+        const response = await fetch(API_URL, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          signal: controller.signal,
+        });
 
         if (!response.ok) {
-          throw new Error("Unable to load product.");
+          throw new Error("Unable to connect to product server.");
         }
 
         const data = await response.json();
 
-        const products = Array.isArray(data)
-          ? data
-          : data.products ||
-            data.data?.products ||
-            data.data ||
-            [];
+        const products = extractProducts(data);
 
-        const foundProduct = products.find(
-          (item) =>
-            String(
-              item._id ||
-              item.id ||
-              item.name
-            ) === String(productId)
+        const normalizedProducts = products
+          .filter((item) => item && item.isActive !== false)
+          .map(normalizeProduct);
+
+        setAllProducts(normalizedProducts);
+
+        const foundProduct = normalizedProducts.find(
+          (item) => item.id === String(productId)
         );
 
-        if (!foundProduct) {
+        if (foundProduct) {
+          setProduct(foundProduct);
+        } else if (routeProduct?.id === String(productId)) {
+          setProduct(routeProduct);
+        } else {
           throw new Error("Product not found.");
         }
-
-        setProduct(
-          normalizeProduct(foundProduct)
-        );
-
       } catch (err) {
-        console.error(
-          "Product Details Error:",
-          err
-        );
+        if (err.name === "AbortError") return;
 
-        setError(err.message);
+        console.error("Product Details Error:", err);
 
+        if (routeProduct?.id === String(productId)) {
+          setProduct(routeProduct);
+        } else {
+          setError(err.message);
+        }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
-    loadProduct();
+    loadProducts();
 
-  }, [productId, location.state]);
+    return () => {
+      controller.abort();
+    };
+  }, [productId, retryCount, location.state]);
 
   // =====================================
-  // CART QUANTITY
+  // GET CART QUANTITY
   // =====================================
 
-  const cartProduct = cartItems.find(
-    (item) =>
-      String(item.id) === String(productId)
-  );
+  const getCartQuantity = (productItem) => {
+    const cartProduct = cartItems.find(
+      (item) => String(item.id) === String(productItem.id)
+    );
 
-  const cartQuantity = cartProduct
-    ? Number(cartProduct.quantity || 0)
+    return Number(cartProduct?.quantity || 0);
+  };
+
+  // =====================================
+  // SIMILAR PRODUCTS
+  // =====================================
+
+  const similarProducts = useMemo(() => {
+    if (!product) return [];
+
+    const currentId = String(product.id);
+
+    const currentCategory = String(
+      product.category || ""
+    )
+      .trim()
+      .toLowerCase();
+
+    const availableProducts = allProducts.filter((item) => {
+      return (
+        item.id !== currentId &&
+        item.stock > 0
+      );
+    });
+
+    // Same category products first
+    const sameCategory = availableProducts.filter(
+      (item) =>
+        String(item.category || "")
+          .trim()
+          .toLowerCase() === currentCategory
+    );
+
+    // Other available products as fallback
+    const otherProducts = availableProducts.filter(
+      (item) =>
+        String(item.category || "")
+          .trim()
+          .toLowerCase() !== currentCategory
+    );
+
+    return [...sameCategory, ...otherProducts].slice(0, 8);
+  }, [product, allProducts]);
+
+  // =====================================
+  // PRODUCT CART QUANTITY
+  // =====================================
+
+  const cartQuantity = product
+    ? getCartQuantity(product)
     : 0;
-
-  // =====================================
-  // LOADING
-  // =====================================
-
-  if (loading) {
-    return (
-      <main className="organigo-product-page">
-        <div className="product-page-message">
-          <span>🥬</span>
-          <h2>Loading Product...</h2>
-        </div>
-      </main>
-    );
-  }
-
-  // =====================================
-  // ERROR
-  // =====================================
-
-  if (error || !product) {
-    return (
-      <main className="organigo-product-page">
-        <div className="product-page-message">
-          <span>⚠️</span>
-
-          <h2>Product Not Found</h2>
-
-          <p>
-            {error ||
-              "This product is unavailable."}
-          </p>
-
-          <button onClick={() => navigate("/")}>
-            Back to Home
-          </button>
-        </div>
-      </main>
-    );
-  }
 
   // =====================================
   // PRODUCT CONDITIONS
   // =====================================
 
-  const hasDiscount =
-    product.oldPrice > product.price;
+  const hasDiscount = product
+    ? product.oldPrice > product.price &&
+      product.oldPrice > 0
+    : false;
 
   const discount = hasDiscount
     ? Math.round(
@@ -213,43 +260,158 @@ function ProductDetails() {
       )
     : 0;
 
-  const outOfStock = product.stock <= 0;
+  const outOfStock = product
+    ? product.stock <= 0
+    : true;
 
-  const maximumQuantityReached =
-    cartQuantity >= product.stock;
+  const maximumQuantityReached = product
+    ? cartQuantity >= product.stock
+    : false;
 
   // =====================================
-  // ADD TO CART
+  // MAIN PRODUCT CART ACTIONS
   // =====================================
 
   const handleAddToCart = () => {
-    if (outOfStock) return;
+    if (!product || product.stock <= 0) return;
+
+    if (getCartQuantity(product) >= product.stock) return;
 
     addToCart(product);
   };
 
-  // =====================================
-  // INCREASE QUANTITY
-  // =====================================
-
   const handleIncrease = () => {
-    if (maximumQuantityReached) return;
+    if (!product) return;
+
+    if (getCartQuantity(product) >= product.stock) return;
 
     increaseQuantity(product.id);
   };
 
-  // =====================================
-  // DECREASE QUANTITY
-  // =====================================
-
   const handleDecrease = () => {
+    if (!product) return;
+
     decreaseQuantity(product.id);
   };
+
+  // =====================================
+  // SIMILAR PRODUCT CART ACTIONS
+  // =====================================
+
+  const handleSimilarAdd = (item) => {
+    if (item.stock <= 0) return;
+
+    if (getCartQuantity(item) >= item.stock) return;
+
+    addToCart(item);
+  };
+
+  const handleSimilarIncrease = (item) => {
+    if (getCartQuantity(item) >= item.stock) return;
+
+    increaseQuantity(item.id);
+  };
+
+  const handleSimilarDecrease = (item) => {
+    decreaseQuantity(item.id);
+  };
+
+  // =====================================
+  // OPEN SIMILAR PRODUCT
+  // =====================================
+
+  const openSimilarProduct = (item) => {
+    navigate(`/product/${item.id}`, {
+      state: { product: item },
+    });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  // =====================================
+  // LOADING SCREEN
+  // =====================================
+
+  if (loading && !product) {
+    return (
+      <main className="organigo-product-page">
+        <div className="product-page-message">
+          <span>🥬</span>
+
+          <h2>Loading Fresh Products...</h2>
+
+          <p>
+            Please wait while we get the latest details.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  // =====================================
+  // PRODUCT NOT FOUND
+  // =====================================
+
+  if (!product) {
+    return (
+      <main className="organigo-product-page">
+        <div className="product-page-message">
+          <span>🥬</span>
+
+          <h2>Product Not Found</h2>
+
+          <p>
+            {error || "This product is currently unavailable."}
+          </p>
+
+          <button
+            onClick={() =>
+              setRetryCount((prev) => prev + 1)
+            }
+          >
+            Try Again
+          </button>
+
+          <button
+            className="product-message-home"
+            onClick={() => navigate("/")}
+          >
+            Back to Home
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  // =====================================
+  // RENDER
+  // =====================================
 
   return (
     <main className="organigo-product-page">
 
       <div className="product-page-container">
+
+        {/* BREADCRUMB */}
+
+        <div className="product-breadcrumb">
+
+          <button onClick={() => navigate("/")}>
+            Home
+          </button>
+
+          <span>/</span>
+
+          <span>{product.category}</span>
+
+          <span>/</span>
+
+          <strong>{product.name}</strong>
+
+        </div>
 
         {/* BACK BUTTON */}
 
@@ -257,8 +419,12 @@ function ProductDetails() {
           className="product-back-button"
           onClick={() => navigate(-1)}
         >
-          ← Back
+          <span>←</span> Back
         </button>
+
+        {/* =====================================
+            MAIN PRODUCT DETAILS
+        ===================================== */}
 
         <div className="product-main-layout">
 
@@ -266,15 +432,18 @@ function ProductDetails() {
 
           <div className="product-detail-image">
 
-            {product.image ? (
+            {product.image && !imageError ? (
               <img
                 src={product.image}
                 alt={product.name}
+                onError={() => setImageError(true)}
               />
             ) : (
-              <span>
-                {product.icon || "🥬"}
-              </span>
+              <div className="product-image-placeholder">
+                <span>{product.icon || "🥬"}</span>
+
+                <p>Fresh from ORGANIGO</p>
+              </div>
             )}
 
             {hasDiscount && (
@@ -283,15 +452,31 @@ function ProductDetails() {
               </div>
             )}
 
+            <div className="product-image-brand">
+              <span>ORGANIGO</span>
+
+              <small>Freshness Delivered</small>
+            </div>
+
           </div>
 
           {/* PRODUCT INFORMATION */}
 
           <div className="product-detail-info">
 
-            <span className="product-detail-category">
-              {product.category || "Fresh Products"}
-            </span>
+            <div className="product-category-row">
+
+              <span className="product-detail-category">
+                {product.category}
+              </span>
+
+              {product.isSpecial && (
+                <span className="product-special-badge">
+                  SPECIAL
+                </span>
+              )}
+
+            </div>
 
             <h1>{product.name}</h1>
 
@@ -299,8 +484,12 @@ function ProductDetails() {
               {product.quantity}
             </p>
 
+            {/* QUALITY */}
+
             <div className="product-detail-rating">
-              🌿 Fresh Quality Product
+              <span>✓</span>
+
+              Fresh Quality Product
             </div>
 
             {/* PRICE */}
@@ -308,13 +497,13 @@ function ProductDetails() {
             <div className="product-detail-price">
 
               <strong>
-                ₹{product.price}
+                ₹{formatPrice(product.price)}
               </strong>
 
               {hasDiscount && (
                 <>
                   <del>
-                    ₹{product.oldPrice}
+                    ₹{formatPrice(product.oldPrice)}
                   </del>
 
                   <span>
@@ -325,13 +514,29 @@ function ProductDetails() {
 
             </div>
 
+            <p className="product-tax-note">
+              Inclusive of all applicable taxes
+            </p>
+
             {/* STOCK */}
 
-            <p className="product-detail-stock">
+            <div
+              className={`product-stock-status ${
+                outOfStock
+                  ? "stock-unavailable"
+                  : "stock-available"
+              }`}
+            >
+              <span>
+                {outOfStock ? "●" : "✓"}
+              </span>
+
               {outOfStock
                 ? "Currently Out of Stock"
-                : "✓ In Stock"}
-            </p>
+                : product.stock <= 5
+                ? `Only ${product.stock} left in stock`
+                : "In Stock - Ready to Deliver"}
+            </div>
 
             {/* CART ACTIONS */}
 
@@ -352,7 +557,7 @@ function ProductDetails() {
                   className="product-add-cart"
                   onClick={handleAddToCart}
                 >
-                  ADD TO CART +
+                  ADD TO CART <span>+</span>
                 </button>
 
               ) : (
@@ -366,9 +571,7 @@ function ProductDetails() {
                     −
                   </button>
 
-                  <strong>
-                    {cartQuantity}
-                  </strong>
+                  <strong>{cartQuantity}</strong>
 
                   <button
                     onClick={handleIncrease}
@@ -386,17 +589,36 @@ function ProductDetails() {
                 className="product-go-cart"
                 onClick={() => navigate("/cart")}
               >
-                View Cart
+                View Cart →
               </button>
 
             </div>
 
-            {maximumQuantityReached &&
-              !outOfStock && (
-                <p className="product-detail-stock">
-                  Maximum available stock reached.
+            {maximumQuantityReached && !outOfStock && (
+              <p className="product-max-stock-message">
+                You have added all available stock to your cart.
+              </p>
+            )}
+
+            {/* DELIVERY INFORMATION */}
+
+            <div className="product-delivery-card">
+
+              <div className="product-delivery-icon">
+                🚚
+              </div>
+
+              <div>
+                <strong>
+                  Delivery to your doorstep
+                </strong>
+
+                <p>
+                  Check your delivery availability at checkout.
                 </p>
-              )}
+              </div>
+
+            </div>
 
             {/* FEATURES */}
 
@@ -432,9 +654,211 @@ function ProductDetails() {
 
             </div>
 
+            {/* TRUST NOTE */}
+
+            <div className="product-trust-note">
+
+              <span>💚</span>
+
+              <p>
+                ORGANIGO - Freshness, Trust & Convenience.
+              </p>
+
+            </div>
+
           </div>
 
         </div>
+
+        {/* =====================================
+            SIMILAR PRODUCTS SECTION
+        ===================================== */}
+
+        {similarProducts.length > 0 && (
+
+          <section className="similar-products-section">
+
+            <div className="similar-products-heading">
+
+              <div>
+                <span className="similar-section-label">
+                  MORE FRESHNESS FOR YOU
+                </span>
+
+                <h2>You May Also Like</h2>
+
+                <p>
+                  Explore more fresh products from ORGANIGO.
+                </p>
+              </div>
+
+              <span className="similar-product-count">
+                {similarProducts.length} Products
+              </span>
+
+            </div>
+
+            <div className="similar-products-grid">
+
+              {similarProducts.map((item) => {
+
+                const quantity = getCartQuantity(item);
+
+                const itemHasDiscount =
+                  item.oldPrice > item.price &&
+                  item.oldPrice > 0;
+
+                const itemDiscount = itemHasDiscount
+                  ? Math.round(
+                      ((item.oldPrice - item.price) /
+                        item.oldPrice) *
+                        100
+                    )
+                  : 0;
+
+                const itemMaxReached =
+                  quantity >= item.stock;
+
+                return (
+
+                  <article
+                    className="similar-product-card"
+                    key={item.id}
+                  >
+
+                    {/* PRODUCT IMAGE */}
+
+                    <div
+                      className="similar-product-image"
+                      onClick={() =>
+                        openSimilarProduct(item)
+                      }
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) => {
+                        if (
+                          event.key === "Enter" ||
+                          event.key === " "
+                        ) {
+                          event.preventDefault();
+                          openSimilarProduct(item);
+                        }
+                      }}
+                    >
+
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span>
+                          {item.icon || "🥬"}
+                        </span>
+                      )}
+
+                      {itemHasDiscount && (
+                        <span className="similar-discount-badge">
+                          {itemDiscount}% OFF
+                        </span>
+                      )}
+
+                    </div>
+
+                    {/* PRODUCT INFORMATION */}
+
+                    <div className="similar-product-info">
+
+                      <span className="similar-product-category">
+                        {item.category}
+                      </span>
+
+                      <h3
+                        onClick={() =>
+                          openSimilarProduct(item)
+                        }
+                      >
+                        {item.name}
+                      </h3>
+
+                      <p className="similar-product-unit">
+                        {item.quantity}
+                      </p>
+
+                      <div className="similar-product-price">
+
+                        <strong>
+                          ₹{formatPrice(item.price)}
+                        </strong>
+
+                        {itemHasDiscount && (
+                          <del>
+                            ₹{formatPrice(item.oldPrice)}
+                          </del>
+                        )}
+
+                      </div>
+
+                      {/* ADD / QUANTITY */}
+
+                      <div className="similar-product-cart">
+
+                        {quantity === 0 ? (
+
+                          <button
+                            className="similar-add-button"
+                            disabled={item.stock <= 0}
+                            onClick={() =>
+                              handleSimilarAdd(item)
+                            }
+                          >
+                            {item.stock <= 0
+                              ? "OUT OF STOCK"
+                              : "ADD +"}
+                          </button>
+
+                        ) : (
+
+                          <div className="similar-quantity-control">
+
+                            <button
+                              onClick={() =>
+                                handleSimilarDecrease(item)
+                              }
+                            >
+                              −
+                            </button>
+
+                            <strong>{quantity}</strong>
+
+                            <button
+                              disabled={itemMaxReached}
+                              onClick={() =>
+                                handleSimilarIncrease(item)
+                              }
+                            >
+                              +
+                            </button>
+
+                          </div>
+
+                        )}
+
+                      </div>
+
+                    </div>
+
+                  </article>
+
+                );
+              })}
+
+            </div>
+
+          </section>
+
+        )}
 
       </div>
 

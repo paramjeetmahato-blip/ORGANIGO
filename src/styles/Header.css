@@ -1,5 +1,6 @@
 /* =====================================================
-   ORGANIGO - PREMIUM RESPONSIVE HEADER
+   ORGANIGO - PREMIUM HEADER
+   BRAND THEME: GREEN + ORANGE
 ===================================================== */
 
 .Organigo-header,
@@ -8,20 +9,23 @@
 }
 
 .Organigo-header {
-  width: 100%;
+  --og-green: #16823B;
+  --og-green-dark: #106B30;
+  --og-green-light: #EAF6ED;
+  --og-orange: #FF8A00;
+  --og-orange-light: #FFF0DC;
+  --og-text: #202820;
+  --og-muted: #718075;
+  --og-border: #DCEADE;
+
   position: sticky;
   top: 0;
   z-index: 1000;
+  width: 100%;
 
-  background: linear-gradient(
-    135deg,
-    #e9f8e9,
-    #d9f2dc,
-    #c9ebce
-  );
-
-  border-bottom: 1px solid #c8e7cd;
-  box-shadow: 0 3px 14px rgba(20, 100, 45, 0.07);
+  background: #ffffff;
+  border-bottom: 1px solid var(--og-border);
+  box-shadow: 0 2px 12px rgba(20, 80, 40, 0.06);
 
   font-family: "DM Sans", Arial, sans-serif;
 }
@@ -34,91 +38,77 @@
    HEADER CONTAINER
 ===================================================== */
 
-.header-container {
+.Organigo-header .header-container {
   width: 100%;
-  max-width: 1700px;
-  min-height: 84px;
+  max-width: 1900px;
+  min-height: 90px;
 
   margin: auto;
-  padding: 10px 30px;
+  padding: 10px 35px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
+  gap: 22px;
 }
 
 /* =====================================================
-   ORGANIGO LOCATION BRAND BAR
+   LOGO
 ===================================================== */
 
-.organigo-location-bar {
-  flex: 0 0 290px;
-  width: 290px;
-  min-width: 0;
-  min-height: 76px;
-
-  padding: 9px 13px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
-  gap: 5px;
-
-  background: linear-gradient(
-    135deg,
-    #ffffff,
-    #effaf0
-  );
-
-  border: 1px solid #cce8d0;
-  border-radius: 13px;
-
-  box-shadow: 0 3px 10px rgba(20, 100, 45, 0.07);
-
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-
-  transition: 0.25s ease;
-}
-
-.organigo-location-bar:hover {
-  background: #ffffff;
-  border-color: #159447;
-
-  box-shadow: 0 5px 15px rgba(20, 100, 45, 0.12);
-}
-
-/* BRAND */
-
-.organigo-location-brand {
-  width: 100%;
+.organigo-header-logo {
+  flex: 0 0 155px;
+  width: 155px;
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: flex-start;
+
+  text-decoration: none;
 }
 
-.organigo-brand-logo {
+.organigo-header-logo-image {
   display: block;
 
-  width: 112px;
-  height: 27px;
+  width: 150px;
+  height: 55px;
 
   object-fit: contain;
   object-position: left center;
 }
 
-.organigo-location-chevron {
-  color: #168b45;
-  font-size: 19px;
-  font-weight: 900;
+/* =====================================================
+   DELIVERY LOCATION
+===================================================== */
+
+.Organigo-header .organigo-location-bar {
+  flex: 0 0 260px;
+  width: 260px;
+  min-width: 0;
+  min-height: 65px;
+
+  padding: 8px 5px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 6px;
+
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+
+  transition: background 0.2s ease;
 }
 
-/* LOCATION DETAILS */
+.organigo-location-bar:hover {
+  background: var(--og-green-light);
+}
 
 .organigo-location-details {
   display: flex;
@@ -129,11 +119,11 @@
 }
 
 .organigo-pin-icon {
-  width: 22px;
-  height: 22px;
-
+  width: 21px;
+  height: 21px;
   flex-shrink: 0;
-  color: #168b45;
+
+  color: var(--og-green);
 }
 
 .organigo-location-address {
@@ -141,24 +131,53 @@
 
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .organigo-location-address > span {
-  color: #819083;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.7px;
+  color: var(--og-green);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
 }
 
 .organigo-location-address > strong {
-  color: #173d26;
+  max-width: 215px;
+
+  color: var(--og-text);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.organigo-location-chevron {
+  margin-left: auto;
+
+  color: var(--og-orange);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+/* LOCATION ARROW */
+
+@media (min-width: 1101px) {
+  .Organigo-header .organigo-location-chevron {
+    font-size: 0;
+  }
+
+  .Organigo-header .organigo-location-chevron::after {
+    content: "";
+
+    width: 0;
+    height: 0;
+
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 7px solid var(--og-orange);
+  }
 }
 
 /* DELIVERY STATUS */
@@ -168,7 +187,7 @@
   align-items: center;
   gap: 8px;
 
-  padding-left: 30px;
+  padding-left: 29px;
 }
 
 .organigo-delivery-status > span {
@@ -177,56 +196,59 @@
 }
 
 .organigo-delivery-status small {
-  color: #879389;
+  color: var(--og-muted);
   font-size: 9px;
 }
 
 .status-available {
-  color: #12843e;
+  color: var(--og-green);
 }
 
 .status-unavailable {
-  color: #d33434;
+  color: #D33434;
 }
 
 .status-pending {
-  color: #b07816;
+  color: var(--og-orange);
 }
 
 /* =====================================================
    SEARCH
 ===================================================== */
 
-.header-search {
+.Organigo-header .header-search {
   flex: 1;
   width: 100%;
-  min-width: 150px;
+  min-width: 180px;
   max-width: none;
-  height: 50px;
+  height: 53px;
+
+  padding: 0 17px;
 
   display: flex;
   align-items: center;
   gap: 11px;
 
-  padding: 0 15px;
+  background: #F7FAF7;
+  border: 1px solid var(--og-border);
+  border-radius: 13px;
 
-  background: #ffffff;
-  border: 1px solid #dceade;
-  border-radius: 12px;
-
-  transition: 0.25s ease;
+  transition: 0.2s ease;
 }
 
 .header-search:focus-within {
-  border-color: #159447;
-  box-shadow: 0 0 0 3px rgba(21, 148, 71, 0.09);
+  background: #ffffff;
+  border-color: var(--og-green);
+
+  box-shadow: 0 0 0 3px rgba(22, 130, 59, 0.09);
 }
 
 .header-search > span {
   display: flex;
   align-items: center;
-  font-size: 18px;
   flex-shrink: 0;
+
+  font-size: 18px;
 }
 
 .header-search input {
@@ -237,65 +259,105 @@
   outline: none;
   background: transparent;
 
-  color: #25382b;
+  color: var(--og-text);
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .header-search input::placeholder {
-  color: #8b978d;
+  color: #929D94;
 }
 
 /* =====================================================
-   CART
+   PREMIUM CART - DESKTOP + TABLET
 ===================================================== */
 
-.header-cart {
-  min-width: 125px;
-  min-height: 49px;
+.Organigo-header .header-cart {
+  position: relative;
+  flex-shrink: 0;
 
-  padding: 0 15px;
+  min-width: 155px;
+  min-height: 58px;
+
+  padding: 9px 14px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-
-  position: relative;
-  flex-shrink: 0;
+  gap: 11px;
 
   color: #ffffff;
-  background: #159447;
-  border: 1px solid #159447;
-  border-radius: 11px;
+
+  background: linear-gradient(
+    135deg,
+    #16823B,
+    #20A34D
+  );
+
+  border: 1px solid var(--og-green);
+  border-radius: 13px;
 
   text-decoration: none;
-  font-size: 13px;
-  font-weight: 800;
 
-  transition: 0.25s ease;
+  box-shadow: 0 4px 12px rgba(22, 130, 59, 0.16);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
 }
 
-.header-cart:hover {
-  background: #087a36;
-  border-color: #087a36;
+.Organigo-header .header-cart:hover {
+  background: linear-gradient(
+    135deg,
+    #106B30,
+    #16823B
+  );
 
   transform: translateY(-2px);
 
-  box-shadow: 0 5px 12px rgba(21, 148, 71, 0.2);
+  box-shadow: 0 7px 17px rgba(22, 130, 59, 0.24);
 }
 
-.cart-icon {
-  font-size: 18px;
+/* CART ICON */
+
+.header-cart-icon-wrapper {
+  position: relative;
+
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.cart-count {
+.Organigo-header .header-cart-icon {
+  display: block;
+
+  width: 25px;
+  height: 25px;
+
+  color: #ffffff;
+
+  transition: transform 0.2s ease;
+}
+
+.header-cart:hover .header-cart-icon {
+  transform: scale(1.08);
+}
+
+/* ORANGE CART BADGE */
+
+.header-cart-badge {
   position: absolute;
   top: -8px;
-  right: -7px;
+  right: -10px;
 
-  min-width: 21px;
-  height: 21px;
+  min-width: 20px;
+  height: 20px;
+
   padding: 0 5px;
 
   display: flex;
@@ -303,42 +365,83 @@
   justify-content: center;
 
   color: #ffffff;
-  background: #ff3535;
+  background: var(--og-orange);
 
   border: 2px solid #ffffff;
   border-radius: 50px;
 
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 900;
+  line-height: 1;
 }
 
-/* =====================================================
-   LOGIN
-===================================================== */
+/* CART INFORMATION */
 
-.header-login {
-  display: inline-flex;
-  align-items: center;
+.header-cart-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: center;
-
-  padding: 12px 20px;
-
-  background: #198754;
-  color: #ffffff;
-
-  border-radius: 10px;
-
-  font-size: 13px;
-  font-weight: 800;
-  text-decoration: none;
-  white-space: nowrap;
-
-  transition: 0.3s ease;
+  gap: 3px;
 }
 
-.header-login:hover {
-  background: #146c43;
-  transform: translateY(-2px);
+.header-cart-label {
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.header-cart-bottom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  white-space: nowrap;
+}
+
+.header-cart-count {
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.header-cart-divider {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+.header-cart-total {
+  color: #FFE0B3;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.header-cart-arrow {
+  margin-left: auto;
+
+  color: #FFD39A;
+  font-size: 20px;
+  font-weight: 700;
+
+  transition: transform 0.2s ease;
+}
+
+.header-cart:hover .header-cart-arrow {
+  transform: translateX(3px);
+}
+
+/* EMPTY CART */
+
+.Organigo-header .header-cart.is-empty {
+  background: linear-gradient(
+    135deg,
+    #16823B,
+    #20A34D
+  );
 }
 
 /* =====================================================
@@ -352,26 +455,35 @@
 }
 
 .header-account-button {
-  min-height: 49px;
-  padding: 6px 13px;
+  min-width: 105px;
+  min-height: 48px;
+
+  padding: 8px 12px;
 
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 9px;
 
-  background: #ffffff;
-  border: 1px solid #d8ebdc;
-  border-radius: 10px;
+  background: transparent;
+  border: none;
+  border-radius: 9px;
 
-  color: #173d26;
+  color: var(--og-text);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+
   cursor: pointer;
-
-  transition: 0.25s ease;
+  transition: 0.2s ease;
 }
 
 .header-account-button:hover {
-  background: #e8f7ec;
-  border-color: #159447;
+  background: var(--og-green-light);
+}
+
+.header-account-button::after {
+  content: "Account";
 }
 
 .account-icon {
@@ -382,24 +494,45 @@
   align-items: center;
   justify-content: center;
 
-  background: #dff3e4;
-  color: #159447;
+  background: var(--og-green-light);
+  color: var(--og-green);
 
   border-radius: 50%;
 }
 
 .account-icon svg {
   display: block;
+  width: 23px;
+  height: 23px;
 }
 
-/* ACCOUNT DROPDOWN */
+/* ACCOUNT ARROW */
+
+@media (min-width: 1101px) {
+  .Organigo-header .header-account-button::before {
+    content: "";
+
+    width: 0;
+    height: 0;
+
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 7px solid var(--og-orange);
+
+    order: 2;
+  }
+}
+
+/* =====================================================
+   ACCOUNT DROPDOWN
+===================================================== */
 
 .account-dropdown {
   position: absolute;
-  top: calc(100% + 12px);
+  top: calc(100% + 10px);
   right: 0;
 
-  width: 245px;
+  width: 260px;
   max-width: calc(100vw - 20px);
 
   padding: 10px;
@@ -409,7 +542,7 @@
   gap: 5px;
 
   background: #ffffff;
-  border: 1px solid #e2eee4;
+  border: 1px solid #E3EEE5;
   border-radius: 14px;
 
   box-shadow: 0 12px 35px rgba(20, 80, 40, 0.15);
@@ -438,19 +571,19 @@
   padding: 12px;
   margin-bottom: 5px;
 
-  background: #f0faf2;
+  background: var(--og-green-light);
   border-radius: 10px;
 }
 
 .account-dropdown-heading strong {
-  color: #173d26;
+  color: var(--og-text);
   font-size: 13px;
 }
 
 .account-dropdown-heading small {
-  color: #718075;
+  color: var(--og-muted);
   font-size: 11px;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .account-dropdown > a,
@@ -466,7 +599,7 @@
   border: none;
   border-radius: 9px;
 
-  color: #344b3b;
+  color: #344B3B;
   text-decoration: none;
   text-align: left;
 
@@ -479,16 +612,100 @@
 }
 
 .account-dropdown > a:hover {
-  background: #eff9f1;
-  color: #087a36;
+  background: var(--og-green-light);
+  color: var(--og-green);
 }
 
 .account-logout-button {
-  color: #d33434;
+  color: #D33434;
 }
 
 .account-logout-button:hover {
-  background: #fff0f0;
+  background: #FFF0F0;
+}
+
+/* =====================================================
+   DESKTOP ACCOUNT DROPDOWN OVERLAY
+===================================================== */
+
+@media (min-width: 1101px) {
+  .Organigo-header:has(.account-dropdown)::after {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.25);
+
+    z-index: 900;
+    pointer-events: none;
+  }
+
+  .Organigo-header .header-account {
+    z-index: 1001;
+  }
+
+  .Organigo-header .account-dropdown {
+    position: fixed;
+    top: 90px;
+    right: 35px;
+
+    width: 305px;
+    max-width: calc(100vw - 30px);
+
+    padding: 15px;
+
+    border: none;
+    border-radius: 0 0 18px 18px;
+
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.16);
+
+    z-index: 1002;
+  }
+
+  .Organigo-header .account-dropdown-heading {
+    padding: 16px;
+  }
+
+  .Organigo-header .account-dropdown-heading strong {
+    font-size: 17px;
+  }
+
+  .Organigo-header .account-dropdown > a,
+  .Organigo-header .account-logout-button {
+    padding: 14px;
+    font-size: 14px;
+  }
+}
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+.header-login {
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px 20px;
+
+  background: var(--og-green);
+  color: #ffffff;
+
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+
+  transition: 0.2s ease;
+}
+
+.header-login:hover {
+  background: var(--og-green-dark);
+  transform: translateY(-2px);
 }
 
 /* =====================================================
@@ -520,25 +737,26 @@
 }
 
 .app-banner-text strong {
-  color: #086b32;
+  color: var(--og-green-dark);
   font-size: 12px;
   font-weight: 900;
 }
 
 .app-banner-text small {
-  color: #526c59;
+  color: #526C59;
   font-size: 9px;
 }
 
 .app-download-button {
   flex-shrink: 0;
+
   padding: 8px 10px;
 
   border: none;
   border-radius: 7px;
 
   color: #ffffff;
-  background: #159447;
+  background: var(--og-green);
 
   font-size: 9px;
   font-weight: 800;
@@ -609,7 +827,7 @@
 .location-modal-heading h2 {
   margin: 0;
 
-  color: #173d26;
+  color: var(--og-text);
   font-size: 20px;
   font-weight: 900;
 }
@@ -617,7 +835,7 @@
 .location-modal-heading p {
   margin: 6px 0 0;
 
-  color: #7b897e;
+  color: var(--og-muted);
   font-size: 12px;
 }
 
@@ -633,16 +851,16 @@
   border: none;
   border-radius: 50%;
 
-  background: #f1f5f1;
-  color: #304b37;
+  background: #F1F5F1;
+  color: #304B37;
 
   font-size: 20px;
   cursor: pointer;
 }
 
 .location-modal-close:hover {
-  background: #ffe8e8;
-  color: #e33434;
+  background: #FFE8E8;
+  color: #E33434;
 }
 
 /* =====================================================
@@ -657,8 +875,8 @@
   padding: 14px;
   margin-bottom: 18px;
 
-  background: #fff0f1;
-  border: 1px solid #ffd9dc;
+  background: var(--og-orange-light);
+  border: 1px solid #FFD9AC;
   border-radius: 12px;
 }
 
@@ -671,7 +889,7 @@
   align-items: center;
   justify-content: center;
 
-  color: #e84459;
+  color: var(--og-orange);
 }
 
 .location-permission-icon svg {
@@ -687,7 +905,7 @@
 .location-permission-text strong {
   display: block;
 
-  color: #d83b50;
+  color: #A85B00;
   font-size: 13px;
   font-weight: 800;
 }
@@ -695,18 +913,18 @@
 .location-permission-text p {
   margin: 4px 0 0;
 
-  color: #777;
+  color: #777777;
   font-size: 11px;
 }
 
 .location-permission-banner button {
+  padding: 8px 13px;
+
   border: none;
   border-radius: 7px;
 
-  background: #e84459;
+  background: var(--og-orange);
   color: #ffffff;
-
-  padding: 8px 13px;
 
   font-weight: 700;
   cursor: pointer;
@@ -729,16 +947,20 @@
 }
 
 .address-section-heading {
-  color: #202820;
+  color: var(--og-text);
   font-size: 16px;
   font-weight: 700;
 }
 
 .saved-addresses-heading > a {
-  color: #16843b;
+  color: var(--og-green);
   font-size: 13px;
   font-weight: 800;
   text-decoration: none;
+}
+
+.saved-addresses-heading > a:hover {
+  color: var(--og-orange);
 }
 
 .saved-addresses-list {
@@ -757,7 +979,7 @@
   padding: 14px;
 
   background: #ffffff;
-  border: 1px solid #e4eee6;
+  border: 1px solid #E4EEE6;
   border-radius: 13px;
 
   text-align: left;
@@ -768,10 +990,10 @@
 
 .saved-address-item:hover,
 .saved-address-item.selected {
-  background: #f0faf2;
-  border-color: #159447;
+  background: var(--og-green-light);
+  border-color: var(--og-green);
 
-  box-shadow: 0 3px 10px rgba(21, 148, 71, 0.08);
+  box-shadow: 0 3px 10px rgba(22, 130, 59, 0.08);
 }
 
 .saved-address-item:disabled {
@@ -788,8 +1010,9 @@
   align-items: center;
   justify-content: center;
 
-  background: #edf8ef;
-  color: #218838;
+  background: var(--og-orange-light);
+  color: var(--og-green);
+
   border-radius: 12px;
 }
 
@@ -803,13 +1026,13 @@
 }
 
 .saved-address-details strong {
-  color: #263b2c;
+  color: #263B2C;
   font-size: 14px;
   font-weight: 900;
 }
 
 .saved-address-details small {
-  color: #77847a;
+  color: #77847A;
   font-size: 11px;
   line-height: 1.5;
   overflow-wrap: anywhere;
@@ -832,9 +1055,9 @@
 
   border-radius: 12px;
 
-  color: #218838;
-  background: #f0f9f1;
-  border: 1px solid #218838;
+  color: var(--og-green);
+  background: var(--og-green-light);
+  border: 1px solid var(--og-green);
 
   font-family: inherit;
   font-size: 14px;
@@ -846,7 +1069,7 @@
 
 .use-current-location-btn:hover:not(:disabled) {
   color: #ffffff;
-  background: #218838;
+  background: var(--og-green);
 }
 
 .use-current-location-btn svg {
@@ -871,7 +1094,7 @@
 
   margin: 20px 0;
 
-  color: #9aa59c;
+  color: #9AA59C;
   font-size: 11px;
   font-weight: 700;
 }
@@ -881,7 +1104,7 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: #e8eee9;
+  background: #E8EEE9;
 }
 
 /* =====================================================
@@ -900,15 +1123,21 @@
   margin: 12px 0;
 
   background: #ffffff;
-  border: 1px solid #e8eee9;
+  border: 1px solid #E8EEE9;
   border-radius: 12px;
 
-  color: #26382b;
+  color: #26382B;
   font-size: 14px;
   font-weight: 700;
 
   cursor: pointer;
   text-align: left;
+  transition: 0.2s ease;
+}
+
+.request-address-btn:hover {
+  border-color: var(--og-green);
+  background: var(--og-green-light);
 }
 
 .request-address-icon {
@@ -918,8 +1147,8 @@
   display: grid;
   place-items: center;
 
-  background: #e5f8e9;
-  color: #16843b;
+  background: var(--og-orange-light);
+  color: var(--og-green);
 
   border-radius: 9px;
   font-size: 23px;
@@ -930,12 +1159,12 @@
 }
 
 .request-address-arrow {
+  color: var(--og-orange);
   font-size: 25px;
-  color: #89928c;
 }
 
 /* =====================================================
-   MANUAL SEARCH
+   MANUAL LOCATION SEARCH
 ===================================================== */
 
 .location-search-box {
@@ -948,8 +1177,8 @@
   align-items: center;
   gap: 10px;
 
-  background: #f7faf7;
-  border: 1px solid #dce8de;
+  background: #F7FAF7;
+  border: 1px solid var(--og-border);
   border-radius: 11px;
 
   transition: 0.2s ease;
@@ -957,9 +1186,9 @@
 
 .location-search-box:focus-within {
   background: #ffffff;
-  border-color: #159447;
+  border-color: var(--og-green);
 
-  box-shadow: 0 0 0 3px rgba(21, 148, 71, 0.08);
+  box-shadow: 0 0 0 3px rgba(22, 130, 59, 0.08);
 }
 
 .location-search-box input {
@@ -972,18 +1201,18 @@
   outline: none;
 
   background: transparent;
-  color: #25382b;
+  color: var(--og-text);
 
   font-family: inherit;
   font-size: 13px;
 }
 
 .location-search-box input::placeholder {
-  color: #98a39a;
+  color: #98A39A;
 }
 
 /* =====================================================
-   SEARCH RESULTS
+   LOCATION SEARCH RESULTS
 ===================================================== */
 
 .location-results {
@@ -1005,7 +1234,7 @@
   gap: 11px;
 
   background: #ffffff;
-  border: 1px solid #edf1ed;
+  border: 1px solid #EDF1ED;
   border-radius: 10px;
 
   text-align: left;
@@ -1015,15 +1244,15 @@
 }
 
 .location-result-item:hover {
-  background: #f0faf2;
-  border-color: #b9dfc2;
+  background: var(--og-green-light);
+  border-color: #B9DFC2;
 }
 
 .location-result-item > svg {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: #218838;
+  color: var(--og-green);
 }
 
 .location-result-item div {
@@ -1035,7 +1264,7 @@
 }
 
 .location-result-item strong {
-  color: #24452e;
+  color: #24452E;
   font-size: 12px;
   font-weight: 800;
 }
@@ -1054,7 +1283,7 @@
 .location-no-results {
   margin-top: 12px;
 
-  color: #718075;
+  color: var(--og-muted);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -1065,24 +1294,24 @@
 
   border-radius: 9px;
 
-  color: #b52b2b;
-  background: #fff0f0;
-  border: 1px solid #ffdada;
+  color: #B52B2B;
+  background: #FFF0F0;
+  border: 1px solid #FFDADA;
 
   font-size: 12px;
   line-height: 1.5;
 }
 
 /* =====================================================
-   SELECTED LOCATION
+   CURRENT SELECTED LOCATION
 ===================================================== */
 
 .current-selected-location {
   margin-top: 18px;
   padding: 13px;
 
-  background: #f3faf4;
-  border: 1px solid #d7ecdc;
+  background: var(--og-green-light);
+  border: 1px solid #D7ECDC;
   border-radius: 12px;
 }
 
@@ -1090,7 +1319,7 @@
   display: block;
   margin-bottom: 6px;
 
-  color: #12843e;
+  color: var(--og-green);
   font-size: 12px;
   font-weight: 900;
 }
@@ -1107,7 +1336,7 @@
   display: block;
   margin-top: 6px;
 
-  color: #16843b;
+  color: var(--og-green);
   font-size: 11px;
   line-height: 1.5;
 }
@@ -1115,7 +1344,7 @@
 .location-modal-footer {
   margin-top: 13px;
 
-  color: #718075;
+  color: var(--og-muted);
   font-size: 11px;
   line-height: 1.5;
 }
@@ -1126,51 +1355,139 @@
 
 @media (min-width: 651px) and (max-width: 1100px) {
 
-  .header-container {
-    min-height: auto;
-    padding: 12px 18px;
+  .Organigo-header .header-container {
+    min-height: 82px;
+    padding: 10px 16px;
 
     display: grid;
 
     grid-template-columns:
-      minmax(190px, 1fr)
-      minmax(130px, 1fr)
-      auto
-      auto;
+      110px
+      minmax(170px, 1fr)
+      minmax(140px, 1fr)
+      125px
+      44px;
 
     grid-template-areas:
-      "location search login cart";
+      "logo location search cart account";
 
     gap: 10px;
   }
 
-  .organigo-location-bar {
-    grid-area: location;
-    width: 100%;
-    min-width: 0;
+  .organigo-header-logo {
+    grid-area: logo;
+    width: 110px;
   }
 
-  .header-search {
+  .organigo-header-logo-image {
+    width: 108px;
+    height: 46px;
+  }
+
+  .Organigo-header .organigo-location-bar {
+    grid-area: location;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 60px;
+
+    padding: 7px;
+  }
+
+  .organigo-location-address > span {
+    font-size: 9px;
+  }
+
+  .organigo-location-address > strong {
+    font-size: 11px;
+  }
+
+  .organigo-delivery-status {
+    padding-left: 27px;
+  }
+
+  .Organigo-header .header-search {
     grid-area: search;
+
     width: 100%;
     min-width: 0;
     height: 44px;
-  }
 
-  .header-login {
-    grid-area: login;
-    padding: 11px 13px;
-    font-size: 12px;
-  }
-
-  .header-cart {
-    grid-area: cart;
-    min-width: 95px;
     padding: 0 10px;
   }
 
-  .header-account {
+  .Organigo-header .header-search input {
+    font-size: 12px;
+  }
+
+  .Organigo-header .header-cart {
+    grid-area: cart;
+
+    min-width: 125px;
+    min-height: 52px;
+
+    padding: 7px 9px;
+    gap: 7px;
+
+    border-radius: 11px;
+  }
+
+  .header-cart-icon-wrapper {
+    width: 25px;
+    height: 25px;
+  }
+
+  .Organigo-header .header-cart-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .header-cart-count {
+    font-size: 11px;
+  }
+
+  .header-cart-total {
+    font-size: 12px;
+  }
+
+  .header-cart-label {
+    font-size: 8px;
+  }
+
+  .header-cart-arrow {
     display: none;
+  }
+
+  .Organigo-header .header-account {
+    grid-area: account;
+    display: block;
+  }
+
+  .Organigo-header .header-account-button {
+    min-width: 44px;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+
+    padding: 0;
+  }
+
+  .Organigo-header .header-account-button::after,
+  .Organigo-header .header-account-button::before {
+    display: none;
+  }
+
+  .Organigo-header .account-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .Organigo-header .header-login {
+    display: none !important;
+  }
+
+  .Organigo-header .account-dropdown {
+    right: 0;
   }
 }
 
@@ -1179,12 +1496,12 @@
 ===================================================== */
 
 @media (min-width: 1101px) {
-  .header-account {
-    display: none;
+  .Organigo-header .header-account {
+    display: block;
   }
 
-  .header-login {
-    display: inline-flex;
+  .Organigo-header .header-login {
+    display: none !important;
   }
 }
 
@@ -1195,8 +1512,8 @@
 @media (max-width: 650px) {
 
   .Organigo-header {
-    background: #f7f9e9;
-    border-bottom: 1px solid #d6ecd4;
+    background: #F8FAF7;
+    border-bottom: 1px solid #DCEADE;
   }
 
   /* APP BANNER */
@@ -1211,13 +1528,17 @@
     align-items: center;
     gap: 9px;
 
-    background: #f2fbf1;
-    border-bottom: 1px solid #d9ead9;
+    background: var(--og-green-light);
+    border-bottom: 1px solid #D9EAD9;
   }
 
-  /* MAIN HEADER */
+  .app-download-button {
+    background: var(--og-orange);
+  }
 
-  .header-container {
+  /* HEADER GRID */
+
+  .Organigo-header .header-container {
     width: 100%;
     min-height: auto;
 
@@ -1236,40 +1557,41 @@
     row-gap: 10px;
   }
 
-  /* LOCATION BAR */
+  /* HIDE LOGO ON MOBILE */
 
-  .organigo-location-bar {
+  .organigo-header-logo {
+    display: none !important;
+  }
+
+  /* LOCATION */
+
+  .Organigo-header .organigo-location-bar {
     grid-area: location;
 
     width: 100%;
     min-width: 0;
     min-height: 76px;
 
-    padding: 7px 9px;
+    padding: 8px 10px;
 
     display: flex;
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
-    gap: 4px;
+    gap: 5px;
 
     background: linear-gradient(
       135deg,
       #ffffff,
-      #effaf0
+      #EFF8F0
     );
 
-    border: 1px solid #cce8d0;
+    border: 1px solid #CCE8D0;
     border-radius: 11px;
   }
 
-  .organigo-brand-logo {
-    width: 95px;
-    height: 23px;
-  }
-
-  .organigo-location-chevron {
-    font-size: 17px;
+  .organigo-location-details {
+    gap: 8px;
   }
 
   .organigo-pin-icon {
@@ -1283,6 +1605,10 @@
 
   .organigo-location-address > strong {
     font-size: 11px;
+  }
+
+  .organigo-location-chevron {
+    font-size: 17px;
   }
 
   .organigo-delivery-status {
@@ -1299,16 +1625,19 @@
 
   /* ACCOUNT */
 
-  .header-account {
-    display: block;
+  .Organigo-header .header-account {
     grid-area: account;
+
+    display: block;
     position: relative;
   }
 
-  .header-account-button {
+  .Organigo-header .header-account-button {
     width: 44px;
     height: 44px;
+    min-width: 44px;
     min-height: 44px;
+
     padding: 0;
 
     display: flex;
@@ -1316,25 +1645,24 @@
     justify-content: center;
 
     background: #ffffff;
-    border: 1px solid #d8ebdc;
+    border: 1px solid #D8EBDC;
     border-radius: 50%;
   }
 
-  .account-icon {
+  .Organigo-header .header-account-button::after,
+  .Organigo-header .header-account-button::before {
+    display: none;
+  }
+
+  .Organigo-header .account-icon {
     width: 34px;
     height: 34px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #e4f5e8;
-    color: #159447;
-
-    border-radius: 50%;
+    background: var(--og-green-light);
+    color: var(--og-green);
   }
 
-  .account-dropdown {
+  .Organigo-header .account-dropdown {
     width: 230px;
     max-width: calc(100vw - 20px);
 
@@ -1344,16 +1672,23 @@
     z-index: 9999;
   }
 
-  /* HIDE DESKTOP CART AND LOGIN */
+  /* CART COMPLETELY HIDDEN ON MOBILE */
 
-  .header-cart,
-  .header-login {
+  .Organigo-header .header-cart {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* LOGIN HIDDEN */
+
+  .Organigo-header .header-login {
     display: none !important;
   }
 
   /* SEARCH */
 
-  .header-search {
+  .Organigo-header .header-search {
     grid-area: search;
 
     width: 100%;
@@ -1364,17 +1699,17 @@
     padding: 0 13px;
 
     background: #ffffff;
-    border: 1px solid #d9e9db;
+    border: 1px solid #D9E9DB;
     border-radius: 10px;
 
     box-shadow: 0 2px 7px rgba(30, 90, 40, 0.05);
   }
 
-  .header-search input {
+  .Organigo-header .header-search input {
     font-size: 13px;
   }
 
-  /* MOBILE MODAL */
+  /* MOBILE LOCATION MODAL */
 
   .location-modal-backdrop {
     align-items: flex-end;
@@ -1433,35 +1768,34 @@
 
 @media (max-width: 360px) {
 
-  .header-container {
+  .Organigo-header .header-container {
     padding: 9px 7px 11px;
+
     column-gap: 5px;
     row-gap: 9px;
   }
 
-  .organigo-location-bar {
+  .Organigo-header .organigo-location-bar {
     padding: 6px 7px;
-  }
-
-  .organigo-brand-logo {
-    width: 85px;
   }
 
   .organigo-location-address > strong {
     font-size: 10px;
   }
 
-  .header-account-button {
+  .Organigo-header .header-account-button {
     width: 40px;
     height: 40px;
+    min-width: 40px;
+    min-height: 40px;
   }
 
-  .account-icon {
+  .Organigo-header .account-icon {
     width: 30px;
     height: 30px;
   }
 
-  .account-dropdown {
+  .Organigo-header .account-dropdown {
     width: 215px;
   }
 
@@ -1475,11 +1809,12 @@
 }
 
 /* =====================================================
-   ACCOUNT PAGE - SEARCH ONLY HEADER
+   PROFILE PAGE - SEARCH ONLY HEADER
 ===================================================== */
 
 .Organigo-header.profile-search-only .organigo-app-banner,
 .Organigo-header.profile-search-only .organigo-location-bar,
+.Organigo-header.profile-search-only .organigo-header-logo,
 .Organigo-header.profile-search-only .header-account,
 .Organigo-header.profile-search-only .header-cart,
 .Organigo-header.profile-search-only .header-login {
@@ -1491,11 +1826,12 @@
   max-width: 100%;
   min-height: 65px;
 
+  padding: 10px 25px;
+
   display: flex !important;
   align-items: center;
   justify-content: center;
 
-  padding: 10px 25px;
   gap: 0;
 }
 
@@ -1509,6 +1845,7 @@
 
   flex: 1;
   margin: 0;
+
   border-radius: 10px;
 }
 
@@ -1518,7 +1855,6 @@
 }
 
 @media (max-width: 650px) {
-
   .Organigo-header.profile-search-only .header-container {
     width: 100%;
     min-height: 60px;
@@ -1549,497 +1885,1328 @@
 body:has(.location-modal) .organigo-bottom-nav {
   display: none !important;
 }
-/* ORGANIGO LOGO - LEFT SIDE */
+/* =========================================
+   ORGANIGO MOBILE HEADER - FINAL FIX
+========================================= */
 
-.organigo-header-logo {
-  flex: 0 0 155px;
-  width: 155px;
+@media only screen and (max-width: 650px) {
 
-  display: flex;
+  /* APP BANNER */
+
+  .Organigo-header .organigo-app-banner {
+    position: relative;
+    width: 100%;
+    min-height: 55px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 42px 10px 12px;
+
+    background: #EAF6ED;
+    border-bottom: 1px solid #CCE8D2;
+    border-radius: 0;
+  }
+
+  .Organigo-header .app-banner-close {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+
+    width: 27px;
+    height: 27px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transform: translateY(-50%);
+
+    background: #ffffff;
+    color: #202820;
+
+    border: 1px solid #DCEADE;
+    border-radius: 50%;
+
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .Organigo-header .app-download-button {
+    background: #FF8A00;
+    color: #ffffff;
+    border-radius: 8px;
+  }
+
+  /* LOCATION BAR */
+
+  .Organigo-header .organigo-location-bar {
+    grid-area: location;
+
+    width: 100% !important;
+    min-width: 0;
+    min-height: 90px !important;
+
+    padding: 12px 15px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+    gap: 7px !important;
+
+    background: #ffffff !important;
+
+    border: 1.5px solid #CCE8D2 !important;
+    border-radius: 16px !important;
+
+    box-shadow: 0 3px 12px rgba(22, 130, 59, 0.06);
+
+    text-align: left;
+  }
+
+  /* LOCATION DETAILS */
+
+  .Organigo-header .organigo-location-details {
+    width: 100%;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 12px;
+    min-width: 0;
+  }
+
+  /* GREEN LOCATION ICON */
+
+  .Organigo-header .organigo-pin-icon {
+    width: 29px !important;
+    height: 29px !important;
+    min-width: 29px;
+
+    color: #16823B !important;
+  }
+
+  /* LOCATION TEXT */
+
+  .Organigo-header .organigo-location-address {
+    flex: 1;
+    min-width: 0;
+
+    display: flex !important;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .Organigo-header .organigo-location-address > span {
+    color: #16823B !important;
+
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.7px;
+  }
+
+  .Organigo-header .organigo-location-address > strong {
+    max-width: 100%;
+
+    color: #202820 !important;
+
+    font-size: 14px !important;
+    font-weight: 800 !important;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* DESKTOP STYLE ORANGE ARROW */
+
+  .Organigo-header .organigo-location-chevron {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+
+    margin-left: auto;
+
+    font-size: 0 !important;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .Organigo-header .organigo-location-chevron::after {
+    content: "";
+
+    width: 0;
+    height: 0;
+
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 7px solid #FF8A00;
+  }
+
+  /* DELIVERY STATUS - IMPORTANT FIX */
+
+  .Organigo-header .organigo-delivery-status {
+    width: 100%;
+
+    padding-left: 41px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap;
+
+    gap: 8px;
+  }
+
+  .Organigo-header .organigo-delivery-status > span {
+    font-size: 10px !important;
+    font-weight: 900 !important;
+  }
+
+  .Organigo-header .organigo-delivery-status small {
+    display: inline-block !important;
+
+    color: #718075 !important;
+    font-size: 10px !important;
+  }
+
+  .Organigo-header .status-available {
+    color: #16823B !important;
+  }
+
+  .Organigo-header .status-unavailable {
+    color: #D33434 !important;
+  }
+
+  .Organigo-header .status-pending {
+    color: #FF8A00 !important;
+  }
+
+  /* ACCOUNT ICON - ORANGE */
+
+  .Organigo-header .header-account-button {
+    background: #ffffff !important;
+    border: 1.5px solid #DCEADE !important;
+    color: #FF8A00 !important;
+  }
+
+  .Organigo-header .account-icon {
+    background: #FFF0DC !important;
+    color: #FF8A00 !important;
+  }
+
+  .Organigo-header .account-icon svg {
+    stroke: #FF8A00 !important;
+  }
+
+}
+/* =========================================
+   ORGANIGO - PREMIUM DELIVERY STATUS
+========================================= */
+
+/* MAIN STATUS CONTAINER */
+
+.Organigo-header .organigo-delivery-status {
+  width: 100%;
+  padding-left: 29px;
+
+  display: flex !important;
   align-items: center;
-  justify-content: flex-start;
-
-  text-decoration: none;
-}
-
-.organigo-header-logo-image {
-  display: block;
-  width: 150px;
-  height: 55px;
-
-  object-fit: contain;
-  object-position: left center;
-}
-
-/* LOCATION BAR */
-
-.Organigo-header .organigo-location-bar {
-  flex: 0 0 260px;
-  width: 260px;
-  min-width: 0;
-  min-height: 72px;
-
-  padding: 10px 13px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
+  flex-wrap: wrap;
   gap: 7px;
 
-  background: linear-gradient(135deg, #ffffff, #effaf0);
-  border: 1px solid #cce8d0;
-  border-radius: 13px;
-
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
+  margin-top: 2px;
 }
 
-.organigo-location-details {
-  display: flex;
+/* DELIVERY AVAILABLE BADGE */
+
+.Organigo-header .organigo-delivery-status > span {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-width: 0;
+  gap: 6px;
+
+  width: fit-content;
+
+  padding: 5px 10px;
+
+  border-radius: 30px;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
-.organigo-location-chevron {
-  margin-left: auto;
-  color: #168b45;
-  font-size: 19px;
+/* STATUS DOT */
+
+.Organigo-header .organigo-delivery-status > span::before {
+  content: "";
+
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+/* AVAILABLE */
+
+.Organigo-header .organigo-delivery-status > .status-available {
+  color: #137A35;
+  background: #E7F7EB;
+  border: 1px solid #C8EBD1;
+}
+
+.Organigo-header .organigo-delivery-status > .status-available::before {
+  background: #16823B;
+  box-shadow: 0 0 0 3px rgba(22, 130, 59, 0.12);
+
+  animation: organigoDeliveryPulse 1.8s infinite;
+}
+
+/* NOT AVAILABLE */
+
+.Organigo-header .organigo-delivery-status > .status-unavailable {
+  color: #C62828;
+  background: #FFF0F0;
+  border: 1px solid #FFD5D5;
+}
+
+.Organigo-header .organigo-delivery-status > .status-unavailable::before {
+  background: #D33434;
+}
+
+/* VERIFY LOCATION */
+
+.Organigo-header .organigo-delivery-status > .status-pending {
+  color: #B86A00;
+  background: #FFF3E2;
+  border: 1px solid #FFE0B3;
+}
+
+.Organigo-header .organigo-delivery-status > .status-pending::before {
+  background: #FF8A00;
+}
+
+/* DISTANCE BADGE */
+
+.Organigo-header .organigo-delivery-status > small {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 5px;
+
+  padding: 5px 9px;
+
+  color: #42634A;
+  background: #F1F7F1;
+
+  border: 1px solid #E0ECE1;
+  border-radius: 30px;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+/* DISTANCE ICON */
+
+.Organigo-header .organigo-delivery-status > small::before {
+  content: "↗";
+
+  color: #16823B;
+  font-size: 13px;
   font-weight: 900;
 }
 
-.organigo-delivery-status {
-  padding-left: 30px;
+/* PULSE ANIMATION */
+
+@keyframes organigoDeliveryPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(22, 130, 59, 0.25);
+  }
+
+  70% {
+    box-shadow: 0 0 0 5px rgba(22, 130, 59, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 130, 59, 0);
+  }
+}
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
+@media (max-width: 650px) {
+
+  .Organigo-header .organigo-delivery-status {
+    padding-left: 41px !important;
+
+    gap: 6px;
+    margin-top: 1px;
+  }
+
+  .Organigo-header .organigo-delivery-status > span {
+    padding: 5px 9px;
+    font-size: 9px;
+  }
+
+  .Organigo-header .organigo-delivery-status > small {
+    padding: 5px 8px;
+    font-size: 9px;
+  }
+}
+
+/* SMALL MOBILE */
+
+@media (max-width: 360px) {
+
+  .Organigo-header .organigo-delivery-status {
+    padding-left: 35px !important;
+    gap: 4px;
+  }
+
+  .Organigo-header .organigo-delivery-status > span {
+    padding: 4px 7px;
+    font-size: 8px;
+  }
+
+  .Organigo-header .organigo-delivery-status > small {
+    padding: 4px 7px;
+    font-size: 8px;
+  }
+}
+/* =========================================
+   ORGANIGO - PREMIUM DELIVERY COLORS
+   DARK GREEN + ORANGE
+========================================= */
+
+/* AVAILABLE BADGE */
+
+.Organigo-header .organigo-delivery-status > .status-available {
+  color: #FFFFFF !important;
+  background: #176B38 !important;
+  border: 1px solid #176B38 !important;
+
+  box-shadow: 0 2px 5px rgba(23, 107, 56, 0.15);
+}
+
+.Organigo-header .organigo-delivery-status > .status-available::before {
+  background: #A8F0B9 !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+}
+
+/* DISTANCE BADGE - ORANGE */
+
+.Organigo-header .organigo-delivery-status > small {
+  color: #A65300 !important;
+  background: #FFF1DE !important;
+  border: 1px solid #FFD6A3 !important;
+
+  font-weight: 800 !important;
+}
+
+.Organigo-header .organigo-delivery-status > small::before {
+  color: #F08000 !important;
+}
+
+/* NOT AVAILABLE */
+
+.Organigo-header .organigo-delivery-status > .status-unavailable {
+  color: #FFFFFF !important;
+  background: #B83B35 !important;
+  border: 1px solid #B83B35 !important;
+}
+
+.Organigo-header .organigo-delivery-status > .status-unavailable::before {
+  background: #FFD0CC !important;
+}
+
+/* VERIFY LOCATION */
+
+.Organigo-header .organigo-delivery-status > .status-pending {
+  color: #8A4B00 !important;
+  background: #FFF0D5 !important;
+  border: 1px solid #FFD28A !important;
+}
+
+.Organigo-header .organigo-delivery-status > .status-pending::before {
+  background: #FF8A00 !important;
 }
 
 /* MOBILE */
 
 @media (max-width: 650px) {
-
-  .organigo-header-logo {
-    display: none !important;
+  .Organigo-header .organigo-delivery-status > span {
+    padding: 6px 10px !important;
+    font-size: 9px !important;
+    border-radius: 20px !important;
   }
 
-  .Organigo-header .header-container {
-    grid-template-columns: minmax(0, 1fr) 44px !important;
-    grid-template-areas:
-      "location account"
-      "search search" !important;
-  }
-
-  .Organigo-header .organigo-location-bar {
-    grid-area: location;
-    width: 100%;
-    min-height: 76px;
-    padding: 8px 10px;
-  }
-
-  .organigo-location-address > strong {
-    font-size: 11px;
+  .Organigo-header .organigo-delivery-status > small {
+    padding: 6px 10px !important;
+    font-size: 9px !important;
+    border-radius: 20px !important;
   }
 }
-
-/* TABLET */
-
-@media (min-width: 651px) and (max-width: 1100px) {
-
-  .organigo-header-logo {
-    flex: 0 0 120px;
-    width: 120px;
-  }
-
-  .organigo-header-logo-image {
-    width: 115px;
-    height: 48px;
-  }
-
-  .Organigo-header .organigo-location-bar {
-    flex: 1;
-    width: 100%;
-  }
-}
-/* =====================================================
-ORGANIGO - PREMIUM DESKTOP HEADER UPDATE
-===================================================== */
-
-@media (min-width: 1101px) {
-
-.Organigo-header {
-background: #ffffff;
-border-bottom: 1px solid #eeeeee;
-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-}
-
-.Organigo-header .header-container {
-width: 100%;
-max-width: 1900px;
-min-height: 90px;
-padding: 10px 35px;
-
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: 22px;
-
-}
-
-/* LOGO */
-
-.organigo-header-logo {
-flex: 0 0 155px;
-width: 155px;
-}
-
-.organigo-header-logo-image {
-width: 150px;
-height: 55px;
-}
-
-/* DELIVERY LOCATION */
-
-.Organigo-header .organigo-location-bar {
-flex: 0 0 260px;
-width: 260px;
-min-height: 65px;
-
-padding: 8px 5px;
-
-background: transparent;
-border: none;
-border-radius: 0;
-box-shadow: none;
-
-gap: 5px;
-
-}
-
-.Organigo-header .organigo-location-bar:hover {
-background: #f7fbf7;
-border: none;
-box-shadow: none;
-}
-
-.organigo-location-details {
-gap: 8px;
-}
-
-.organigo-pin-icon {
-width: 21px;
-height: 21px;
-}
-
-.organigo-location-address > span {
-color: #202820;
-font-size: 17px;
-font-weight: 900;
-letter-spacing: 0;
-}
-
-.organigo-location-address > strong {
-max-width: 215px;
-color: #657168;
-font-size: 12px;
-font-weight: 500;
-}
-
-.organigo-location-chevron {
-margin-left: auto;
-font-size: 17px;
-}
-
-.organigo-delivery-status {
-padding-left: 29px;
-gap: 8px;
-}
-
-.organigo-delivery-status > span {
-font-size: 10px;
-}
-
-/* SEARCH */
-
-.Organigo-header .header-search {
-flex: 1;
-min-width: 180px;
-height: 53px;
-
-padding: 0 17px;
-
-background: #f7f8fa;
-border: 1px solid #e5e7eb;
-border-radius: 13px;
-
-box-shadow: none;
-
-}
-
-.Organigo-header .header-search:focus-within {
-background: #ffffff;
-border-color: #159447;
-box-shadow: 0 0 0 3px rgba(21, 148, 71, 0.08);
-}
-
-.Organigo-header .header-search input {
-font-size: 14px;
-}
-
-/* ACCOUNT */
-
-.Organigo-header .header-account {
-display: block;
-position: relative;
-flex-shrink: 0;
-}
-
-.Organigo-header .header-account-button {
-min-width: 105px;
-min-height: 48px;
-padding: 8px 12px;
-
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 9px;
-
-background: transparent;
-border: none;
-border-radius: 9px;
-
-color: #26382b;
-font-family: inherit;
-font-size: 15px;
-font-weight: 600;
-
-}
-
-.Organigo-header .header-account-button::after {
-content: "Account";
-}
-
-.Organigo-header .header-account-button:hover {
-background: #f2f8f3;
-}
-
-.Organigo-header .account-icon {
-width: 27px;
-height: 27px;
-background: transparent;
-color: #26382b;
-}
-
-.Organigo-header .account-icon svg {
-width: 23px;
-height: 23px;
-}
-
-/* ACCOUNT DROPDOWN */
-
-.Organigo-header .account-dropdown {
-position: fixed;
-top: 90px;
-right: 35px;
-
-width: 305px;
-max-width: calc(100vw - 30px);
-
-padding: 15px;
-
-background: #ffffff;
-border: none;
-border-radius: 0 0 18px 18px;
-
-box-shadow: 0 12px 35px rgba(0, 0, 0, 0.16);
-
-z-index: 1002;
-
-}
-
-.Organigo-header .account-dropdown-heading {
-padding: 16px;
-}
-
-.Organigo-header .account-dropdown-heading strong {
-font-size: 17px;
-}
-
-.Organigo-header .account-dropdown > a,
-.Organigo-header .account-logout-button {
-padding: 14px;
-font-size: 14px;
-}
-
-/* HIDE OLD DESKTOP LOGIN BUTTON */
-
-.Organigo-header .header-login {
-display: none !important;
-}
-
-/* DESKTOP CART */
-
-.Organigo-header .header-cart {
-min-width: 120px;
-min-height: 53px;
-border-radius: 11px;
-}
-
-/* LOCATION POPUP - LEFT SIDE */
-
-.Organigo-header .location-modal-backdrop {
-align-items: flex-start;
-justify-content: flex-start;
-
-padding: 90px 0 30px 5.4%;
-
-}
-
-.Organigo-header .location-modal {
-width: 550px;
-max-width: min(550px, 90vw);
-max-height: calc(100vh - 115px);
-
-padding: 26px;
-
-border-radius: 0 0 14px 14px;
-box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
-
-}
-
-}
-
-/* =====================================================
-ACCOUNT OPEN OVERLAY - DESKTOP
-===================================================== */
-
-@media (min-width: 1101px) {
-
-.Organigo-header:has(.account-dropdown)::after {
-content: "";
-position: fixed;
-inset: 0;
-
-background: rgba(0, 0, 0, 0.25);
-
-z-index: 900;
-pointer-events: none;
-
-}
-
-.Organigo-header .header-account {
-z-index: 1001;
-}
-
-.Organigo-header .account-dropdown {
-z-index: 1002;
-}
-
-}
-
-/* =====================================================
-TABLET HEADER
-===================================================== */
-
-@media (min-width: 651px) and (max-width: 1100px) {
-
-.Organigo-header .header-account {
-display: block;
-}
-
-.Organigo-header .header-login {
-display: none !important;
-}
-
-.Organigo-header .account-dropdown {
-right: 0;
-}
-
-}
-
-/* =====================================================
-MOBILE - PRESERVE EXISTING LAYOUT
-===================================================== */
+/* =========================================
+   ORGANIGO - LOCATION ADDRESS FINAL DESIGN
+========================================= */
 
 @media (max-width: 650px) {
 
-.Organigo-header .header-account-button::after {
-content: none;
+  /* LOCATION BAR */
+
+  .Organigo-header .organigo-location-bar {
+    min-height: 100px !important;
+    padding: 12px 14px !important;
+    gap: 7px !important;
+
+    background: #FFFFFF !important;
+    border: 1px solid #D5E9D9 !important;
+    border-radius: 16px !important;
+  }
+
+  /* LOCATION ICON + ADDRESS */
+
+  .Organigo-header .organigo-location-details {
+    display: flex !important;
+    align-items: center !important;
+    gap: 11px !important;
+  }
+
+  .Organigo-header .organigo-pin-icon {
+    width: 29px !important;
+    height: 29px !important;
+    color: #16823B !important;
+  }
+
+  /* ADDRESS TEXT */
+
+  .Organigo-header .organigo-location-address {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+    min-width: 0;
+  }
+
+  .Organigo-header .organigo-location-address > span {
+    font-size: 10px !important;
+    font-weight: 900 !important;
+    color: #16823B !important;
+    letter-spacing: 1px !important;
+  }
+
+  .Organigo-header .organigo-location-address > strong {
+    max-width: 100% !important;
+
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    line-height: 1.35 !important;
+
+    color: #202820 !important;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ORANGE DROPDOWN */
+
+  .Organigo-header .organigo-location-chevron {
+    color: #FF8A00 !important;
+  }
+
+  /* DELIVERY STATUS */
+
+  .Organigo-header .organigo-delivery-status {
+    padding-left: 40px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap;
+    gap: 9px !important;
+  }
+
+  /* AVAILABLE STATUS */
+
+  .Organigo-header .organigo-delivery-status > .status-available {
+    padding: 0 !important;
+
+    color: #16823B !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    font-size: 10px !important;
+    font-weight: 800 !important;
+  }
+
+  .Organigo-header .organigo-delivery-status > .status-available::before {
+    width: 7px;
+    height: 7px;
+    background: #16823B !important;
+    box-shadow: none !important;
+  }
+
+  /* DISTANCE - SMALL ORANGE TEXT */
+
+  .Organigo-header .organigo-delivery-status > small {
+    padding: 0 !important;
+
+    color: #F08000 !important;
+    background: transparent !important;
+    border: none !important;
+
+    font-size: 9px !important;
+    font-weight: 800 !important;
+  }
+
+  .Organigo-header .organigo-delivery-status > small::before {
+    content: "•";
+    color: #FF8A00 !important;
+    font-size: 12px !important;
+  }
+
+  /* NOT AVAILABLE */
+
+  .Organigo-header .organigo-delivery-status > .status-unavailable {
+    padding: 0 !important;
+    color: #D33434 !important;
+    background: transparent !important;
+    border: none !important;
+  }
+
+  /* VERIFY LOCATION */
+
+  .Organigo-header .organigo-delivery-status > .status-pending {
+    padding: 0 !important;
+    color: #E47B00 !important;
+    background: transparent !important;
+    border: none !important;
+  }
 }
 
-.Organigo-header .header-login {
-display: none !important;
-}
+/* SMALL MOBILE */
+
+@media (max-width: 360px) {
+
+  .Organigo-header .organigo-location-address > strong {
+    font-size: 13px !important;
+  }
+
+  .Organigo-header .organigo-location-bar {
+    min-height: 92px !important;
+    padding: 10px !important;
+  }
 
 }
 /* =====================================
-   SOLID DROPDOWN ARROW ICONS
+   ORGANIGO GPS PERMISSION BANNER
 ===================================== */
 
-@media (min-width: 1101px) {
+.Organigo-header .location-permission-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 
-  /* LOCATION ARROW */
+  padding: 14px;
 
-  .Organigo-header .organigo-location-chevron {
-    font-size: 0 !important;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 8px;
-  }
-
-  .Organigo-header .organigo-location-chevron::after {
-    content: "";
-    width: 0;
-    height: 0;
-
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-top: 7px solid #111111;
-  }
-
-  /* ACCOUNT ARROW */
-
-  .Organigo-header .header-account-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-  }
-
-  .Organigo-header .header-account-button::after {
-    content: "Account";
-
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-
-    color: #222222;
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  .Organigo-header .header-account-button::before {
-    content: "";
-    width: 0;
-    height: 0;
-
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-top: 7px solid #111111;
-
-    order: 2;
-  }
-
+  background: #F0F8F1;
+  border: 1px solid #D5E9D8;
+  border-radius: 14px;
 }
+
+.Organigo-header .location-permission-icon {
+  width: 65px;
+  min-width: 65px;
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #FFFFFF;
+  border-radius: 10px;
+}
+
+.Organigo-header .location-permission-icon img {
+  width: 58px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.Organigo-header .location-permission-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.Organigo-header .location-permission-text strong {
+  display: block;
+  color: #176B38;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.Organigo-header .location-permission-text p {
+  margin: 5px 0 0;
+  color: #657468;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.Organigo-header .location-permission-banner button {
+  padding: 9px 13px;
+
+  color: #FFFFFF;
+  background: #16823B;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.Organigo-header .location-permission-banner button:hover {
+  background: #106B30;
+}
+
+.Organigo-header .location-permission-banner button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+@media (max-width: 360px) {
+  .Organigo-header .location-permission-banner {
+    gap: 7px;
+    padding: 10px;
+  }
+
+  .Organigo-header .location-permission-icon {
+    width: 48px;
+    min-width: 48px;
+  }
+
+  .Organigo-header .location-permission-icon img {
+    width: 45px;
+  }
+
+  .Organigo-header .location-permission-text strong {
+    font-size: 10px;
+  }
+
+  .Organigo-header .location-permission-text p {
+    font-size: 9px;
+  }
+
+  .Organigo-header .location-permission-banner button {
+    padding: 8px;
+    font-size: 10px;
+  }
+}
+/* =====================================
+   ORGANIGO PREMIUM SEARCH + VOICE SEARCH
+===================================== */
+
+.Organigo-header .header-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 10px 0 15px;
+  background: #ffffff;
+  border: 1.5px solid #dce9df;
+  border-radius: 12px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.Organigo-header .header-search:focus-within {
+  border-color: #16823b;
+  box-shadow: 0 0 0 3px rgba(22, 130, 59, 0.10);
+}
+
+.Organigo-header .header-search-icon {
+  width: 21px;
+  height: 21px;
+  min-width: 21px;
+  color: #16823b;
+}
+
+.Organigo-header .header-search input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #202820;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.Organigo-header .header-search input::placeholder {
+  color: #89958b;
+  opacity: 1;
+}
+
+.Organigo-header .header-search-clear {
+  border: none;
+  background: transparent;
+  color: #778477;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.Organigo-header .header-search-mic {
+  width: 35px;
+  min-width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9px;
+  background: #fff0dc;
+  color: #ff8a00;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.Organigo-header .header-search-mic svg {
+  width: 20px;
+  height: 20px;
+}
+
+.Organigo-header .header-search-mic:hover {
+  background: #ff8a00;
+  color: #ffffff;
+}
+
+.Organigo-header .header-search-mic.listening {
+  background: #16823b;
+  color: #ffffff;
+  animation: organigoMicPulse 1s infinite;
+}
+
+.Organigo-header .header-search-mic:disabled {
+  cursor: not-allowed;
+}
+
+@keyframes organigoMicPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(22, 130, 59, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(22, 130, 59, 0);
+  }
+}
+
+@media (max-width: 650px) {
+  .Organigo-header .header-search {
+    height: 44px;
+    border-radius: 11px;
+  }
+
+  .Organigo-header .header-search input {
+    font-size: 13px;
+  }
+
+  .Organigo-header .header-search-mic {
+    width: 33px;
+    min-width: 33px;
+    height: 33px;
+  }
+}
+
+/* =====================================================
+   ORGANIGO LOCATION SELECTOR - RESPONSIVE FINAL OVERRIDE
+   Desktop: centered modal | Mobile: Blinkit-style bottom sheet
+===================================================== */
+
+/* Compact desktop location bar */
 @media (min-width: 1101px) {
-
-  /* Location dropdown arrow */
-  .Organigo-header .organigo-location-chevron::after {
-    border-top-color: #ff8c00 !important;
+  .Organigo-header .organigo-location-bar {
+    flex: 0 0 225px !important;
+    width: 225px !important;
+    max-width: 225px !important;
   }
 
-  /* Account dropdown arrow */
-  .Organigo-header .header-account-button::before {
-    border-top-color: #ff8c00 !important;
+  .Organigo-header .organigo-location-address > strong {
+    max-width: 175px !important;
+  }
+}
+
+/* Tablet location sizing */
+@media (min-width: 651px) and (max-width: 1100px) {
+  .Organigo-header .organigo-location-bar {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+.location-modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+  background: rgba(20, 28, 22, 0.68) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.location-modal {
+  position: relative !important;
+  width: min(480px, calc(100vw - 32px)) !important;
+  max-width: 480px !important;
+  max-height: min(82vh, 760px) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding: 25px !important;
+  border: 1px solid #e7ece8;
+  border-radius: 20px !important;
+  background: #f5f6fc !important;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.25) !important;
+  scrollbar-width: thin;
+}
+
+.location-modal-heading {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 0 0 18px !important;
+  padding-right: 38px;
+}
+
+.location-modal-heading h2 {
+  color: #202820 !important;
+  font-size: 21px !important;
+  font-weight: 900 !important;
+}
+
+.location-modal-heading p {
+  margin-top: 5px !important;
+  color: #758078 !important;
+  font-size: 12px !important;
+}
+
+.location-modal-logo {
+  display: block;
+  width: 46px;
+  height: 40px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.location-modal-close {
+  position: absolute !important;
+  top: 17px !important;
+  right: 17px !important;
+  width: 34px !important;
+  height: 34px !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #202820 !important;
+  color: #ffffff !important;
+  font-size: 25px !important;
+  line-height: 1 !important;
+  cursor: pointer;
+}
+
+.location-search-box {
+  min-height: 48px !important;
+  padding: 0 12px !important;
+  margin-bottom: 12px;
+  background: #ffffff !important;
+  border: 1px solid #d8ded9 !important;
+  border-radius: 12px !important;
+}
+
+.location-search-box > svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  color: #28332b;
+}
+
+.location-search-box input {
+  font-size: 14px !important;
+}
+
+.location-search-clear {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 50%;
+  background: #f0f2f0;
+  color: #5d685f;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.use-current-location-btn {
+  min-height: 47px !important;
+  justify-content: flex-start !important;
+  margin: 10px 0 18px;
+  padding: 10px 13px !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  color: #16823b !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+}
+
+.use-current-location-btn:hover:not(:disabled) {
+  background: #eaf6ed !important;
+}
+
+.saved-addresses-section {
+  margin: 12px 0 0 !important;
+}
+
+.saved-addresses-heading {
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+.address-section-heading {
+  color: #69736c !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.saved-addresses-heading > a {
+  font-size: 11px !important;
+  white-space: nowrap;
+}
+
+.saved-address-item {
+  align-items: center !important;
+  padding: 12px !important;
+  border: 0 !important;
+  border-radius: 13px !important;
+  background: #ffffff !important;
+}
+
+.saved-address-item.selected {
+  border: 1px solid #16823b !important;
+  background: #f0f8f1 !important;
+}
+
+.saved-address-icon {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  border-radius: 10px !important;
+}
+
+.saved-address-details {
+  gap: 3px !important;
+}
+
+.saved-address-details strong {
+  color: #26332a !important;
+  font-size: 13px !important;
+}
+
+.saved-address-details small {
+  font-size: 11px !important;
+}
+
+.address-saving {
+  color: #16823b;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.location-login-prompt {
+  padding: 13px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #68736b;
+  font-size: 12px;
+}
+
+.location-login-prompt p {
+  margin: 0 0 8px;
+}
+
+.location-login-prompt a {
+  color: #16823b;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.location-modal .request-address-btn {
+  min-height: 44px !important;
+  margin: 14px 0 0 !important;
+  padding: 8px 10px !important;
+  font-size: 12px !important;
+}
+
+.location-modal .request-address-icon {
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 18px !important;
+}
+
+.location-modal-footer {
+  margin: 12px 0 0 !important;
+  font-size: 10px !important;
+}
+
+.current-selected-location {
+  margin: 0 0 15px !important;
+  padding: 10px 12px !important;
+}
+
+.current-selected-location p,
+.current-selected-location small {
+  font-size: 11px !important;
+}
+
+@media (max-width: 650px) {
+  .Organigo-header .organigo-location-bar {
+    width: min(100%, 320px) !important;
+    max-width: 320px !important;
+    min-height: 82px !important;
+    padding: 9px 11px !important;
   }
 
-}            
+  .location-modal-backdrop {
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding: 0 !important;
+  }
+
+  .location-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: min(68vh, 560px) !important;
+    max-height: 68vh !important;
+    min-height: 390px;
+    margin: 0 !important;
+    padding: 15px 12px max(22px, env(safe-area-inset-bottom)) !important;
+    border: 0 !important;
+    border-radius: 22px 22px 0 0 !important;
+    background: #f4f5fb !important;
+    box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.14) !important;
+    overflow-y: auto !important;
+  }
+
+  .location-modal-close {
+    top: -51px !important;
+    right: calc(50% - 18px) !important;
+    width: 38px !important;
+    height: 38px !important;
+    background: #171a18 !important;
+    font-size: 27px !important;
+  }
+
+  .location-modal-heading {
+    align-items: center !important;
+    margin: 0 0 13px !important;
+    padding: 0 !important;
+  }
+
+  .location-modal-heading h2 {
+    font-size: 17px !important;
+  }
+
+  .location-modal-heading p {
+    display: none;
+  }
+
+  .location-modal-logo {
+    width: 39px;
+    height: 34px;
+  }
+
+  .location-search-box {
+    min-height: 43px !important;
+    margin-bottom: 10px;
+    border-radius: 11px !important;
+  }
+
+  .location-search-box input {
+    padding: 10px 0 !important;
+    font-size: 13px !important;
+  }
+
+  .use-current-location-btn {
+    min-height: 44px !important;
+    margin: 0 0 15px !important;
+    padding: 9px 11px !important;
+    background: #ffffff !important;
+    font-size: 12px !important;
+  }
+
+  .saved-addresses-heading {
+    margin-bottom: 9px !important;
+  }
+
+  .saved-address-item {
+    padding: 11px !important;
+  }
+
+  .location-modal .request-address-btn {
+    margin-top: 12px !important;
+  }
+
+  .location-modal-footer {
+    display: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .Organigo-header .organigo-location-bar {
+    width: min(100%, 285px) !important;
+    max-width: 285px !important;
+  }
+
+  .location-modal {
+    min-height: 360px;
+    height: 70vh !important;
+    max-height: 70vh !important;
+  }
+}
+/* =========================================
+   ORGANIGO LOCATION MODAL FIX
+========================================= */
+
+.location-modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 999999 !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+  background: rgba(20, 30, 23, 0.68);
+  backdrop-filter: blur(5px);
+}
+
+.location-modal {
+  position: relative !important;
+  z-index: 1000000 !important;
+
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 24px;
+}
+
+/* CLOSE BUTTON */
+
+.location-modal-close {
+  position: absolute !important;
+  top: -48px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  width: 40px !important;
+  height: 40px !important;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  border: none !important;
+  border-radius: 50% !important;
+
+  background: #171717 !important;
+  color: white !important;
+
+  font-size: 30px !important;
+  cursor: pointer;
+  z-index: 1000002 !important;
+}
+
+/* HIDE CART WHEN LOCATION OPENS */
+
+body.organigo-location-modal-open .organigo-floating-cart {
+  display: none !important;
+}
+
+body.organigo-location-modal-open .bottom-navigation {
+  display: none !important;
+}
+
+body.organigo-location-modal-open .header-cart {
+  visibility: hidden !important;
+}
+
+/* DESKTOP LOCATION BAR WIDTH */
+
+@media (min-width: 1101px) {
+  .Organigo-header .organigo-location-bar {
+    width: 225px !important;
+    max-width: 225px !important;
+    flex-shrink: 0;
+  }
+}
+
+/* MOBILE LOCATION MODAL */
+
+@media (max-width: 650px) {
+  .location-modal-backdrop {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .location-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 70vh !important;
+    max-height: 70vh !important;
+
+    border-radius: 22px 22px 0 0 !important;
+    padding: 22px 16px 35px !important;
+  }
+
+  .location-modal-close {
+    top: -48px !important;
+  }
+
+  .location-modal-heading h2 {
+    font-size: 18px;
+  }
+
+  .location-modal-logo {
+    width: 65px;
+    height: auto;
+  }
+}

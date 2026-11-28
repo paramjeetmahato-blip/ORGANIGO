@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { getToken } from "../utils/auth";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
@@ -12,12 +12,9 @@ const DEFAULT_HUB = {
   active: true,
 };
 
-// Distance calculate karne ka function
 function getDistanceKm(lat1, lon1, lat2, lon2) {
   const toRad = (value) => (value * Math.PI) / 180;
-
   const earthRadius = 6371;
-
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
 
@@ -30,34 +27,25 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
   return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// Admin delivery settings
 function getDeliverySettings() {
   try {
     const saved = localStorage.getItem("organigoDeliverySettings");
-
     if (!saved) return DEFAULT_HUB;
-
-    return {
-      ...DEFAULT_HUB,
-      ...JSON.parse(saved),
-    };
+    return { ...DEFAULT_HUB, ...JSON.parse(saved) };
   } catch {
     return DEFAULT_HUB;
   }
 }
 
-// Customer selected location
 function getCustomerLocation() {
   try {
     const saved = localStorage.getItem("organigoSelectedLocation");
-
     return saved ? JSON.parse(saved) : null;
   } catch {
     return null;
   }
 }
 
-// Delivery verification
 function checkDeliveryAvailability() {
   const location = getCustomerLocation();
   const settings = getDeliverySettings();
@@ -78,7 +66,6 @@ function checkDeliveryAvailability() {
 
   const customerLat = Number(location.latitude);
   const customerLon = Number(location.longitude);
-
   const hubLat = Number(settings.latitude);
   const hubLon = Number(settings.longitude);
   const radius = Number(settings.radius);
@@ -119,16 +106,22 @@ function checkDeliveryAvailability() {
   return {
     available: false,
     distance: distance.toFixed(2),
-    message: `Sorry! Your location is ${distance.toFixed(
-      2
-    )} km away. Our delivery radius is ${radius} km.`,
+    message: `Your location is ${distance.toFixed(2)} km away. Our delivery radius is ${radius} km.`,
   };
 }
 
+const formatPrice = (amount) =>
+  `₹${Number(amount || 0).toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+  })}`;
+
 function Cart() {
   const navigate = useNavigate();
-
   const [checkoutMessage, setCheckoutMessage] = useState("");
+  const [donationSelected, setDonationSelected] = useState(false);
+  const [selectedTip, setSelectedTip] = useState(0);
+  const [customTip, setCustomTip] = useState("");
+  const [showCustomTip, setShowCustomTip] = useState(false);
 
   const {
     cartItems,
@@ -139,10 +132,50 @@ function Cart() {
     cartTotal,
   } = useCart();
 
-  const delivery = checkDeliveryAvailability();
+  const delivery = useMemo(() => checkDeliveryAvailability(), [cartItems.length]);
+  const itemCount = cartItems.reduce(
+    (total, item) => total + Number(item.quantity || 0),
+    0
+  );
+  const subtotal = Number(cartTotal || 0);
+  const validCustomTip = Math.max(0, Number(customTip) || 0);
+  const tipAmount = showCustomTip ? validCustomTip : selectedTip;
+  const donationAmount = donationSelected ? 1 : 0;
+
+  // Delivery/handling fees are intentionally not guessed here.
+  // They must be calculated by the existing checkout/backend rules.
+  const estimatedTotal = subtotal + tipAmount + donationAmount;
+
+  const handleShare = async () => {
+    const shareData = {
+      title: "ORGANIGO Cart",
+      text: `My ORGANIGO cart has ${itemCount} item(s), worth ${formatPrice(subtotal)}.`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareData.text);
+        window.alert("Cart details copied.");
+      } else {
+        window.alert(shareData.text);
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        console.error("Cart share failed:", error);
+      }
+    }
+  };
+
+  const handleTipSelect = (amount) => {
+    setShowCustomTip(false);
+    setCustomTip("");
+    setSelectedTip((current) => (current === amount ? 0 : amount));
+  };
 
   const handleCheckout = () => {
-    // Fresh delivery verification
     const latestDelivery = checkDeliveryAvailability();
 
     if (!latestDelivery.available) {
@@ -152,193 +185,293 @@ function Cart() {
 
     setCheckoutMessage("");
 
-    const token = getToken();
+    // Keep optional extras available for the next checkout integration step.
+    const cartExtras = {
+      donation: donationSelected ? 1 : 0,
+      deliveryTip: tipAmount,
+    };
 
+    sessionStorage.setItem("organigoCartExtras", JSON.stringify(cartExtras));
+
+    const token = getToken();
     if (token) {
-      navigate("/checkout");
+      navigate("/checkout", { state: { cartExtras } });
     } else {
       navigate("/login", {
-        state: { from: "/checkout" },
+        state: { from: "/checkout", cartExtras },
       });
     }
   };
 
-  return (
-    <div className="cart-page">
+  if (cartItems.length === 0) {
+    return (
+      <main className="cart-page">
+        <div className="cart-shell cart-empty-shell">
+          <header className="cart-topbar">
+            <button
+              type="button"
+              className="cart-back-button"
+              onClick={() => navigate("/")}
+              aria-label="Go back to shopping"
+            >
+              <span aria-hidden="true">←</span>
+            </button>
+            <h1>My Cart</h1>
+          </header>
 
-      <div className="cart-heading">
-        <h1>My Shopping Cart 🛒</h1>
-        <p>Manage your grocery items</p>
-      </div>
-
-      {cartItems.length === 0 ? (
-
-        <div className="empty-cart">
-          <div>🛒</div>
-          <h2>Your Cart is Empty!</h2>
-          <p>Add some fresh products to your cart.</p>
-
-          <button
-            className="continue-shopping"
-            onClick={() => navigate("/")}
-          >
-            Continue Shopping
-          </button>
+          <section className="cart-empty-state">
+            <div className="cart-empty-icon" aria-hidden="true">🛒</div>
+            <h1>Your cart is empty</h1>
+            <p>Fresh fruits, vegetables and daily essentials are waiting for you.</p>
+            <button
+              type="button"
+              onClick={() => navigate("/")}
+              className="cart-primary-button"
+            >
+              Continue shopping
+            </button>
+          </section>
         </div>
+      </main>
+    );
+  }
 
-      ) : (
+  return (
+    <main className="cart-page">
+      <div className="cart-shell">
+        <header className="cart-topbar">
+          <button
+            type="button"
+            className="cart-back-button"
+            onClick={() => navigate(-1)}
+            aria-label="Go back"
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+          <h1>My Cart</h1>
+          <button type="button" className="cart-share-button" onClick={handleShare}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 16V3m0 0L7 8m5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
+            </svg>
+            <span>Share</span>
+          </button>
+        </header>
 
-        <div className="cart-container">
+        <div className="cart-layout">
+          <section className="cart-main-column">
+            <div className="cart-delivery-card">
+              <div className="cart-delivery-icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48">
+                  <circle cx="24" cy="25" r="16" />
+                  <path d="M24 25V13m0 12 8-5M18 4h12" />
+                </svg>
+              </div>
+              <div className="cart-delivery-copy">
+                <strong>Delivery estimate at checkout</strong>
+                <span>Shipment of {itemCount} {itemCount === 1 ? "item" : "items"}</span>
+              </div>
+              <span className="cart-delivery-tag">ORGANIGO</span>
+            </div>
 
-          <div className="cart-products">
-
-            {cartItems.map((item) => (
-
-              <div className="cart-item" key={item.id}>
-
-                <div className="cart-product-image">
-                  {item.image ? (
-                    <img src={item.image} alt={item.name} />
-                  ) : (
-                    <span>{item.icon || "🛒"}</span>
-                  )}
-                </div>
-
-                <div className="cart-product-details">
-
-                  <h3>{item.name}</h3>
-                  <p>{item.weight || "Available"}</p>
-
-                  <strong>₹{item.price}</strong>
-
-                  <div className="quantity-controls">
-
-                    <button onClick={() => decreaseQuantity(item.id)}>
-                      −
-                    </button>
-
-                    <span>{item.quantity}</span>
-
-                    <button onClick={() => increaseQuantity(item.id)}>
-                      +
-                    </button>
-
+            <section className="cart-products-card" aria-label="Cart products">
+              {cartItems.map((item) => (
+                <article className="cart-item" key={item.id}>
+                  <div className="cart-product-image">
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} />
+                    ) : (
+                      <span>{item.icon || "🛒"}</span>
+                    )}
                   </div>
 
-                  <p className="item-total">
-                    Total: ₹{Number(item.price) * item.quantity}
-                  </p>
+                  <div className="cart-product-details">
+                    <h2>{item.name}</h2>
+                    <p className="cart-product-weight">{item.weight || "Available"}</p>
+                    <strong className="cart-product-price">{formatPrice(item.price)}</strong>
+                    <span className="cart-item-line-total">
+                      Item total: {formatPrice(Number(item.price) * Number(item.quantity))}
+                    </span>
+                    <button
+                      type="button"
+                      className="cart-remove-button"
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      Remove
+                    </button>
+                  </div>
 
-                  <button
-                    className="remove-item"
-                    onClick={() => removeFromCart(item.id)}
-                  >
-                    Remove
-                  </button>
+                  <div className="cart-quantity-control" aria-label={`Quantity for ${item.name}`}>
+                    <button
+                      type="button"
+                      onClick={() => decreaseQuantity(item.id)}
+                      aria-label={`Decrease ${item.name} quantity`}
+                    >
+                      −
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => increaseQuantity(item.id)}
+                      aria-label={`Increase ${item.name} quantity`}
+                    >
+                      +
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </section>
 
-                </div>
-
+            <section className="cart-bill-card">
+              <h2>Bill details</h2>
+              <div className="cart-bill-row">
+                <span><span className="cart-bill-symbol">▤</span> Items total</span>
+                <strong>{formatPrice(subtotal)}</strong>
               </div>
-
-            ))}
-
-          </div>
-
-          <div className="cart-summary">
-
-            <h2>Order Summary</h2>
-
-            <div className="summary-row">
-              <span>Subtotal</span>
-              <strong>₹{cartTotal}</strong>
-            </div>
-
-            <div className="summary-row">
-              <span>Delivery</span>
-              <strong>Free</strong>
-            </div>
-
-            <hr />
-
-            <div className="summary-total">
-              <span>Total Amount</span>
-              <strong>₹{cartTotal}</strong>
-            </div>
-
-            {/* DELIVERY STATUS */}
-
-            <div
-              style={{
-                marginTop: "15px",
-                marginBottom: "12px",
-                padding: "13px",
-                borderRadius: "10px",
-                background: delivery.available ? "#eaf8ee" : "#fff0f0",
-                border: `1px solid ${
-                  delivery.available ? "#c9ebd2" : "#ffdada"
-                }`,
-                color: delivery.available ? "#087a36" : "#b52b2b",
-                fontSize: "13px",
-                lineHeight: "1.5",
-              }}
-            >
-              <strong>
-                {delivery.available
-                  ? "✓ Delivery Available"
-                  : "✕ Delivery Not Available"}
-              </strong>
-
-              <p style={{ margin: "5px 0 0" }}>
-                {delivery.message}
-              </p>
-
-              {delivery.distance && (
-                <p style={{ margin: "5px 0 0" }}>
-                  Distance from delivery hub: {delivery.distance} km
-                </p>
+              <div className="cart-bill-row">
+                <span><span className="cart-bill-symbol">♧</span> Delivery charge</span>
+                <span className="cart-calculated-label">Calculated at checkout</span>
+              </div>
+              <div className="cart-bill-row">
+                <span><span className="cart-bill-symbol">▣</span> Handling charge</span>
+                <span className="cart-calculated-label">If applicable</span>
+              </div>
+              {donationAmount > 0 && (
+                <div className="cart-bill-row cart-extra-row">
+                  <span>Feeding India donation</span>
+                  <strong>{formatPrice(donationAmount)}</strong>
+                </div>
               )}
-            </div>
-
-            {/* CHECKOUT MESSAGE */}
-
-            {checkoutMessage && (
-              <p
-                style={{
-                  color: "#c02b2b",
-                  fontSize: "12px",
-                  marginBottom: "10px",
-                }}
-              >
-                {checkoutMessage}
+              {tipAmount > 0 && (
+                <div className="cart-bill-row cart-extra-row">
+                  <span>Delivery partner tip</span>
+                  <strong>{formatPrice(tipAmount)}</strong>
+                </div>
+              )}
+              <div className="cart-bill-divider" />
+              <div className="cart-grand-total">
+                <strong>Grand total*</strong>
+                <strong>{formatPrice(estimatedTotal)}</strong>
+              </div>
+              <p className="cart-bill-note">
+                *Delivery and handling charges, if any, are confirmed at checkout.
               </p>
-            )}
+            </section>
 
-            <button
-              className="checkout-btn"
-              onClick={handleCheckout}
-              disabled={!delivery.available}
-              style={{
-                opacity: delivery.available ? 1 : 0.5,
-                cursor: delivery.available ? "pointer" : "not-allowed",
-              }}
-            >
-              Proceed to Checkout →
-            </button>
+            <section className="cart-donation-card">
+              <div className="cart-donation-icon" aria-hidden="true">❤️</div>
+              <div className="cart-donation-copy">
+                <strong>Feeding India donation</strong>
+                <p>Support a meaningful cause with a small contribution.</p>
+              </div>
+              <strong className="cart-donation-amount">₹1</strong>
+              <input
+                type="checkbox"
+                checked={donationSelected}
+                onChange={(event) => setDonationSelected(event.target.checked)}
+                aria-label="Add one rupee donation"
+              />
+            </section>
 
-            <button
-              className="clear-cart-btn"
-              onClick={clearCart}
-            >
-              Clear Cart
-            </button>
+            <section className="cart-tip-card">
+              <h2>Tip your delivery partner</h2>
+              <p>Your kindness means a lot! Your tip is intended for your delivery partner.</p>
+              <div className="cart-tip-options">
+                {[20, 30, 50].map((amount) => (
+                  <button
+                    type="button"
+                    key={amount}
+                    className={selectedTip === amount && !showCustomTip ? "selected" : ""}
+                    onClick={() => handleTipSelect(amount)}
+                    aria-pressed={selectedTip === amount && !showCustomTip}
+                  >
+                    <span aria-hidden="true">{amount === 20 ? "✌️" : amount === 30 ? "💌" : "❤️"}</span>
+                    ₹{amount}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className={showCustomTip ? "selected" : ""}
+                  onClick={() => {
+                    setShowCustomTip(true);
+                    setSelectedTip(0);
+                  }}
+                  aria-pressed={showCustomTip}
+                >
+                  <span aria-hidden="true">👏</span> Custom
+                </button>
+              </div>
+              {showCustomTip && (
+                <label className="cart-custom-tip">
+                  Enter tip amount (₹)
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={customTip}
+                    onChange={(event) => setCustomTip(event.target.value)}
+                    placeholder="Enter amount"
+                  />
+                </label>
+              )}
+            </section>
 
-          </div>
+            <section className="cart-policy-card">
+              <h2>Cancellation Policy</h2>
+              <p>
+                Orders may not be cancellable once they are packed for delivery.
+                If an unexpected delay occurs, a refund will be provided where applicable
+                under ORGANIGO&apos;s policy.
+              </p>
+            </section>
+          </section>
 
+          <aside className="cart-side-column">
+            <section className="cart-side-summary">
+              <h2>Order summary</h2>
+              <div className="cart-bill-row">
+                <span>Items ({itemCount})</span>
+                <strong>{formatPrice(subtotal)}</strong>
+              </div>
+              <div className="cart-bill-row">
+                <span>Delivery</span>
+                <span className="cart-calculated-label">At checkout</span>
+              </div>
+              <div className="cart-bill-divider" />
+              <div className="cart-grand-total">
+                <strong>Subtotal</strong>
+                <strong>{formatPrice(estimatedTotal)}</strong>
+              </div>
+              <p className="cart-side-note">Final delivery charges are shown before order confirmation.</p>
+              <button type="button" className="cart-clear-button" onClick={clearCart}>
+                Clear cart
+              </button>
+            </section>
+
+            <div className={`cart-delivery-status ${delivery.available ? "is-available" : "is-unavailable"}`}>
+              <strong>{delivery.available ? "✓ Delivery available" : "Delivery location needed"}</strong>
+              <p>{delivery.message}</p>
+              {delivery.distance && <span>{delivery.distance} km from delivery hub</span>}
+            </div>
+            {checkoutMessage && <p className="cart-checkout-error" role="alert">{checkoutMessage}</p>}
+          </aside>
         </div>
+      </div>
 
-      )}
-
-    </div>
+      <div className="cart-sticky-checkout">
+        <div className="cart-sticky-total">
+          <strong>{formatPrice(estimatedTotal)}</strong>
+          <span> TOTAL</span>
+        </div>
+        <button
+          type="button"
+          onClick={handleCheckout}
+          disabled={!delivery.available}
+          title={!delivery.available ? delivery.message : "Proceed to checkout"}
+        >
+          Proceed <span aria-hidden="true">›</span>
+        </button>
+      </div>
+    </main>
   );
 }
 

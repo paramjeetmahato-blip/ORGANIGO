@@ -1,0 +1,704 @@
+/* =========================================
+   ORGANIGO - PRODUCT INVENTORY
+========================================= */
+
+.product-inventory {
+  width: 100%;
+  color: #202820;
+  padding-bottom: 30px;
+}
+
+.product-inventory * {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.pi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.pi-eyebrow {
+  display: inline-block;
+  color: #16823b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  margin-bottom: 7px;
+}
+
+.pi-header h1 {
+  font-size: 27px;
+  font-weight: 800;
+  margin: 0 0 7px;
+}
+
+.pi-header p {
+  color: #718071;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* =========================================
+   MESSAGES
+========================================= */
+
+.pi-message {
+  padding: 13px 16px;
+  border-radius: 9px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pi-message.error {
+  background: #fff0f0;
+  color: #c62828;
+  border: 1px solid #ffcaca;
+}
+
+.pi-message.success {
+  background: #eaf8ee;
+  color: #16823b;
+  border: 1px solid #c7e9d0;
+}
+
+/* =========================================
+   SUMMARY CARDS
+========================================= */
+
+.pi-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.pi-summary-card {
+  background: #ffffff;
+  border: 1px solid #e4ece5;
+  border-radius: 13px;
+  padding: 20px;
+  box-shadow: 0 3px 12px rgba(20, 70, 35, 0.04);
+}
+
+.pi-summary-card span {
+  display: block;
+  color: #748074;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 9px;
+}
+
+.pi-summary-card strong {
+  color: #16823b;
+  font-size: 27px;
+  font-weight: 800;
+}
+
+/* =========================================
+   COMMON CARD
+========================================= */
+
+.pi-card {
+  background: #ffffff;
+  border: 1px solid #e4ece5;
+  border-radius: 14px;
+  padding: 23px;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 15px rgba(20, 70, 35, 0.04);
+}
+
+.pi-card-heading {
+  margin-bottom: 22px;
+}
+
+.pi-card-heading h2,
+.pi-section-heading h2 {
+  font-size: 19px;
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+
+.pi-card-heading p,
+.pi-section-heading p {
+  font-size: 12px;
+  color: #778477;
+  margin: 0;
+}
+
+/* =========================================
+   FORM SECTION
+========================================= */
+
+.pi-form-section-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #16823b;
+  border-bottom: 1px solid #edf1ed;
+  padding-bottom: 11px;
+  margin: 25px 0 18px;
+}
+
+.pi-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+  margin-bottom: 18px;
+}
+
+.pi-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.pi-field label {
+  color: #354335;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pi-field input,
+.pi-field select,
+.pi-field textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #dce6dc;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 11px 12px;
+  color: #263326;
+  font-size: 13px;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.pi-field input:focus,
+.pi-field select:focus,
+.pi-field textarea:focus {
+  border-color: #16823b;
+  box-shadow: 0 0 0 3px rgba(22, 130, 59, 0.08);
+}
+
+.pi-field input[type="file"] {
+  padding: 8px;
+}
+
+.pi-field textarea {
+  resize: vertical;
+}
+
+/* =========================================
+   IMAGE PREVIEW
+========================================= */
+
+.pi-image-preview {
+  margin: 15px 0;
+}
+
+.pi-image-preview img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e1e9e1;
+}
+
+/* =========================================
+   PRODUCT TYPE CHOICES
+========================================= */
+
+.pi-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+  margin-bottom: 20px;
+}
+
+.pi-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 16px;
+  border: 1px solid #e0e9e0;
+  border-radius: 11px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.pi-choice.selected {
+  background: #eff9f1;
+  border-color: #16823b;
+  box-shadow: 0 0 0 2px rgba(22, 130, 59, 0.06);
+}
+
+.pi-choice input {
+  accent-color: #16823b;
+  width: 16px;
+  height: 16px;
+}
+
+.pi-choice strong {
+  font-size: 14px;
+  color: #243324;
+}
+
+.pi-choice span {
+  font-size: 11px;
+  color: #788478;
+}
+
+/* =========================================
+   PRICING
+========================================= */
+
+.pi-pricing-select {
+  max-width: 400px;
+  margin-bottom: 20px;
+}
+
+.pi-profit-preview {
+  display: inline-block;
+  background: #eaf8ee;
+  color: #365b3c;
+  border: 1px solid #ccebd4;
+  border-radius: 8px;
+  padding: 12px 15px;
+  font-size: 12px;
+  margin: 5px 0 15px;
+}
+
+.pi-profit-preview strong {
+  color: #16823b;
+  font-size: 15px;
+}
+
+/* =========================================
+   SECTION HEADINGS
+========================================= */
+
+.pi-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.pi-section-heading h3 {
+  font-size: 16px;
+  margin: 0 0 5px;
+}
+
+.pi-secondary-btn {
+  border: none;
+  background: #fff0dc;
+  color: #d96d00;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pi-secondary-btn:hover {
+  background: #ffe4bd;
+}
+
+/* =========================================
+   BULK PRICE TIERS
+========================================= */
+
+.pi-tier-section,
+.pi-variant-section {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid #e5ece5;
+  border-radius: 11px;
+  background: #fbfdfb;
+}
+
+.pi-tier-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e9eee9;
+}
+
+.pi-tier-row:last-child {
+  border-bottom: none;
+}
+
+/* =========================================
+   VARIANTS
+========================================= */
+
+.pi-variant-card {
+  background: #ffffff;
+  border: 1px solid #e2eae2;
+  border-radius: 11px;
+  padding: 17px;
+  margin-bottom: 15px;
+}
+
+.pi-variant-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 17px;
+}
+
+.pi-variant-heading h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #16823b;
+}
+
+.pi-remove-btn {
+  border: 1px solid #ffd1c8;
+  background: #fff0ed;
+  color: #d04432;
+  border-radius: 7px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pi-remove-btn:hover {
+  background: #ffe1db;
+}
+
+.pi-empty {
+  text-align: center;
+  padding: 35px 15px;
+  color: #778477;
+  font-size: 13px;
+}
+
+.pi-empty span {
+  display: block;
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.pi-empty h3 {
+  color: #354335;
+  margin: 0 0 7px;
+}
+
+/* =========================================
+   PRODUCT LABELS
+========================================= */
+
+.pi-checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 18px 0 25px;
+}
+
+.pi-checkbox-grid label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #465446;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pi-checkbox-grid input {
+  accent-color: #16823b;
+  width: 16px;
+  height: 16px;
+}
+
+/* =========================================
+   FORM ACTIONS
+========================================= */
+
+.pi-form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-top: 1px solid #edf1ed;
+  padding-top: 20px;
+  margin-top: 15px;
+}
+
+.pi-primary-btn {
+  border: none;
+  background: #16823b;
+  color: #ffffff;
+  padding: 12px 23px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pi-primary-btn:hover {
+  background: #116d31;
+}
+
+.pi-primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pi-cancel-btn {
+  border: none;
+  background: #fff0dc;
+  color: #d96d00;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* =========================================
+   PRODUCT LIST TOOLBAR
+========================================= */
+
+.pi-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.pi-toolbar input,
+.pi-toolbar select {
+  min-width: 0;
+  border: 1px solid #dce6dc;
+  border-radius: 8px;
+  padding: 11px 13px;
+  font-size: 12px;
+  outline: none;
+}
+
+.pi-toolbar input {
+  flex: 1;
+}
+
+.pi-toolbar select {
+  width: 210px;
+  background: #ffffff;
+}
+
+.pi-toolbar input:focus,
+.pi-toolbar select:focus {
+  border-color: #16823b;
+}
+
+/* =========================================
+   PRODUCT TABLE
+========================================= */
+
+.pi-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.pi-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 850px;
+}
+
+.pi-table th {
+  text-align: left;
+  background: #f2f8f2;
+  color: #465546;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 13px 12px;
+  white-space: nowrap;
+}
+
+.pi-table td {
+  border-bottom: 1px solid #edf1ed;
+  padding: 13px 12px;
+  font-size: 12px;
+  color: #455245;
+}
+
+.pi-product-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 150px;
+}
+
+.pi-product-cell img,
+.pi-product-placeholder {
+  width: 43px;
+  height: 43px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.pi-product-placeholder {
+  display: grid;
+  place-items: center;
+  background: #edf7ee;
+  font-size: 20px;
+}
+
+.pi-product-cell strong {
+  color: #263526;
+  font-size: 12px;
+}
+
+.pi-badge {
+  display: inline-block;
+  background: #fff0dc;
+  color: #d96d00;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.pi-stock-normal {
+  color: #16823b;
+  font-weight: 700;
+}
+
+.pi-stock-low {
+  color: #d04432;
+  font-weight: 800;
+}
+
+.pi-table-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.pi-edit-btn,
+.pi-delete-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pi-edit-btn {
+  background: #eaf8ee;
+  color: #16823b;
+}
+
+.pi-delete-btn {
+  background: #fff0ed;
+  color: #d04432;
+}
+
+/* =========================================
+   RESPONSIVE - TABLET
+========================================= */
+
+@media (max-width: 900px) {
+  .pi-card {
+    padding: 18px;
+  }
+
+  .pi-tier-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================
+   RESPONSIVE - MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+  .product-inventory {
+    padding-bottom: 20px;
+  }
+
+  .pi-header h1 {
+    font-size: 22px;
+  }
+
+  .pi-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .pi-summary-card {
+    padding: 15px;
+  }
+
+  .pi-summary-card strong {
+    font-size: 23px;
+  }
+
+  .pi-card {
+    padding: 15px;
+    border-radius: 11px;
+  }
+
+  .pi-card-heading h2,
+  .pi-section-heading h2 {
+    font-size: 17px;
+  }
+
+  .pi-form-grid {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .pi-choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pi-tier-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pi-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pi-toolbar {
+    flex-direction: column;
+  }
+
+  .pi-toolbar select {
+    width: 100%;
+  }
+
+  .pi-checkbox-grid {
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .pi-form-actions {
+    flex-direction: column;
+  }
+
+  .pi-form-actions button {
+    width: 100%;
+  }
+
+  .pi-variant-card {
+    padding: 13px;
+  }
+}

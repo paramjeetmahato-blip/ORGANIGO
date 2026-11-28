@@ -1,48 +1,129 @@
-/* =====================================
-   ORGANIGO - GLOBAL APP CSS
-===================================== */
 
-* {
+
+/* =========================================
+   ORGANIGO CART DRAWER MODE
+   Desktop: right-side drawer over Home
+   Mobile: full-screen cart, hide site header/search
+========================================= */
+
+.customer-layout.is-cart-open {
+  min-height: 100vh;
+}
+
+/* Keep the home page behind the dim overlay */
+.customer-layout.is-cart-open > .customer-main-header {
+  position: relative;
+  z-index: 1;
+}
+
+.customer-layout.is-cart-open > .customer-main-header,
+.customer-layout.is-cart-open > .customer-main-header * {
+  pointer-events: none;
+}
+
+/* Cart backdrop */
+.cart-page {
+  position: fixed !important;
+  z-index: 3000 !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: rgba(0, 0, 0, 0.68) !important;
+}
+
+/* Desktop right-side panel */
+.cart-page .cart-shell {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(410px, 100vw);
+  height: 100%;
+  max-width: none;
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  width: 100%;
-  min-height: 100%;
+  padding: 10px 10px 105px;
   overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #f3f5fb;
+  box-shadow: -8px 0 28px rgba(0, 0, 0, 0.16);
+  scrollbar-width: thin;
 }
 
-body {
-  width: 100%;
+.cart-page .cart-topbar {
+  position: sticky;
+  top: -10px;
+  z-index: 5;
+  margin: -10px -10px 10px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.cart-page .cart-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cart-page .cart-main-column {
+  gap: 12px;
+}
+
+.cart-page .cart-side-column {
+  position: static;
+  display: flex;
+}
+
+.cart-page .cart-side-summary {
+  display: none;
+}
+
+/* Fixed checkout bar stays inside the desktop drawer */
+.cart-page .cart-sticky-checkout {
+  z-index: 3010;
+  right: 0;
+  left: auto;
+  width: min(410px, 100vw);
+  padding: 10px 14px;
+  border-radius: 15px 15px 0 0;
+}
+
+.cart-page .cart-sticky-checkout button {
   min-width: 0;
-  min-height: 100vh;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
+  width: 58%;
 }
 
-#root {
-  width: 100%;
-  max-width: 100%;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow-x: clip;
-}
+/* Mobile: remove main ORGANIGO header and its search bar */
+@media (max-width: 680px) {
+  .customer-layout.is-cart-open > .customer-main-header {
+    display: none !important;
+  }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
+  .customer-layout.is-cart-open > .cart-page {
+    background: #f3f5fb !important;
+  }
 
-img {
-  max-width: 100%;
-}
+  .cart-page .cart-shell {
+    width: 100%;
+    height: 100%;
+    padding: 8px 9px 105px;
+    background: #f3f5fb;
+    box-shadow: none;
+  }
 
-a {
-  text-decoration: none;
+  .cart-page .cart-topbar {
+    top: -8px;
+    margin: -8px -9px 12px;
+    padding: 8px 11px;
+  }
+
+  .cart-page .cart-sticky-checkout {
+    right: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 9px max(10px, env(safe-area-inset-bottom));
+  }
 }
